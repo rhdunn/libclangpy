@@ -50,3 +50,5 @@ libclang.load()
 
 test_SourceLocation()
 test_SourceRange()
+
+index = libclang.Index()

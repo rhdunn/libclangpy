@@ -352,3 +352,16 @@ class TranslationUnit:
 		for i in range(0, _libclang.clang_getNumDiagnostics(self._tu)):
 			d = _libclang.clang_getDiagnostic(self._tu, i)
 			yield Diagnostic(d)
+
+class Index:
+	@requires(2.7, 'clang_createIndex', [c_int, c_int], c_void_p)
+	def __init__(self, exclude_from_pch=True, display_diagnostics=False):
+		self._index = _libclang.clang_createIndex(exclude_from_pch, display_diagnostics)
+
+	@requires(2.7, 'clang_disposeIndex', [c_void_p])
+	def __del__(self):
+		_libclang.clang_disposeIndex(self._index)
+
+	@requires(2.7, 'clang_setUseExternalASTGeneration', [c_void_p, c_int])
+	def use_external_ast_generation(self, use_external_ast):
+		_libclang.clang_setUseExternalASTGeneration(self._index, use_external_ast)
