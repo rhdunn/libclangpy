@@ -71,6 +71,14 @@ class _CXUnsavedFile(Structure):
 		('length', c_uint)
 	]
 
+class _CXCursor(Structure):
+	_fields_ = [
+		('kind', c_uint),
+		('data', c_void_p * 3)
+	]
+
+cb_cursor_visitor = CFUNCTYPE(c_int, _CXCursor, _CXCursor, py_object)
+
 def _marshall_args(args):
 	if not args or len(args) == 0:
 		return 0, None
@@ -371,6 +379,25 @@ class Diagnostic:
 			s  = _libclang.clang_getDiagnosticFixIt(self._d, i, byref(sr))
 			yield (SourceRange(sr), _to_str(s))
 
+class Linkage:
+	@requires(2.7)
+	def __init__(self, value):
+		self.value = value
+
+	@requires(2.7)
+	def __eq__(self, other):
+		return self.value == other.value
+
+	@requires(2.7)
+	def __ne__(self, other):
+		return self.value != other.value
+
+Linkage.INVALID = Linkage(0) # 2.7
+Linkage.NO_LINKAGE = Linkage(1) # 2.7
+Linkage.INTERNAL = Linkage(2) # 2.7
+Linkage.UNIQUE_EXTERNAL = Linkage(3) # 2.7
+Linkage.EXTERNAL = Linkage(4) # 2.7
+
 class CursorKind:
 	@requires(2.7)
 	def __init__(self, value):
@@ -468,6 +495,96 @@ CursorKind.UNEXPOSED_ATTR = CursorKind(400) # 2.7
 CursorKind.IB_ACTION_ATTR = CursorKind(401) # 2.7
 CursorKind.IB_OUTLET_ATTR = CursorKind(402) # 2.7
 
+class Cursor:
+	@requires(2.7)
+	def __init__(self, c, parent, tu):
+		self._c = c
+		self.parent = parent
+		self._tu = tu
+
+	@requires(2.7, 'clang_equalCursors', [_CXCursor, _CXCursor], c_uint)
+	def __eq__(self, other):
+		return bool(_libclang.clang_equalCursors(self._c, other._c))
+
+	@requires(2.7)
+	def __ne__(self, other):
+		return not self == other
+
+	@requires(2.7)
+	def __str__(self):
+		return self.spelling
+
+	@staticmethod
+	@requires(2.7, 'clang_getNullCursor', [], _CXCursor)
+	def null():
+		c = _libclang.clang_getNullCursor()
+		return Cursor(c, None, None)
+
+	@property
+	@requires(2.7, 'clang_getCursorKind', [_CXCursor], c_uint)
+	def kind(self):
+		kind = _libclang.clang_getCursorKind(self._c)
+		return CursorKind(kind)
+
+	@property
+	@requires(2.7, 'clang_getCursorLinkage', [_CXCursor], c_uint)
+	def linkage(self):
+		return Linkage(_libclang.clang_getCursorLinkage(self._c))
+
+	@property
+	@requires(2.7, 'clang_getCursorLocation', [_CXCursor], _CXSourceLocation)
+	def location(self):
+		sl = _libclang.clang_getCursorLocation(self._c)
+		return SourceLocation(sl)
+
+	@property
+	@requires(2.7, 'clang_getCursorExtent', [_CXCursor], _CXSourceRange)
+	def extent(self):
+		sr = _libclang.clang_getCursorExtent(self._c)
+		return SourceRange(sr)
+
+	@property
+	@requires(2.7, 'clang_visitChildren', [_CXCursor, cb_cursor_visitor, py_object], c_uint)
+	def children(self):
+		def visitor(child, parent_cursor, args):
+			(children, parent) = args
+			c = Cursor(child, parent, self._tu)
+			if c != Cursor.null():
+				children.append(c)
+			return 1 # continue
+		ret = []
+		_libclang.clang_visitChildren(self._c, cb_cursor_visitor(visitor), (ret, self))
+		return ret
+
+	@property
+	@requires(2.7, 'clang_getCursorUSR', [_CXCursor], _CXString)
+	def usr(self):
+		s = _libclang.clang_getCursorUSR(self._c)
+		return _to_str(s)
+
+	@property
+	@requires(2.7, 'clang_getCursorSpelling', [_CXCursor], _CXString)
+	def spelling(self):
+		s = _libclang.clang_getCursorSpelling(self._c)
+		return _to_str(s)
+
+	@property
+	@requires(2.7, 'clang_getCursorReferenced', [_CXCursor], _CXCursor)
+	def referenced(self):
+		c = _libclang.clang_getCursorReferenced(self._c)
+		return Cursor(c, None, self._tu)
+
+	@property
+	@requires(2.7, 'clang_getCursorDefinition', [_CXCursor], _CXCursor)
+	def definition(self):
+		c = _libclang.clang_getCursorDefinition(self._c)
+		return Cursor(c, None, self._tu)
+
+	@property
+	@requires(2.7, 'clang_isCursorDefinition', [_CXCursor], c_uint)
+	def is_definition(self):
+		return bool(_libclang.clang_isCursorDefinition(self._c))
+
 class TranslationUnit:
 	@requires(2.7)
 	def __init__(self, tu):
@@ -506,6 +623,15 @@ class TranslationUnit:
 	def spelling(self):
 		s = _libclang.clang_getTranslationUnitSpelling(self._tu)
 		return _to_str(s)
+
+	@requires(2.7, 'clang_getTranslationUnitCursor', [c_void_p], _CXCursor)
+	@requires(2.7, 'clang_getCursor', [c_void_p, _CXSourceLocation], _CXCursor)
+	def cursor(self, source_location=None):
+		if not source_location:
+			c = _libclang.clang_getTranslationUnitCursor(self._tu)
+		else:
+			c = _libclang.clang_getCursor(self._tu, source_location._sl)
+		return Cursor(c, None, self)
 
 class Index:
 	@requires(2.7, 'clang_createIndex', [c_int, c_int], c_void_p)

@@ -107,6 +107,29 @@ def test_Diagnostic(index):
 	match_location(r.end, 'tests/error.hpp', 6, 2, 25)
 	equals(msg, ';')
 
+def test_Cursor(index):
+	tu = index.from_source('tests/enumeration.hpp')
+	c = tu.cursor()
+	equals(c == c, True)
+	equals(c == libclang.Cursor.null(), False)
+	equals(c != c, False)
+	equals(c != libclang.Cursor.null(), True)
+	equals(c.spelling, 'tests/enumeration.hpp')
+	equals(str(c), 'tests/enumeration.hpp')
+	equals(c.kind, libclang.CursorKind.TRANSLATION_UNIT)
+	equals(c.linkage, libclang.Linkage.INVALID)
+	equals(c.location, libclang.SourceLocation.null())
+	match_location(c.extent.start, 'tests/enumeration.hpp', 1, 1, 0)
+	match_location(c.extent.end, 'tests/enumeration.hpp', 1, 1, 0)
+	equals(c.usr, '')
+	equals(c.referenced, libclang.Cursor.null())
+	equals(c.definition, libclang.Cursor.null())
+	equals(c.is_definition, False)
+	# children
+	children = [child for child in c.children if child.location.file]
+	equals(len(children), 1)
+	equals(children[0].kind, libclang.CursorKind.ENUM_DECL)
+
 libclang.load()
 
 test_SourceLocation()
@@ -117,5 +140,6 @@ index = libclang.Index()
 
 test_TranslationUnit(index)
 test_Diagnostic(index)
+test_Cursor(index)
 
 print('success')
