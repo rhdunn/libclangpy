@@ -38,6 +38,13 @@ class _CXSourceLocation(Structure):
 		('int_data', c_uint)
 	]
 
+class _CXSourceRange(Structure):
+	_fields_ = [
+		('ptr_data', c_void_p * 2),
+		('begin_int_data', c_uint),
+		('end_int_data', c_uint)
+	]
+
 def load(name=None, version=None):
 	""" Load libclang from the specified name and/or version. """
 
@@ -185,6 +192,43 @@ class SourceLocation:
 	@requires(2.7)
 	def offset(self):
 		return self.instantiation_location.offset
+
+class SourceRange:
+	@requires(2.7)
+	def __init__(self, sr):
+		self._sr = sr
+
+	@requires(2.7)
+	def __eq__(self, other):
+		return self.start == other.start and self.end == other.end
+
+	@requires(2.7)
+	def __ne__(self, other):
+		return not self == other
+
+	@staticmethod
+	@requires(2.7, 'clang_getNullRange', [], _CXSourceRange)
+	def null():
+		sr = _libclang.clang_getNullRange()
+		return SourceRange(sr)
+
+	@staticmethod
+	@requires(2.7, 'clang_getRange', [_CXSourceLocation, _CXSourceLocation], _CXSourceRange)
+	def create(start, end):
+		sr = _libclang.clang_getRange(start._sl, end._sl)
+		return SourceRange(sr)
+
+	@property
+	@requires(2.7, 'clang_getRangeStart', [_CXSourceRange], _CXSourceLocation)
+	def start(self):
+		sl = _libclang.clang_getRangeStart(self._sr)
+		return SourceLocation(sl)
+
+	@property
+	@requires(2.7, 'clang_getRangeEnd', [_CXSourceRange], _CXSourceLocation)
+	def end(self):
+		sl = _libclang.clang_getRangeStart(self._sr)
+		return SourceLocation(sl)
 
 class TranslationUnit:
 	@requires(2.7)

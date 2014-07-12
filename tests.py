@@ -35,6 +35,18 @@ def test_SourceLocation():
 	assert(loc == libclang.SourceLocation.null())
 	assert(not loc != libclang.SourceLocation.null())
 
+def test_SourceRange():
+	rng1 = libclang.SourceRange.null()
+	assert(rng1.start == libclang.SourceLocation.null())
+	assert(rng1.end   == libclang.SourceLocation.null())
+	rng2 = libclang.SourceRange.create(libclang.SourceLocation.null(),
+	                                   libclang.SourceLocation.null())
+	assert(rng2.start == libclang.SourceLocation.null())
+	assert(rng2.end   == libclang.SourceLocation.null())
+	assert(rng1 == rng2)
+	assert(not rng1 != rng2)
+
 libclang.load()
 
 test_SourceLocation()
+test_SourceRange()
