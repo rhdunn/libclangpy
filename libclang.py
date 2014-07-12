@@ -32,6 +32,12 @@ class _CXString(Structure):
 		('private_flags', c_uint)
 	]
 
+class _CXSourceLocation(Structure):
+	_fields_ = [
+		('ptr_data', c_void_p * 2),
+		('int_data', c_uint)
+	]
+
 def load(name=None, version=None):
 	""" Load libclang from the specified name and/or version. """
 
@@ -124,6 +130,62 @@ class File:
 	def time(self):
 		return _libclang.clang_getFileTime(self._f)
 
+class SourceLocationData:
+	def __init__(self, f, l, c, o):
+		self.file = File(f) if f else None
+		self.line = int(l.value)
+		self.column = int(c.value)
+		self.offset = int(o.value)
+
+class SourceLocation:
+	@requires(2.7)
+	def __init__(self, sl):
+		self._sl = sl
+		self._instantiation = None
+
+	@requires(2.7, 'clang_equalLocations', [_CXSourceLocation, _CXSourceLocation], c_uint)
+	def __eq__(self, other):
+		return bool(_libclang.clang_equalLocations(self._sl, other._sl))
+
+	@requires(2.7)
+	def __ne__(self, other):
+		return not self == other
+
+	@property
+	@requires(2.7, 'clang_getInstantiationLocation', [_CXSourceLocation, POINTER(c_void_p), POINTER(c_uint), POINTER(c_uint), POINTER(c_uint)])
+	def instantiation_location(self):
+		if self._instantiation is None:
+			f, l, c, o = c_void_p(), c_uint(), c_uint(), c_uint()
+			_libclang.clang_getInstantiationLocation(self._sl, byref(f), byref(l), byref(c), byref(o))
+			self._instantiation = SourceLocationData(f, l, c, o)
+		return self._instantiation
+
+	@staticmethod
+	@requires(2.7, 'clang_getNullLocation', [], _CXSourceLocation)
+	def null():
+		sl = _libclang.clang_getNullLocation()
+		return SourceLocation(sl)
+
+	@property
+	@requires(2.7)
+	def file(self):
+		return self.instantiation_location.file
+
+	@property
+	@requires(2.7)
+	def line(self):
+		return self.instantiation_location.line
+
+	@property
+	@requires(2.7)
+	def column(self):
+		return self.instantiation_location.column
+
+	@property
+	@requires(2.7)
+	def offset(self):
+		return self.instantiation_location.offset
+
 class TranslationUnit:
 	@requires(2.7)
 	def __init__(self, tu):
@@ -135,3 +197,8 @@ class TranslationUnit:
 		if not ret:
 			raise Exception('File "%s" not in the translation unit.' % filename)
 		return File(ret)
+
+	@requires(2.7, 'clang_getLocation', [c_void_p, c_void_p, c_uint, c_uint], _CXSourceLocation)
+	def location(self, cxfile, line, column):
+		ret = _libclang.clang_getLocation(self._tu, cxfile._f, line, column)
+		return SourceLocation(ret)

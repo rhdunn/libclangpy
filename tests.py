@@ -19,4 +19,22 @@
 
 import libclang
 
+def match_location(loc, filename, line, column, offset):
+	if filename:
+		assert(loc.file.name == filename)
+	else:
+		assert(loc.file == None)
+	assert(loc.line == line)
+	assert(loc.column == column)
+	assert(loc.offset == offset)
+
+def test_SourceLocation():
+	loc = libclang.SourceLocation.null()
+	match_location(loc, None, 0, 0, 0)
+	match_location(loc.instantiation_location, None, 0, 0, 0)
+	assert(loc == libclang.SourceLocation.null())
+	assert(not loc != libclang.SourceLocation.null())
+
 libclang.load()
+
+test_SourceLocation()
