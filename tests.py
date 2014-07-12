@@ -59,6 +59,21 @@ def test_SourceRange():
 	equals(rng1 == rng2, True)
 	equals(rng1 != rng2, False)
 
+def test_CursorKind():
+	equals(libclang.CursorKind.CLASS_DECL == libclang.CursorKind.CLASS_DECL, True)
+	equals(libclang.CursorKind.CLASS_DECL == libclang.CursorKind.UNION_DECL, False)
+	equals(libclang.CursorKind.CLASS_DECL != libclang.CursorKind.CLASS_DECL, False)
+	equals(libclang.CursorKind.CLASS_DECL != libclang.CursorKind.UNION_DECL, True)
+	kind = libclang.CursorKind.STRUCT_DECL
+	equals(kind.spelling, 'StructDecl')
+	equals(str(kind), 'StructDecl')
+	equals(kind.is_declaration, True)
+	equals(kind.is_reference, False)
+	equals(kind.is_expression, False)
+	equals(kind.is_statement, False)
+	equals(kind.is_invalid, False)
+	equals(kind.is_translation_unit, False)
+
 def test_TranslationUnit(index):
 	filename = 'tests/enumeration.hpp'
 	tu = index.from_source(filename)
@@ -96,6 +111,7 @@ libclang.load()
 
 test_SourceLocation()
 test_SourceRange()
+test_CursorKind()
 
 index = libclang.Index()
 

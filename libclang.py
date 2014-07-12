@@ -371,6 +371,103 @@ class Diagnostic:
 			s  = _libclang.clang_getDiagnosticFixIt(self._d, i, byref(sr))
 			yield (SourceRange(sr), _to_str(s))
 
+class CursorKind:
+	@requires(2.7)
+	def __init__(self, value):
+		self.value = value
+
+	@requires(2.7)
+	def __str__(self):
+		return self.spelling
+
+	@requires(2.7)
+	def __eq__(self, other):
+		return self.value == other.value
+
+	@requires(2.7)
+	def __ne__(self, other):
+		return self.value != other.value
+
+	@property
+	@requires(2.7, 'clang_getCursorKindSpelling', [c_uint], _CXString)
+	def spelling(self):
+		s = _libclang.clang_getCursorKindSpelling(self.value)
+		return _to_str(s)
+
+	@property
+	@requires(2.7, 'clang_isDeclaration', [c_uint], c_uint)
+	def is_declaration(self):
+		return bool(_libclang.clang_isDeclaration(self.value))
+
+	@property
+	@requires(2.7, 'clang_isReference', [c_uint], c_uint)
+	def is_reference(self):
+		return bool(_libclang.clang_isReference(self.value))
+
+	@property
+	@requires(2.7, 'clang_isExpression', [c_uint], c_uint)
+	def is_expression(self):
+		return bool(_libclang.clang_isExpression(self.value))
+
+	@property
+	@requires(2.7, 'clang_isStatement', [c_uint], c_uint)
+	def is_statement(self):
+		return bool(_libclang.clang_isStatement(self.value))
+
+	@property
+	@requires(2.7, 'clang_isInvalid', [c_uint], c_uint)
+	def is_invalid(self):
+		return bool(_libclang.clang_isInvalid(self.value))
+
+	@property
+	@requires(2.7, 'clang_isTranslationUnit', [c_uint], c_uint)
+	def is_translation_unit(self):
+		return bool(_libclang.clang_isTranslationUnit(self.value))
+
+CursorKind.UNEXPOSED_DECL = CursorKind(1) # 2.7
+CursorKind.STRUCT_DECL = CursorKind(2) # 2.7
+CursorKind.UNION_DECL = CursorKind(3) # 2.7
+CursorKind.CLASS_DECL = CursorKind(4) # 2.7
+CursorKind.ENUM_DECL = CursorKind(5) # 2.7
+CursorKind.FIELD_DECL = CursorKind(6) # 2.7
+CursorKind.ENUM_CONSTANT_DECL = CursorKind(7) # 2.7
+CursorKind.FUNCTION_DECL = CursorKind(8) # 2.7
+CursorKind.VAR_DECL = CursorKind(9) # 2.7
+CursorKind.PARM_DECL = CursorKind(10) # 2.7
+CursorKind.OBJC_INTERFACE_DECL = CursorKind(11) # 2.7
+CursorKind.OBJC_CATEGORY_DECL = CursorKind(12) # 2.7
+CursorKind.OBJC_PROTOCOL_DECL = CursorKind(13) # 2.7
+CursorKind.OBJC_PROPERTY_DECL = CursorKind(14) # 2.7
+CursorKind.OBJC_IVAR_DECL = CursorKind(15) # 2.7
+CursorKind.OBJC_INSTANCE_METHOD_DECL = CursorKind(16) # 2.7
+CursorKind.OBJC_CLASS_METHOD_DECL = CursorKind(17) # 2.7
+CursorKind.OBJC_IMPLEMENTATION_DECL = CursorKind(18) # 2.7
+CursorKind.OBJC_CATEGORY_IMPL_DECL = CursorKind(19) # 2.7
+CursorKind.TYPEDEF_DECL = CursorKind(20) # 2.7
+
+CursorKind.OBJC_SUPER_CLASS_REF = CursorKind(40) # 2.7
+CursorKind.OBJC_PROTOCOL_REF = CursorKind(41) # 2.7
+CursorKind.OBJC_CLASS_REF = CursorKind(42) # 2.7
+CursorKind.TYPE_REF = CursorKind(43) # 2.7
+
+CursorKind.INVALID_FILE = CursorKind(70) # 2.7
+CursorKind.NO_DECL_FOUND = CursorKind(71) # 2.7
+CursorKind.NOT_IMPLEMENTED = CursorKind(72) # 2.7
+
+CursorKind.UNEXPOSED_EXPR = CursorKind(100) # 2.7
+CursorKind.DECL_REF_EXPR = CursorKind(101) # 2.7
+CursorKind.MEMBER_REF_EXPR = CursorKind(102) # 2.7
+CursorKind.CALL_EXPR = CursorKind(103) # 2.7
+CursorKind.OBJC_MESSAGE_EXPR = CursorKind(104) # 2.7
+
+CursorKind.UNEXPOSED_STMT = CursorKind(200) # 2.7
+
+CursorKind.TRANSLATION_UNIT = CursorKind(300) # 2.7
+
+CursorKind.UNEXPOSED_ATTR = CursorKind(400) # 2.7
+CursorKind.IB_ACTION_ATTR = CursorKind(401) # 2.7
+CursorKind.IB_OUTLET_ATTR = CursorKind(402) # 2.7
+
 class TranslationUnit:
 	@requires(2.7)
 	def __init__(self, tu):
