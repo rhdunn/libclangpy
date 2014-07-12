@@ -230,6 +230,104 @@ class SourceRange:
 		sl = _libclang.clang_getRangeStart(self._sr)
 		return SourceLocation(sl)
 
+class DiagnosticDisplayOptions:
+	@requires(2.7)
+	def __init__(self, value):
+		self.value = value
+
+	@requires(2.7)
+	def __or__(self, other):
+		return DiagnosticDisplayOptions(self.value | other.value)
+
+	@requires(2.7)
+	def __eq__(self, other):
+		return self.value == other.value
+
+	@requires(2.7)
+	def __ne__(self, other):
+		return self.value != other.value
+
+	@staticmethod
+	@requires(2.7, 'clang_defaultDiagnosticDisplayOptions', [], c_uint)
+	def DEFAULT():
+		value = _libclang.clang_defaultDiagnosticDisplayOptions()
+		return DiagnosticDisplayOptions(value)
+
+DiagnosticDisplayOptions.SOURCE_LOCATION = DiagnosticDisplayOptions(1) # 2.7
+DiagnosticDisplayOptions.COLUMN = DiagnosticDisplayOptions(2) # 2.7
+DiagnosticDisplayOptions.SOURCE_RANGES = DiagnosticDisplayOptions(4) # 2.7
+
+class DiagnosticSeverity:
+	@requires(2.7)
+	def __init__(self, value):
+		self.value = value
+
+	@requires(2.7)
+	def __eq__(self, other):
+		return self.value == other.value
+
+	@requires(2.7)
+	def __ne__(self, other):
+		return self.value != other.value
+
+DiagnosticSeverity.IGNORED = DiagnosticSeverity(0) # 2.7
+DiagnosticSeverity.NOTE = DiagnosticSeverity(1) # 2.7
+DiagnosticSeverity.WARNING = DiagnosticSeverity(2) # 2.7
+DiagnosticSeverity.ERROR = DiagnosticSeverity(3) # 2.7
+DiagnosticSeverity.FATAL = DiagnosticSeverity(4) # 2.7
+
+class Diagnostic:
+	@requires(2.7)
+	def __init__(self, d):
+		self._d = d
+
+	@requires(2.7, 'clang_disposeDiagnostic', [c_void_p])
+	def __del__(self):
+		_libclang.clang_disposeDiagnostic(self._d)
+
+	@requires(2.7)
+	def __str__(self):
+		return self.spelling
+
+	@requires(2.7, 'clang_formatDiagnostic', [c_void_p, c_uint], _CXString)
+	def format(self, options=DiagnosticDisplayOptions.SOURCE_LOCATION | DiagnosticDisplayOptions.COLUMN):
+		s = _libclang.clang_formatDiagnostic(self._d, options.value)
+		return _to_str(s)
+
+	@property
+	@requires(2.7, 'clang_getDiagnosticSeverity', [c_void_p], c_uint)
+	def severity(self):
+		return DiagnosticSeverity(_libclang.clang_getDiagnosticSeverity(self._d))
+
+	@property
+	@requires(2.7, 'clang_getDiagnosticLocation', [c_void_p], _CXSourceLocation)
+	def location(self):
+		sl = _libclang.clang_getDiagnosticLocation(self._d)
+		return SourceLocation(sl)
+
+	@property
+	@requires(2.7, 'clang_getDiagnosticSpelling', [c_void_p], _CXString)
+	def spelling(self):
+		s = _libclang.clang_getDiagnosticSpelling(self._d)
+		return _to_str(s)
+
+	@property
+	@requires(2.7, 'clang_getDiagnosticNumRanges', [c_void_p], c_uint)
+	@requires(2.7, 'clang_getDiagnosticRange', [c_void_p, c_uint], _CXSourceRange)
+	def ranges(self):
+		for i in range(0, _libclang.clang_getDiagnosticNumRanges(self._d)):
+			sr = _libclang.clang_getDiagnosticRange(self._d, i)
+			yield SourceRange(sr)
+
+	@property
+	@requires(2.7, 'clang_getDiagnosticNumFixIts', [c_void_p], c_uint)
+	@requires(2.7, 'clang_getDiagnosticFixIt', [c_void_p, c_uint, POINTER(_CXSourceRange)], _CXString)
+	def fixits(self):
+		for i in range(0, _libclang.clang_getNumDiagnosticFixIts(self._d)):
+			sr = _CXSourceRange()
+			s  = _libclang.clang_getDiagnosticFixIt(self._d, i, byref(sr))
+			yield (SourceRange(sr), _to_str(s))
+
 class TranslationUnit:
 	@requires(2.7)
 	def __init__(self, tu):
@@ -246,3 +344,11 @@ class TranslationUnit:
 	def location(self, cxfile, line, column):
 		ret = _libclang.clang_getLocation(self._tu, cxfile._f, line, column)
 		return SourceLocation(ret)
+
+	@property
+	@requires(2.7, 'clang_getNumDiagnostics', [c_void_p], c_uint)
+	@requires(2.7, 'clang_getDiagnostic', [c_void_p, c_uint], c_void_p)
+	def diagnostics(self):
+		for i in range(0, _libclang.clang_getNumDiagnostics(self._tu)):
+			d = _libclang.clang_getDiagnostic(self._tu, i)
+			yield Diagnostic(d)
