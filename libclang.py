@@ -24,6 +24,12 @@ _lib_extension = { 'Darwin': 'dylib', 'Linux': 'so', 'Windows': 'dll' }
 _system = platform.system()
 _libclang = None
 
+class _CXString(Structure):
+	_fields_ = [
+		('data', c_void_p),
+		('private_flags', c_uint)
+	]
+
 def load(name=None, version=None):
 	""" Load libclang from the specified name and/or version. """
 
@@ -80,3 +86,10 @@ def optional(version, name, argtypes=None, restype=None):
 			return f(*args)
 		return call
 	return new
+
+@requires(2.7, 'clang_getCString', [_CXString], c_char_p)
+@requires(2.7, 'clang_disposeString', [_CXString])
+def _to_str(s):
+	ret = str(_libclang.clang_getCString(s))
+	_libclang.clang_disposeString(s)
+	return ret
