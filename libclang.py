@@ -627,6 +627,73 @@ CursorKind.PREPROCESSING_DIRECTIVE = CursorKind(500) # 2.8
 CursorKind.MACRO_DEFINITION = CursorKind(501) # 2.8
 CursorKind.MACRO_INSTANTIATION = CursorKind(502) # 2.8
 
+class TypeKind:
+	@requires(2.8)
+	def __init__(self, value):
+		self.value = value
+
+	@requires(2.8)
+	def __eq__(self, other):
+		return self.value == other.value
+
+	@requires(2.8)
+	def __ne__(self, other):
+		return self.value != other.value
+
+	@requires(2.8)
+	def __str__(self):
+		return self.spelling
+
+	@property
+	@requires(2.8, 'clang_getTypeKindSpelling', [c_uint], _CXString)
+	def spelling(self):
+		s = _libclang.clang_getTypeKindSpelling(self.value)
+		return _to_str(s)
+
+TypeKind.INVALID = TypeKind(0) # 2.8
+TypeKind.UNEXPOSED = TypeKind(1) # 2.8
+TypeKind.VOID = TypeKind(2) # 2.8
+TypeKind.BOOL = TypeKind(3) # 2.8
+TypeKind.CHAR_U = TypeKind(4) # 2.8
+TypeKind.UCHAR = TypeKind(5) # 2.8
+TypeKind.CHAR16 = TypeKind(6) # 2.8
+TypeKind.CHAR32 = TypeKind(7) # 2.8
+TypeKind.USHORT = TypeKind(8) # 2.8
+TypeKind.UINT = TypeKind(9) # 2.8
+TypeKind.ULONG = TypeKind(10) # 2.8
+TypeKind.ULONGLONG = TypeKind(11) # 2.8
+TypeKind.UINT128 = TypeKind(12) # 2.8
+TypeKind.CHAR_S = TypeKind(13) # 2.8
+TypeKind.SCHAR = TypeKind(14) # 2.8
+TypeKind.WCHAR = TypeKind(15) # 2.8
+TypeKind.SHORT = TypeKind(16) # 2.8
+TypeKind.INT = TypeKind(17) # 2.8
+TypeKind.LONG = TypeKind(18) # 2.8
+TypeKind.LONGLONG = TypeKind(19) # 2.8
+TypeKind.INT128 = TypeKind(20) # 2.8
+TypeKind.FLOAT = TypeKind(21) # 2.8
+TypeKind.DOUBLE = TypeKind(22) # 2.8
+TypeKind.LONG_DOUBLE = TypeKind(23) # 2.8
+TypeKind.NULLPTR = TypeKind(24) # 2.8
+TypeKind.OVERLOAD = TypeKind(25) # 2.8
+TypeKind.DEPENDENT = TypeKind(26) # 2.8
+TypeKind.OBJC_ID = TypeKind(27) # 2.8
+TypeKind.OBJC_CLASS = TypeKind(28) # 2.8
+TypeKind.OBJC_SEL = TypeKind(29) # 2.8
+
+TypeKind.COMPLEX = TypeKind(100) # 2.8
+TypeKind.POINTER = TypeKind(101) # 2.8
+TypeKind.BLOCK_POINTER = TypeKind(102) # 2.8
+TypeKind.LVALUE_REFERENCE = TypeKind(103) # 2.8
+TypeKind.RVALUE_REFERENCE = TypeKind(104) # 2.8
+TypeKind.RECORD = TypeKind(105) # 2.8
+TypeKind.ENUM = TypeKind(106) # 2.8
+TypeKind.TYPEDEF = TypeKind(107) # 2.8
+TypeKind.OBJC_INTERFACE = TypeKind(108) # 2.8
+TypeKind.OBJC_OBJECT_POINTER = TypeKind(109) # 2.8
+TypeKind.FUNCTION_NO_PROTO = TypeKind(110) # 2.8
+TypeKind.FUNCTION_PROTO = TypeKind(111) # 2.8
+
 class Cursor:
 	@requires(2.7)
 	def __init__(self, c, parent, tu):

@@ -91,6 +91,15 @@ def test_CursorKind28():
 	equals(kind.is_preprocessing, False)
 	equals(kind.is_unexposed, False)
 
+def test_TypeKind28():
+	equals(libclang.TypeKind.VOID == libclang.TypeKind.VOID, True)
+	equals(libclang.TypeKind.VOID == libclang.TypeKind.UINT, False)
+	equals(libclang.TypeKind.VOID != libclang.TypeKind.VOID, False)
+	equals(libclang.TypeKind.VOID != libclang.TypeKind.UINT, True)
+	kind = libclang.TypeKind.FLOAT
+	equals(kind.spelling, 'Float')
+	equals(str(kind), 'Float')
+
 def test_Index():
 	index = libclang.Index()
 	filename = 'tests/enumeration.hpp'
@@ -232,6 +241,7 @@ run(2.7, test_SourceLocation)
 run(2.7, test_SourceRange)
 run(2.7, test_CursorKind)
 run(2.8, test_CursorKind28)
+run(2.8, test_TypeKind28)
 run(2.7, test_Index)
 run(2.8, test_Index28)
 run(2.7, test_TranslationUnit)
