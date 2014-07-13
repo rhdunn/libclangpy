@@ -24,13 +24,13 @@ the cindex bindings from LLVM/clang in that it:
 | `CXCursor`              | 2.7     | Yes       |
 | `CXCursorKind`          | 2.7     | Yes       |
 | `CXFile`                | 2.7     | Yes       |
-| `CXIndex`               | 2.7     | Yes       |
+| `CXIndex`               | 2.8     | Yes       |
 | `CXSourceLocation`      | 2.7     | Yes       |
 | `CXSourceRange`         | 2.7     | Yes       |
 | `CXString`              | 2.7     | Yes       |
 | `CXToken`               | 2.7     | Yes       |
 | `CXTokenKind`           | 2.7     | Yes       |
-| `CXTranslationUnit`     | 2.7     | Yes       |
+| `CXTranslationUnit`     | 2.8     | Yes       |
 | `clang_getClangVersion` | 2.7     | No        |
 | `clang_getInclusions`   | 2.7     | No        |
 

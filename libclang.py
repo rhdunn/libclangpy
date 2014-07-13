@@ -687,6 +687,65 @@ class Cursor:
 	def tokens(self):
 		return self._tu.tokenize(self.extent)
 
+class TranslationUnitFlags:
+	@requires(2.8)
+	def __init__(self, value):
+		self.value = value
+
+	@requires(2.8)
+	def __or__(self, other):
+		return TranslationUnitFlags(self.value | other.value)
+
+	@requires(2.7)
+	def __eq__(self, other):
+		return self.value == other.value
+
+	@requires(2.7)
+	def __ne__(self, other):
+		return self.value != other.value
+
+	@staticmethod
+	@requires(2.8, 'clang_defaultEditingTranslationUnitOptions', [], c_uint)
+	def DEFAULT_EDITING():
+		value = _libclang.clang_defaultEditingTranslationUnitOptions()
+		return TranslationUnitFlags(value)
+
+TranslationUnitFlags.NONE = TranslationUnitFlags(0) # 2.8
+TranslationUnitFlags.DETAILED_PREPROCESSING_RECORD = TranslationUnitFlags(1) # 2.8
+TranslationUnitFlags.INCOMPLETE = TranslationUnitFlags(2) # 2.8
+TranslationUnitFlags.PRECOMPILED_PREAMBLE = TranslationUnitFlags(4) # 2.8
+TranslationUnitFlags.CACHE_COMPLETION_RESULTS = TranslationUnitFlags(8) # 2.8
+
+class SaveTranslationUnitFlags:
+	@requires(2.8)
+	def __init__(self, value):
+		self.value = value
+
+	@requires(2.7)
+	def __eq__(self, other):
+		return self.value == other.value
+
+	@requires(2.7)
+	def __ne__(self, other):
+		return self.value != other.value
+
+SaveTranslationUnitFlags.NONE = SaveTranslationUnitFlags(0) # 2.8
+
+class ReparseTranslationUnitFlags:
+	@requires(2.8)
+	def __init__(self, value):
+		self.value = value
+
+	@requires(2.7)
+	def __eq__(self, other):
+		return self.value == other.value
+
+	@requires(2.7)
+	def __ne__(self, other):
+		return self.value != other.value
+
+ReparseTranslationUnitFlags.NONE = ReparseTranslationUnitFlags(0) # 2.8
+
 class TranslationUnit:
 	@requires(2.7)
 	def __init__(self, tu):
@@ -745,6 +804,27 @@ class TranslationUnit:
 			return None
 		return TokenList(self, tokens, length)
 
+	@staticmethod
+	@requires(2.8, 'clang_defaultSaveOptions', [c_void_p], c_uint)
+	def DEFAULT_SAVE_OPTIONS():
+		value = _libclang.clang_defaultSaveOptions(self._tu)
+		return SaveTranslationUnitFlags(value)
+
+	@requires(2.8, 'clang_saveTranslationUnit', [c_void_p, c_utf8_p, c_uint], c_int)
+	def save(self, filename, options=SaveTranslationUnitFlags.NONE):
+		return bool(_libclang.clang_saveTranslationUnit(self._tu, filename, options.value))
+
+	@staticmethod
+	@requires(2.8, 'clang_defaultReparseOptions', [c_void_p], c_uint)
+	def DEFAULT_REPARSE_OPTIONS():
+		value = _libclang.clang_defaultReparseOptions(self._tu)
+		return ReparseTranslationUnitFlags(value)
+
+	@requires(2.8, 'clang_reparseTranslationUnit', [c_void_p, c_uint, POINTER(_CXUnsavedFile), c_uint], c_int)
+	def reparse(self, unsaved_files, options=ReparseTranslationUnitFlags.NONE):
+		unsavedc, unsavedv = _marshall_unsaved_files(unsaved_files)
+		return bool(_libclang.clang_saveTranslationUnit(self._tu, unsavedc, unsavedv, options.value))
+
 class Index:
 	@requires(2.7, 'clang_createIndex', [c_int, c_int], c_void_p)
 	def __init__(self, exclude_from_pch=True, display_diagnostics=False):
@@ -768,4 +848,11 @@ class Index:
 		argc, argv = _marshall_args(args)
 		unsavedc, unsavedv = _marshall_unsaved_files(unsaved_files)
 		tu = _libclang.clang_createTranslationUnitFromSourceFile(self._index, filename, argc, argv, unsavedc, unsavedv)
+		return TranslationUnit(tu)
+
+	@requires(2.8, 'clang_parseTranslationUnit', [c_void_p, c_utf8_p, POINTER(c_utf8_p), c_uint, POINTER(_CXUnsavedFile), c_uint, c_uint], c_void_p)
+	def parse(self, filename=None, args=None, unsaved_files=None, options=TranslationUnitFlags.NONE):
+		argc, argv = _marshall_args(args)
+		unsavedc, unsavedv = _marshall_unsaved_files(unsaved_files)
+		tu = _libclang.clang_parseTranslationUnit(self._index, filename, argv, argc, unsavedv, unsavedc, options.value)
 		return TranslationUnit(tu)

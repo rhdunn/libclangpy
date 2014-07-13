@@ -110,6 +110,30 @@ def test_Index():
 	equals(tu.spelling, '')
 	equals(len(list(tu.diagnostics)), 0)
 
+def test_Index28():
+	index = libclang.Index()
+	filename = 'tests/enumeration.hpp'
+	# no args
+	tu = index.parse(filename)
+	equals(tu.spelling, filename)
+	equals(len(list(tu.diagnostics)), 0)
+	# no args -- as keyword argument
+	tu = index.parse(filename=filename)
+	equals(tu.spelling, filename)
+	equals(len(list(tu.diagnostics)), 0)
+	# file as arg
+	tu = index.parse(args=[filename])
+	equals(tu.spelling, filename)
+	equals(len(list(tu.diagnostics)), 0)
+	# args
+	tu = index.parse(filename, args=['-std=c++98'])
+	equals(tu.spelling, filename)
+	equals(len(list(tu.diagnostics)), 0)
+	# unsaved files
+	tu = index.parse('unsaved.hxx', unsaved_files=[('unsaved.hxx', 'struct test {};')])
+	equals(tu.spelling, '')
+	equals(len(list(tu.diagnostics)), 0)
+
 def test_TranslationUnit():
 	index = libclang.Index()
 	filename = 'tests/enumeration.hpp'
@@ -203,6 +227,7 @@ run(2.7, test_SourceLocation)
 run(2.7, test_SourceRange)
 run(2.7, test_CursorKind)
 run(2.7, test_Index)
+run(2.8, test_Index28)
 run(2.7, test_TranslationUnit)
 run(2.7, test_Diagnostic)
 run(2.7, test_Cursor)
