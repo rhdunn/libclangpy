@@ -71,6 +71,12 @@ class _CXUnsavedFile(Structure):
 		('length', c_uint)
 	]
 
+class _CXToken(Structure):
+	_fields_ = [
+		('int_data', c_uint * 4),
+		('ptr_data', c_void_p)
+	]
+
 class _CXCursor(Structure):
 	_fields_ = [
 		('kind', c_uint),
@@ -417,6 +423,73 @@ TokenKind.IDENTIFIER = TokenKind(2) # 2.7
 TokenKind.LITERAL = TokenKind(3) # 2.7
 TokenKind.COMMENT = TokenKind(4) # 2.7
 
+class Token:
+	@requires(2.7)
+	def __init__(self, t, tokens, tu):
+		self._t = t
+		self._tokens = tokens
+		self._tu = tu
+
+	@requires(2.7)
+	def __str__(self):
+		return self.spelling
+
+	@property
+	@requires(2.7, 'clang_getTokenKind', [_CXToken], c_uint)
+	def kind(self):
+		kind = _libclang.clang_getTokenKind(self._t)
+		return TokenKind(kind)
+
+	@property
+	@requires(2.7, 'clang_getTokenSpelling', [c_void_p, _CXToken], _CXString)
+	def spelling(self):
+		s = _libclang.clang_getTokenSpelling(self._tu._tu, self._t)
+		return _to_str(s)
+
+	@property
+	@requires(2.7, 'clang_getTokenLocation', [c_void_p, _CXToken], _CXSourceLocation)
+	def location(self):
+		sl = _libclang.clang_getTokenLocation(self._tu._tu, self._t)
+		return SourceLocation(sl)
+
+	@property
+	@requires(2.7, 'clang_getTokenExtent', [c_void_p, _CXToken], _CXSourceRange)
+	def extent(self):
+		sr = _libclang.clang_getTokenExtent(self._tu._tu, self._t)
+		return SourceRange(sr)
+
+	@property
+	@requires(2.7, 'clang_getCursor', [c_void_p, _CXSourceLocation], _CXCursor)
+	def cursor(self):
+		# NOTE: This is doing what clang_annotateTokens does, but on one token only.
+		c = _libclang.clang_getCursor(self._tu._tu, self.location._sl)
+		return Cursor(c, None, self._tu)
+
+class TokenList:
+	@requires(2.7)
+	def __init__(self, tu, tokens, length):
+		self._tu = tu
+		self._data = tokens
+		self._tokens = cast(tokens, POINTER(_CXToken * length)).contents
+		self._length = length
+
+	@requires(2.7, 'clang_disposeTokens', [c_void_p, POINTER(_CXToken), c_uint])
+	def __del__(self):
+		_libclang.clang_disposeTokens(self._tu._tu, self._data, self._length)
+
+	@requires(2.7)
+	def __len__(self):
+		return self._length
+
+	@requires(2.7)
+	def __getitem__(self, key):
+		return Token(self._tokens[key], self, self._tu)
+
+	@requires(2.7)
+	def __iter__(self):
+		for i in range(0, len(self)):
+			yield self[i]
+
 class CursorKind:
 	@requires(2.7)
 	def __init__(self, value):
@@ -604,6 +677,11 @@ class Cursor:
 	def is_definition(self):
 		return bool(_libclang.clang_isCursorDefinition(self._c))
 
+	@property
+	@requires(2.7)
+	def tokens(self):
+		return self._tu.tokenize(self.extent)
+
 class TranslationUnit:
 	@requires(2.7)
 	def __init__(self, tu):
@@ -651,6 +729,16 @@ class TranslationUnit:
 		else:
 			c = _libclang.clang_getCursor(self._tu, source_location._sl)
 		return Cursor(c, None, self)
+
+	@requires(2.7, 'clang_tokenize', [c_void_p, _CXSourceRange, POINTER(POINTER(_CXToken)), POINTER(c_uint)])
+	def tokenize(self, srcrange):
+		tokens = POINTER(_CXToken)()
+		length = c_uint()
+		_libclang.clang_tokenize(self._tu, srcrange._sr, byref(tokens), byref(length))
+		length = int(length.value)
+		if length < 1:
+			return None
+		return TokenList(self, tokens, length)
 
 class Index:
 	@requires(2.7, 'clang_createIndex', [c_int, c_int], c_void_p)

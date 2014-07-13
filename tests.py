@@ -129,6 +129,33 @@ def test_Cursor(index):
 	children = [child for child in c.children if child.location.file]
 	equals(len(children), 1)
 	equals(children[0].kind, libclang.CursorKind.ENUM_DECL)
+	# tokens
+	tokens = list(c.tokens)
+	equals(len(tokens), 11)
+	equals(tokens[0].kind, libclang.TokenKind.KEYWORD)
+
+def test_Token(index):
+	tu = index.from_source('tests/enumeration.hpp')
+	f = tu.file('tests/enumeration.hpp')
+	rng = libclang.SourceRange.create(tu.location(f, 1, 1), tu.location(f, 2, 1))
+	children = [child for child in tu.cursor().children if child.location.file]
+	# tokenize
+	tokens = tu.tokenize(rng)
+	equals(len(tokens), 3)
+	equals(tokens[0].spelling, 'enum')
+	equals(tokens[0].kind, libclang.TokenKind.KEYWORD)
+	equals(tokens[1].spelling, 'test')
+	equals(tokens[1].kind, libclang.TokenKind.IDENTIFIER)
+	equals(tokens[2].spelling, '{')
+	equals(tokens[2].kind, libclang.TokenKind.PUNCTUATION)
+	# token
+	token = tokens[0]
+	equals(str(token), 'enum')
+	equals(token.location, tu.location(f, 1, 1))
+	match_location(token.location, 'tests/enumeration.hpp', 1, 1, 0)
+	match_location(token.extent.start, 'tests/enumeration.hpp', 1, 1, 0)
+	match_location(token.extent.end, 'tests/enumeration.hpp', 1, 1, 0)
+	equals(token.cursor, children[0])
 
 libclang.load()
 
@@ -141,5 +168,6 @@ index = libclang.Index()
 test_TranslationUnit(index)
 test_Diagnostic(index)
 test_Cursor(index)
+test_Token(index)
 
 print('success')
