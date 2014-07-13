@@ -83,6 +83,12 @@ class _CXCursor(Structure):
 		('data', c_void_p * 3)
 	]
 
+class _CXType(Structure):
+	_fields_ = [
+		('kind', c_uint),
+		('data', c_void_p * 2)
+	]
+
 cb_cursor_visitor = CFUNCTYPE(c_int, _CXCursor, _CXCursor, py_object)
 
 def _marshall_args(args):
@@ -694,6 +700,50 @@ TypeKind.OBJC_OBJECT_POINTER = TypeKind(109) # 2.8
 TypeKind.FUNCTION_NO_PROTO = TypeKind(110) # 2.8
 TypeKind.FUNCTION_PROTO = TypeKind(111) # 2.8
 
+class Type:
+	@requires(2.8)
+	def __init__(self, t, tu):
+		self._t = t
+		self.kind = TypeKind(t.kind)
+		self._tu = tu
+
+	@requires(2.8, 'clang_equalTypes', [_CXType, _CXType], c_uint)
+	def __eq__(self, other):
+		return bool(_libclang.clang_equalTypes(self._t, other._t))
+
+	@requires(2.8)
+	def __ne__(self, other):
+		return not self.__eq__(other)
+
+	@property
+	@requires(2.8, 'clang_getCanonicalType', [_CXType], _CXType)
+	def canonical_type(self):
+		t = _libclang.clang_getCanonicalType(self._t)
+		return Type(t, self._tu)
+
+	@property
+	@requires(2.8, 'clang_getPointeeType', [_CXType], _CXType)
+	def pointee_type(self):
+		t = _libclang.clang_getPointeeType(self._t)
+		return Type(t, self._tu)
+
+	@property
+	@requires(2.8, 'clang_getResultType', [_CXType], _CXType)
+	def result_type(self):
+		t = _libclang.clang_getResultType(self._t)
+		return Type(t, self._tu)
+
+	@property
+	@requires(2.8, 'clang_getTypeDeclaration', [_CXType], _CXCursor)
+	def declaration(self):
+		c = _libclang.clang_getTypeDeclaration(self._t)
+		return Cursor(c, None, self._tu)
+
+	@property
+	@requires(2.8, 'clang_isPODType', [_CXType], c_uint)
+	def is_pod(self):
+		return bool(_libclang.clang_isPODType(self._t))
+
 class Cursor:
 	@requires(2.7)
 	def __init__(self, c, parent, tu):
@@ -788,6 +838,24 @@ class Cursor:
 	@requires(2.7)
 	def tokens(self):
 		return self._tu.tokenize(self.extent)
+
+	@property
+	@requires(2.8, 'clang_getCursorType', [_CXCursor], _CXType)
+	def type(self):
+		t = _libclang.clang_getCursorType(self._c)
+		return Type(t, self._tu)
+
+	@property
+	@requires(2.8, 'clang_getCursorResultType', [_CXCursor], _CXType)
+	def result_type(self):
+		t = _libclang.clang_getCursorResultType(self._c)
+		return Type(t, self._tu)
+
+	@property
+	@requires(2.8, 'clang_getIBOutletCollectionType', [_CXCursor], _CXType)
+	def ib_outlet_collection_type(self):
+		t = _libclang.clang_getIBOutletCollectionType(self._c)
+		return Type(t, self._tu)
 
 class TranslationUnitFlags:
 	@requires(2.8)

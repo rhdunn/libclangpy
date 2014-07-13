@@ -40,6 +40,10 @@ def run(version, test):
 		print('failed')
 		print(traceback.format_exc())
 
+def parse_str(index, contents):
+	tu = index.from_source('parse_str.cpp', unsaved_files=[('parse_str.cpp', contents)])
+	return [child for child in tu.cursor().children if child.location.file]
+
 def match_location(loc, filename, line, column, offset):
 	if filename:
 		equals(loc.file.name, filename)
@@ -237,6 +241,22 @@ def test_Token():
 	match_location(token.extent.end, 'tests/enumeration.hpp', 1, 1, 0)
 	equals(token.cursor, children[0])
 
+def test_Type28():
+	index = libclang.Index()
+	c = parse_str(index, 'int a;')[0]
+	t = c.type
+	equals(t == t, True)
+	equals(t == t.pointee_type, False)
+	equals(t != t, False)
+	equals(t != t.pointee_type, True)
+	# type
+	equals(t.kind, libclang.TypeKind.INT)
+	equals(t.canonical_type, t)
+	equals(t.pointee_type.kind, libclang.TypeKind.INVALID)
+	equals(t.result_type.kind, libclang.TypeKind.INVALID)
+	equals(t.declaration.kind, libclang.CursorKind.NO_DECL_FOUND)
+	equals(t.is_pod, True)
+
 libclang.load()
 
 run(2.7, test_SourceLocation)
@@ -250,3 +270,4 @@ run(2.7, test_TranslationUnit)
 run(2.7, test_Diagnostic)
 run(2.7, test_Cursor)
 run(2.7, test_Token)
+run(2.8, test_Type28)
