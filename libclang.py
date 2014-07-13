@@ -744,6 +744,59 @@ class Type:
 	def is_pod(self):
 		return bool(_libclang.clang_isPODType(self._t))
 
+class AvailabilityKind:
+	@requires(2.8)
+	def __init__(self, value):
+		self.value = value
+
+	@requires(2.8)
+	def __eq__(self, other):
+		return self.value == other.value
+
+	@requires(2.8)
+	def __ne__(self, other):
+		return self.value != other.value
+
+AvailabilityKind.AVAILABLE = AvailabilityKind(0) # 2.8
+AvailabilityKind.DEPRECATED = AvailabilityKind(1) # 2.8
+AvailabilityKind.NOT_AVAILABLE = AvailabilityKind(2) # 2.8
+
+class LanguageKind:
+	@requires(2.8)
+	def __init__(self, value):
+		self.value = value
+
+	@requires(2.8)
+	def __eq__(self, other):
+		return self.value == other.value
+
+	@requires(2.8)
+	def __ne__(self, other):
+		return self.value != other.value
+
+LanguageKind.INVALID = LanguageKind(0) # 2.8
+LanguageKind.C = LanguageKind(1) # 2.8
+LanguageKind.OBJC = LanguageKind(2) # 2.8
+LanguageKind.C_PLUS_PLUS = LanguageKind(3) # 2.8
+
+class AccessSpecifier:
+	@requires(2.8)
+	def __init__(self, value):
+		self.value = value
+
+	@requires(2.8)
+	def __eq__(self, other):
+		return self.value == other.value
+
+	@requires(2.8)
+	def __ne__(self, other):
+		return self.value != other.value
+
+AccessSpecifier.INVALID = AccessSpecifier(0) # 2.8
+AccessSpecifier.PUBLIC = AccessSpecifier(1) # 2.8
+AccessSpecifier.PROTECTED = AccessSpecifier(2) # 2.8
+AccessSpecifier.PRIVATE = AccessSpecifier(3) # 2.8
+
 class Cursor:
 	@requires(2.7)
 	def __init__(self, c, parent, tu):
@@ -856,6 +909,46 @@ class Cursor:
 	def ib_outlet_collection_type(self):
 		t = _libclang.clang_getIBOutletCollectionType(self._c)
 		return Type(t, self._tu)
+
+	@property
+	@requires(2.8, 'clang_getCursorAvailability', [_CXCursor], c_uint)
+	def availability(self):
+		kind = _libclang.clang_getCursorAvailability(self._c)
+		return AvailabilityKind(kind)
+
+	@property
+	@requires(2.8, 'clang_getCursorLanguage', [_CXCursor], c_uint)
+	def language(self):
+		kind = _libclang.clang_getCursorLanguage(self._c)
+		return LanguageKind(kind)
+
+	@property
+	@requires(2.8, 'clang_getCXXAccessSpecifier', [_CXCursor], c_uint)
+	def access_specifier(self):
+		access = _libclang.clang_getCXXAccessSpecifier(self._c)
+		return AccessSpecifier(access)
+
+	@property
+	@requires(2.8, 'clang_getTemplateCursorKind', [_CXCursor], c_uint)
+	def template_kind(self):
+		kind = _libclang.clang_getTemplateCursorKind(self._c)
+		return CursorKind(kind)
+
+	@property
+	@requires(2.8, 'clang_getSpecializedCursorTemplate', [_CXCursor], _CXCursor)
+	def specialized_template(self):
+		c = _libclang.clang_getSpecializedCursorTemplate(self._c)
+		return Cursor(c, None, self._tu)
+
+	@property
+	@requires(2.8, 'clang_isVirtualBase', [_CXCursor], c_uint)
+	def is_virtual_base(self):
+		return bool(_libclang.clang_isVirtualBase(self._c))
+
+	@property
+	@requires(2.8, 'clang_CXXMethod_isStatic', [_CXCursor], c_uint)
+	def is_static(self):
+		return bool(_libclang.clang_CXXMethod_isStatic(self._c))
 
 class TranslationUnitFlags:
 	@requires(2.8)

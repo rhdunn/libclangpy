@@ -217,6 +217,20 @@ def test_Cursor():
 	equals(len(tokens), 11)
 	equals(tokens[0].kind, libclang.TokenKind.KEYWORD)
 
+def test_Cursor28():
+	index = libclang.Index()
+	c = parse_str(index, 'enum test {};')[0]
+	equals(c.type.kind, libclang.TypeKind.ENUM)
+	equals(c.result_type.kind, libclang.TypeKind.INVALID)
+	equals(c.ib_outlet_collection_type.kind, libclang.TypeKind.INVALID)
+	equals(c.availability, libclang.AvailabilityKind.AVAILABLE)
+	equals(c.language, libclang.LanguageKind.C)
+	equals(c.access_specifier, libclang.AccessSpecifier.INVALID)
+	equals(c.template_kind, libclang.CursorKind.NO_DECL_FOUND)
+	equals(c.specialized_template.kind, libclang.CursorKind.INVALID_FILE)
+	equals(c.is_virtual_base, False)
+	equals(c.is_static, False)
+
 def test_Token():
 	index = libclang.Index()
 	tu = index.from_source('tests/enumeration.hpp')
@@ -269,5 +283,6 @@ run(2.8, test_Index28)
 run(2.7, test_TranslationUnit)
 run(2.7, test_Diagnostic)
 run(2.7, test_Cursor)
+run(2.8, test_Cursor28)
 run(2.7, test_Token)
 run(2.8, test_Type28)
