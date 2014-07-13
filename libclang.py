@@ -548,6 +548,16 @@ class CursorKind:
 	def is_translation_unit(self):
 		return bool(_libclang.clang_isTranslationUnit(self.value))
 
+	@property
+	@requires(2.8, 'clang_isPreprocessing', [c_uint], c_uint)
+	def is_preprocessing(self):
+		return bool(_libclang.clang_isPreprocessing(self.value))
+
+	@property
+	@requires(2.8, 'clang_isUnexposed', [c_uint], c_uint)
+	def is_unexposed(self):
+		return bool(_libclang.clang_isUnexposed(self.value))
+
 CursorKind.UNEXPOSED_DECL = CursorKind(1) # 2.7
 CursorKind.STRUCT_DECL = CursorKind(2) # 2.7
 CursorKind.UNION_DECL = CursorKind(3) # 2.7
@@ -568,21 +578,41 @@ CursorKind.OBJC_CLASS_METHOD_DECL = CursorKind(17) # 2.7
 CursorKind.OBJC_IMPLEMENTATION_DECL = CursorKind(18) # 2.7
 CursorKind.OBJC_CATEGORY_IMPL_DECL = CursorKind(19) # 2.7
 CursorKind.TYPEDEF_DECL = CursorKind(20) # 2.7
+CursorKind.CXX_METHOD_DECL = CursorKind(21) # 2.8
+CursorKind.NAMESPACE = CursorKind(22) # 2.8
+CursorKind.LINKAGE_SPEC = CursorKind(23) # 2.8
+CursorKind.CONSTRUCTOR = CursorKind(24) # 2.8
+CursorKind.DESTRUCTOR = CursorKind(25) # 2.8
+CursorKind.CONVERSION_FUNCTION = CursorKind(26) # 2.8
+CursorKind.TEMPLATE_TYPE_PARAMETER = CursorKind(27) # 2.8
+CursorKind.NON_TYPE_TEMPLATE_PARAMETER = CursorKind(28) # 2.8
+CursorKind.TEMPLATE_TEMPLATE_PARAMETER = CursorKind(29) # 2.8
+CursorKind.FUNCTION_TEMPLATE = CursorKind(30) # 2.8
+CursorKind.CLASS_TEMPLATE = CursorKind(31) # 2.8
+CursorKind.CLASS_TEMPLATE_PARTIAL_SPECIALIZATION = CursorKind(32) # 2.8
+CursorKind.NAMESPACE_ALIAS = CursorKind(33) # 2.8
+CursorKind.USING_DIRECTIVE = CursorKind(34) # 2.8
+CursorKind.USING_DECLARATION = CursorKind(35) # 2.8
 
 CursorKind.OBJC_SUPER_CLASS_REF = CursorKind(40) # 2.7
 CursorKind.OBJC_PROTOCOL_REF = CursorKind(41) # 2.7
 CursorKind.OBJC_CLASS_REF = CursorKind(42) # 2.7
 CursorKind.TYPE_REF = CursorKind(43) # 2.7
+CursorKind.CXX_BASE_SPECIFIER = CursorKind(44) # 2.8
+CursorKind.TEMPLATE_REF = CursorKind(45) # 2.8
+CursorKind.NAMESPACE_REF = CursorKind(46) # 2.8
 
 CursorKind.INVALID_FILE = CursorKind(70) # 2.7
 CursorKind.NO_DECL_FOUND = CursorKind(71) # 2.7
 CursorKind.NOT_IMPLEMENTED = CursorKind(72) # 2.7
+CursorKind.INVALID_CODE = CursorKind(73) # 2.8
 
 CursorKind.UNEXPOSED_EXPR = CursorKind(100) # 2.7
 CursorKind.DECL_REF_EXPR = CursorKind(101) # 2.7
 CursorKind.MEMBER_REF_EXPR = CursorKind(102) # 2.7
 CursorKind.CALL_EXPR = CursorKind(103) # 2.7
 CursorKind.OBJC_MESSAGE_EXPR = CursorKind(104) # 2.7
+CursorKind.BLOCK_EXPR = CursorKind(105) # 2.8
 
 CursorKind.UNEXPOSED_STMT = CursorKind(200) # 2.7
 
@@ -591,6 +621,11 @@ CursorKind.TRANSLATION_UNIT = CursorKind(300) # 2.7
 CursorKind.UNEXPOSED_ATTR = CursorKind(400) # 2.7
 CursorKind.IB_ACTION_ATTR = CursorKind(401) # 2.7
 CursorKind.IB_OUTLET_ATTR = CursorKind(402) # 2.7
+CursorKind.IB_OUTLET_COLLECTION_ATTR = CursorKind(403) # 2.8
+
+CursorKind.PREPROCESSING_DIRECTIVE = CursorKind(500) # 2.8
+CursorKind.MACRO_DEFINITION = CursorKind(501) # 2.8
+CursorKind.MACRO_INSTANTIATION = CursorKind(502) # 2.8
 
 class Cursor:
 	@requires(2.7)

@@ -86,6 +86,11 @@ def test_CursorKind():
 	equals(kind.is_invalid, False)
 	equals(kind.is_translation_unit, False)
 
+def test_CursorKind28():
+	kind = libclang.CursorKind.STRUCT_DECL
+	equals(kind.is_preprocessing, False)
+	equals(kind.is_unexposed, False)
+
 def test_Index():
 	index = libclang.Index()
 	filename = 'tests/enumeration.hpp'
@@ -226,6 +231,7 @@ libclang.load()
 run(2.7, test_SourceLocation)
 run(2.7, test_SourceRange)
 run(2.7, test_CursorKind)
+run(2.8, test_CursorKind28)
 run(2.7, test_Index)
 run(2.8, test_Index28)
 run(2.7, test_TranslationUnit)

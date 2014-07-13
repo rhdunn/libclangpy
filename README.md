@@ -22,7 +22,7 @@ the cindex bindings from LLVM/clang in that it:
 | `CXCompletionChunkKind` | 2.7     | No        |
 | `CXCompletionResult`    | 2.7     | No        |
 | `CXCursor`              | 2.7     | Yes       |
-| `CXCursorKind`          | 2.7     | Yes       |
+| `CXCursorKind`          | 2.8     | Yes       |
 | `CXFile`                | 2.7     | Yes       |
 | `CXIndex`               | 2.8     | Yes       |
 | `CXSourceLocation`      | 2.7     | Yes       |
