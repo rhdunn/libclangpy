@@ -398,6 +398,25 @@ Linkage.INTERNAL = Linkage(2) # 2.7
 Linkage.UNIQUE_EXTERNAL = Linkage(3) # 2.7
 Linkage.EXTERNAL = Linkage(4) # 2.7
 
+class TokenKind:
+	@requires(2.7)
+	def __init__(self, value):
+		self.value = value
+
+	@requires(2.7)
+	def __eq__(self, other):
+		return self.value == other.value
+
+	@requires(2.7)
+	def __ne__(self, other):
+		return self.value != other.value
+
+TokenKind.PUNCTUATION = TokenKind(0) # 2.7
+TokenKind.KEYWORD = TokenKind(1) # 2.7
+TokenKind.IDENTIFIER = TokenKind(2) # 2.7
+TokenKind.LITERAL = TokenKind(3) # 2.7
+TokenKind.COMMENT = TokenKind(4) # 2.7
+
 class CursorKind:
 	@requires(2.7)
 	def __init__(self, value):
