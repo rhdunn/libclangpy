@@ -30,7 +30,7 @@ The support status for libclang 2.9 is as follows:
 | `CXFile`                | 2.7      | Yes        |
 | `CXIndex`               | 2.9      | Yes        |
 | `CXSourceLocation`      | 3.0      | Yes        |
-| `CXSourceRange`         | 2.7      | Yes        |
+| `CXSourceRange`         | 3.0      | Yes        |
 | `CXString`              | 2.7      | Yes        |
 | `CXToken`               | 2.7      | Yes        |
 | `CXTokenKind`           | 2.7      | Yes        |

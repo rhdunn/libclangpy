@@ -302,7 +302,10 @@ class SourceRange:
 		self._sr = sr
 
 	@requires(2.7)
+	@optional(3.0, 'clang_equalRanges', [_CXSourceRange, _CXSourceRange], c_uint)
 	def __eq__(self, other):
+		if _libclang.clang_equalRanges:
+			return bool(_libclang.clang_equalRanges(self._sr, other._sr))
 		return self.start == other.start and self.end == other.end
 
 	@requires(2.7)
@@ -314,6 +317,14 @@ class SourceRange:
 	def null():
 		sr = _libclang.clang_getNullRange()
 		return SourceRange(sr)
+
+	@property
+	@requires(2.7)
+	@optional(3.0, 'clang_Range_isNull', [_CXSourceRange], c_int)
+	def is_null(self):
+		if _libclang.clang_Range_isNull:
+			return bool(_libclang.clang_Range_isNull(self._sr))
+		return self == SourceRange.null()
 
 	@staticmethod
 	@requires(2.7, 'clang_getRange', [_CXSourceLocation, _CXSourceLocation], _CXSourceRange)

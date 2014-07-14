@@ -85,6 +85,7 @@ def test_SourceRange():
 	equals(rng2.end,   libclang.SourceLocation.null())
 	equals(rng1 == rng2, True)
 	equals(rng1 != rng2, False)
+	equals(rng1.is_null, True)
 
 def test_CursorKind():
 	equals(libclang.CursorKind.CLASS_DECL == libclang.CursorKind.CLASS_DECL, True)
