@@ -24,6 +24,8 @@ _lib_extension = { 'Darwin': 'dylib', 'Linux': 'so', 'Windows': 'dll' }
 _system = platform.system()
 _libclang = None
 
+time_t = c_uint
+
 class _CXString(Structure):
 	_fields_ = [
 		('data', c_void_p),
@@ -93,3 +95,43 @@ def _to_str(s):
 	ret = str(_libclang.clang_getCString(s))
 	_libclang.clang_disposeString(s)
 	return ret
+
+class File:
+	@requires(2.7)
+	def __init__(self, f):
+		self._f = f
+
+	@requires(2.7)
+	def __str__(self):
+		return self.name
+
+	@requires(2.7)
+	def __eq__(self, other):
+		return self.name == other.name
+
+	@requires(2.7)
+	def __ne__(self, other):
+		return not self == other
+
+	@property
+	@requires(2.7, 'clang_getFileName', [c_void_p], _CXString)
+	def name(self):
+		ret = _libclang.clang_getFileName(self._f)
+		return _to_str(ret)
+
+	@property
+	@requires(2.7, 'clang_getFileTime', [c_void_p], time_t)
+	def time(self):
+		return _libclang.clang_getFileTime(self._f)
+
+class TranslationUnit:
+	@requires(2.7)
+	def __init__(self, tu):
+		self._tu = tu
+
+	@requires(2.7, 'clang_getFile', [c_void_p, c_char_p], c_void_p)
+	def file(self, filename):
+		ret = _libclang.clang_getFile(self._tu, filename)
+		if not ret:
+			raise Exception('File "%s" not in the translation unit.' % filename)
+		return File(ret)
