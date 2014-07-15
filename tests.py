@@ -19,47 +19,51 @@
 
 import libclang
 
+def equals(a, b):
+	if a != b:
+		raise AssertionError('Value mismatch: `{0}` != `{1}`'.format(str(a), str(b)))
+
 def match_location(loc, filename, line, column, offset):
 	if filename:
-		assert(loc.file.name == filename)
+		equals(loc.file.name, filename)
 	else:
-		assert(loc.file == None)
-	assert(loc.line == line)
-	assert(loc.column == column)
-	assert(loc.offset == offset)
+		equals(loc.file, None)
+	equals(loc.line, line)
+	equals(loc.column, column)
+	equals(loc.offset, offset)
 
 def test_File(f, filename):
-	assert(f.name == filename)
-	assert(str(f) == filename)
-	assert(f == f)
-	assert(not f != f)
+	equals(f.name, filename)
+	equals(str(f), filename)
+	equals(f == f, True)
+	equals(f != f, False)
 
 def test_SourceLocation():
 	loc = libclang.SourceLocation.null()
 	match_location(loc, None, 0, 0, 0)
 	match_location(loc.instantiation_location, None, 0, 0, 0)
-	assert(loc == libclang.SourceLocation.null())
-	assert(not loc != libclang.SourceLocation.null())
+	equals(loc == libclang.SourceLocation.null(), True)
+	equals(loc != libclang.SourceLocation.null(), False)
 
 def test_SourceRange():
 	rng1 = libclang.SourceRange.null()
-	assert(rng1.start == libclang.SourceLocation.null())
-	assert(rng1.end   == libclang.SourceLocation.null())
+	equals(rng1.start, libclang.SourceLocation.null())
+	equals(rng1.end,   libclang.SourceLocation.null())
 	rng2 = libclang.SourceRange.create(libclang.SourceLocation.null(),
 	                                   libclang.SourceLocation.null())
-	assert(rng2.start == libclang.SourceLocation.null())
-	assert(rng2.end   == libclang.SourceLocation.null())
-	assert(rng1 == rng2)
-	assert(not rng1 != rng2)
+	equals(rng2.start, libclang.SourceLocation.null())
+	equals(rng2.end,   libclang.SourceLocation.null())
+	equals(rng1 == rng2, True)
+	equals(rng1 != rng2, False)
 
 def test_TranslationUnit(index):
 	filename = 'tests/enumeration.hpp'
 	tu = index.from_source(filename)
-	assert(tu.spelling == filename)
-	assert(str(tu) == filename)
+	equals(tu.spelling, filename)
+	equals(str(tu), filename)
 	test_File(tu.file(filename), filename)
 	match_location(tu.location(tu.file(filename), 3, 2), filename, 3, 2, 13)
-	assert(len(list(tu.diagnostics)) == 0)
+	equals(list(tu.diagnostics), [])
 
 libclang.load()
 
