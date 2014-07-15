@@ -206,8 +206,13 @@ class File:
 		return _libclang.clang_getFileTime(self._f)
 
 class SourceLocationData:
-	def __init__(self, f, l, c, o):
-		self.file = File(f) if f else None
+	def __init__(self, l, c, o, cxfile=None, filename=None):
+		if filename:
+			self.file = _to_str(filename)
+		elif cxfile:
+			self.file = File(cxfile)
+		else:
+			self.file = None
 		self.line = int(l.value)
 		self.column = int(c.value)
 		self.offset = int(o.value)
@@ -218,6 +223,8 @@ class SourceLocation:
 		self._sl = sl
 		self._instantiation = None
 		self._spelling = None
+		self._expansion = None
+		self._presumed = None
 
 	@requires(2.7, 'clang_equalLocations', [_CXSourceLocation, _CXSourceLocation], c_uint)
 	def __eq__(self, other):
@@ -233,7 +240,7 @@ class SourceLocation:
 		if self._instantiation is None:
 			f, l, c, o = c_void_p(), c_uint(), c_uint(), c_uint()
 			_libclang.clang_getInstantiationLocation(self._sl, byref(f), byref(l), byref(c), byref(o))
-			self._instantiation = SourceLocationData(f, l, c, o)
+			self._instantiation = SourceLocationData(l, c, o, cxfile=f)
 		return self._instantiation
 
 	@property
@@ -242,8 +249,26 @@ class SourceLocation:
 		if self._spelling is None:
 			f, l, c, o = c_void_p(), c_uint(), c_uint(), c_uint()
 			_libclang.clang_getSpellingLocation(self._sl, byref(f), byref(l), byref(c), byref(o))
-			self._spelling = SourceLocationData(f, l, c, o)
+			self._spelling = SourceLocationData(l, c, o, cxfile=f)
 		return self._spelling
+
+	@property
+	@requires(3.0, 'clang_getExpansionLocation', [_CXSourceLocation, POINTER(c_void_p), POINTER(c_uint), POINTER(c_uint), POINTER(c_uint)])
+	def expansion_location(self):
+		if self._expansion is None:
+			f, l, c, o = c_void_p(), c_uint(), c_uint(), c_uint()
+			_libclang.clang_getExpansionLocation(self._sl, byref(f), byref(l), byref(c), byref(o))
+			self._expansion = SourceLocationData(l, c, o, cxfile=f)
+		return self._expansion
+
+	@property
+	@requires(3.0, 'clang_getPresumedLocation', [_CXSourceLocation, POINTER(_CXString), POINTER(c_uint), POINTER(c_uint), POINTER(c_uint)])
+	def presumed_location(self):
+		if self._presumed is None:
+			f, l, c, o = _CXString(), c_uint(), c_uint(), c_uint()
+			_libclang.clang_getPresumedLocation(self._sl, byref(f), byref(l), byref(c), byref(o))
+			self._presumed = SourceLocationData(l, c, o, filename=f)
+		return self._presumed
 
 	@staticmethod
 	@requires(2.7, 'clang_getNullLocation', [], _CXSourceLocation)

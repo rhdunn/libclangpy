@@ -45,10 +45,10 @@ def parse_str(index, contents):
 	return [child for child in tu.cursor().children if child.location.file]
 
 def match_location(loc, filename, line, column, offset):
-	if filename:
+	if isinstance(loc.file, libclang.File):
 		equals(loc.file.name, filename)
 	else:
-		equals(loc.file, None)
+		equals(loc.file, filename)
 	equals(loc.line, line)
 	equals(loc.column, column)
 	equals(loc.offset, offset)
@@ -69,6 +69,11 @@ def test_SourceLocation():
 def test_SourceLocation29():
 	loc = libclang.SourceLocation.null()
 	match_location(loc.spelling_location, None, 0, 0, 0)
+
+def test_SourceLocation30():
+	loc = libclang.SourceLocation.null()
+	match_location(loc.expansion_location, None, 0, 0, 0)
+	match_location(loc.presumed_location, '', 0, 0, 0)
 
 def test_SourceRange():
 	rng1 = libclang.SourceRange.null()
@@ -322,6 +327,7 @@ libclang.load()
 
 run(2.7, test_SourceLocation)
 run(2.9, test_SourceLocation29)
+run(3.0, test_SourceLocation30)
 run(2.7, test_SourceRange)
 run(2.7, test_CursorKind)
 run(2.8, test_CursorKind28)
