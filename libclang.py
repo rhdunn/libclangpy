@@ -45,6 +45,30 @@ class _CXSourceRange(Structure):
 		('end_int_data', c_uint)
 	]
 
+class _CXUnsavedFile(Structure):
+	_fields_ = [
+		('filename', c_char_p),
+		('contents', c_char_p),
+		('length', c_uint)
+	]
+
+def _marshall_args(args):
+	if not args or len(args) == 0:
+		return 0, None
+	return len(args), (c_char_p * len(args))(*args)
+
+def _marshall_unsaved_files(unsaved_files):
+	if not unsaved_files or len(unsaved_files) == 0:
+		return 0, None
+	ret = (_CXUnsavedFile * len(unsaved_files))()
+	for i, (name, contents) in enumerate(unsaved_files):
+		if hasattr(contents, 'read'):
+			contents = contents.read()
+		ret[i].name = name
+		ret[i].contents = contents
+		ret[i].length = len(contents)
+	return len(unsaved_files), ret
+
 def load(name=None, version=None):
 	""" Load libclang from the specified name and/or version. """
 
@@ -333,6 +357,14 @@ class TranslationUnit:
 	def __init__(self, tu):
 		self._tu = tu
 
+	@requires(2.7, 'clang_disposeTranslationUnit', [c_void_p])
+	def __del__(self):
+		_libclang.clang_disposeTranslationUnit(self._tu)
+
+	@requires(2.7)
+	def __str__(self):
+		return self.spelling
+
 	@requires(2.7, 'clang_getFile', [c_void_p, c_char_p], c_void_p)
 	def file(self, filename):
 		ret = _libclang.clang_getFile(self._tu, filename)
@@ -353,6 +385,12 @@ class TranslationUnit:
 			d = _libclang.clang_getDiagnostic(self._tu, i)
 			yield Diagnostic(d)
 
+	@property
+	@requires(2.7, 'clang_getTranslationUnitSpelling', [c_void_p], _CXString)
+	def spelling(self):
+		s = _libclang.clang_getTranslationUnitSpelling(self._tu)
+		return _to_str(s)
+
 class Index:
 	@requires(2.7, 'clang_createIndex', [c_int, c_int], c_void_p)
 	def __init__(self, exclude_from_pch=True, display_diagnostics=False):
@@ -365,3 +403,15 @@ class Index:
 	@requires(2.7, 'clang_setUseExternalASTGeneration', [c_void_p, c_int])
 	def use_external_ast_generation(self, use_external_ast):
 		_libclang.clang_setUseExternalASTGeneration(self._index, use_external_ast)
+
+	@requires(2.7, 'clang_createTranslationUnit', [c_void_p, c_char_p], c_void_p)
+	def from_ast(self, filename):
+		tu = _libclang.clang_createTranslationUnit(self._index, filename)
+		return TranslationUnit(tu)
+
+	@requires(2.7, 'clang_createTranslationUnitFromSourceFile', [c_void_p, c_char_p, c_int, POINTER(c_char_p), c_uint, POINTER(_CXUnsavedFile)], c_void_p)
+	def from_source(self, filename=None, args=None, unsaved_files=None):
+		argc, argv = _marshall_args(args)
+		unsavedc, unsavedv = _marshall_unsaved_files(unsaved_files)
+		tu = _libclang.clang_createTranslationUnitFromSourceFile(self._index, filename, argc, argv, unsavedc, unsavedv)
+		return TranslationUnit(tu)

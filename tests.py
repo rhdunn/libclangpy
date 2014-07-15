@@ -28,6 +28,12 @@ def match_location(loc, filename, line, column, offset):
 	assert(loc.column == column)
 	assert(loc.offset == offset)
 
+def test_File(f, filename):
+	assert(f.name == filename)
+	assert(str(f) == filename)
+	assert(f == f)
+	assert(not f != f)
+
 def test_SourceLocation():
 	loc = libclang.SourceLocation.null()
 	match_location(loc, None, 0, 0, 0)
@@ -46,9 +52,20 @@ def test_SourceRange():
 	assert(rng1 == rng2)
 	assert(not rng1 != rng2)
 
+def test_TranslationUnit(index):
+	filename = 'tests/enumeration.hpp'
+	tu = index.from_source(filename)
+	assert(tu.spelling == filename)
+	assert(str(tu) == filename)
+	test_File(tu.file(filename), filename)
+	match_location(tu.location(tu.file(filename), 3, 2), filename, 3, 2, 13)
+	assert(len(list(tu.diagnostics)) == 0)
+
 libclang.load()
 
 test_SourceLocation()
 test_SourceRange()
 
 index = libclang.Index()
+
+test_TranslationUnit(index)
