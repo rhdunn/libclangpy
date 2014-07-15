@@ -19,12 +19,31 @@
 
 from ctypes import *
 import platform
+import sys
 
 _lib_extension = { 'Darwin': 'dylib', 'Linux': 'so', 'Windows': 'dll' }
 _system = platform.system()
 _libclang = None
 
 time_t = c_uint
+
+if sys.version_info.major >= 3:
+	class c_utf8_p(c_char_p):
+		@staticmethod
+		def _check_retval_(retval):
+			if not retval:
+				return None
+			return retval.value.decode('utf-8')
+
+		@classmethod
+		def from_param(self, value):
+			if not value:
+				return None
+			if isinstance(value, str):
+				return value.encode('utf-8')
+			raise ValueError('string expected, got {0}'.format(value))
+else:
+	c_utf8_p = c_char_p
 
 class _CXString(Structure):
 	_fields_ = [
@@ -47,15 +66,15 @@ class _CXSourceRange(Structure):
 
 class _CXUnsavedFile(Structure):
 	_fields_ = [
-		('filename', c_char_p),
-		('contents', c_char_p),
+		('filename', c_utf8_p),
+		('contents', c_utf8_p),
 		('length', c_uint)
 	]
 
 def _marshall_args(args):
 	if not args or len(args) == 0:
 		return 0, None
-	return len(args), (c_char_p * len(args))(*args)
+	return len(args), (c_utf8_p * len(args))(*args)
 
 def _marshall_unsaved_files(unsaved_files):
 	if not unsaved_files or len(unsaved_files) == 0:
@@ -126,10 +145,10 @@ def optional(version, name, argtypes=None, restype=None):
 		return call
 	return new
 
-@requires(2.7, 'clang_getCString', [_CXString], c_char_p)
+@requires(2.7, 'clang_getCString', [_CXString], c_utf8_p)
 @requires(2.7, 'clang_disposeString', [_CXString])
 def _to_str(s):
-	ret = str(_libclang.clang_getCString(s))
+	ret = _libclang.clang_getCString(s)
 	_libclang.clang_disposeString(s)
 	return ret
 
@@ -365,7 +384,7 @@ class TranslationUnit:
 	def __str__(self):
 		return self.spelling
 
-	@requires(2.7, 'clang_getFile', [c_void_p, c_char_p], c_void_p)
+	@requires(2.7, 'clang_getFile', [c_void_p, c_utf8_p], c_void_p)
 	def file(self, filename):
 		ret = _libclang.clang_getFile(self._tu, filename)
 		if not ret:
@@ -404,12 +423,12 @@ class Index:
 	def use_external_ast_generation(self, use_external_ast):
 		_libclang.clang_setUseExternalASTGeneration(self._index, use_external_ast)
 
-	@requires(2.7, 'clang_createTranslationUnit', [c_void_p, c_char_p], c_void_p)
+	@requires(2.7, 'clang_createTranslationUnit', [c_void_p, c_utf8_p], c_void_p)
 	def from_ast(self, filename):
 		tu = _libclang.clang_createTranslationUnit(self._index, filename)
 		return TranslationUnit(tu)
 
-	@requires(2.7, 'clang_createTranslationUnitFromSourceFile', [c_void_p, c_char_p, c_int, POINTER(c_char_p), c_uint, POINTER(_CXUnsavedFile)], c_void_p)
+	@requires(2.7, 'clang_createTranslationUnitFromSourceFile', [c_void_p, c_utf8_p, c_int, POINTER(c_utf8_p), c_uint, POINTER(_CXUnsavedFile)], c_void_p)
 	def from_source(self, filename=None, args=None, unsaved_files=None):
 		argc, argv = _marshall_args(args)
 		unsavedc, unsavedv = _marshall_unsaved_files(unsaved_files)

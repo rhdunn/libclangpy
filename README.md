@@ -9,7 +9,9 @@ the cindex bindings from LLVM/clang in that it:
 
 3.  provides a cleaner, more pythonic API;
 
-4.  provides backward compatibility for several APIs.
+4.  provides backward compatibility for several APIs;
+
+5.  supports Python 2 and Python 3.
 
 ## License
 
