@@ -20,6 +20,9 @@
 import libclang
 
 def equals(a, b):
+	ta, tb = type(a), type(b)
+	if ta.__name__ != tb.__name__:
+		raise AssertionError('Type mismatch: `{0}` != `{1}`'.format(ta.__name__, tb.__name__))
 	if a != b:
 		raise AssertionError('Value mismatch: `{0}` != `{1}`'.format(str(a), str(b)))
 
