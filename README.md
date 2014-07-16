@@ -1,6 +1,6 @@
-# libclangpy 2.8
+# libclangpy 2.9
 
-The libclangpy project is a Python binding to the libclang 2.8 API. It differs
+The libclangpy project is a Python binding to the libclang 2.9 API. It differs
 from the cindex bindings from LLVM/clang in that it:
 
 1.  a more complete libclang binding (see Implementation Status below);
@@ -15,7 +15,7 @@ from the cindex bindings from LLVM/clang in that it:
 
 ## Implementation Status
 
-The support status for libclang 2.8 is as follows:
+The support status for libclang 2.9 is as follows:
 
 | API                     | libclang | libclangpy |
 |-------------------------|----------|------------|
@@ -25,6 +25,7 @@ The support status for libclang 2.8 is as follows:
 | `CXCompletionString`    | 2.8      | No         |
 | `CXCursor`              | 2.9      | Yes        |
 | `CXCursorKind`          | 2.9      | Yes        |
+| `CXCursorSet`           | 2.9      | No         |
 | `CXDiagnostic`          | 2.9      | Yes        |
 | `CXFile`                | 2.7      | Yes        |
 | `CXIndex`               | 2.9      | Yes        |
@@ -37,6 +38,7 @@ The support status for libclang 2.8 is as follows:
 | `CXType`                | 2.9      | Yes        |
 | `CXTypeKind`            | 2.8      | Yes        |
 | `clang_constructUSR_*`  | 2.8      | No         |
+| `clang_executeOnThread` | 2.9      | No         |
 | `clang_getClangVersion` | 2.7      | No         |
 | `clang_getInclusions`   | 2.7      | No         |
 
