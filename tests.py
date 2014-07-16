@@ -215,6 +215,7 @@ def test_Cursor():
 	equals(c.spelling, 'tests/enumeration.hpp')
 	equals(str(c), 'tests/enumeration.hpp')
 	equals(c.kind, libclang.CursorKind.TRANSLATION_UNIT)
+	equals(c.parent, None)
 	equals(c.linkage, libclang.Linkage.INVALID)
 	equals(c.location, libclang.SourceLocation.null())
 	match_location(c.extent.start, 'tests/enumeration.hpp', 1, 1, 0)
@@ -227,6 +228,7 @@ def test_Cursor():
 	children = [child for child in c.children if child.location.file]
 	equals(len(children), 1)
 	equals(children[0].kind, libclang.CursorKind.ENUM_DECL)
+	equals(children[0].parent, c)
 	# tokens
 	tokens = list(c.tokens)
 	equals(len(tokens), 11)
@@ -245,6 +247,19 @@ def test_Cursor28():
 	equals(c.specialized_template.kind, libclang.CursorKind.INVALID_FILE)
 	equals(c.is_virtual_base, False)
 	equals(c.is_static, False)
+
+def test_Cursor29():
+	index = libclang.Index()
+	c = parse_str(index, 'enum test {};')[0]
+	equals(hash(c), hash(c))
+	equals(c.semantic_parent, c.parent)
+	equals(c.lexical_parent, c.parent)
+	equals(c.included_file.name, None)
+	equals(c.objc_decltype_encoding, '?')
+	equals(len(list(c.overloads)), 0)
+	equals(c.display_name, 'test')
+	equals(c.canonical, c)
+	equals(len(c.overridden), 0)
 
 def test_Token():
 	index = libclang.Index()
@@ -309,6 +324,7 @@ run(2.7, test_Diagnostic)
 run(2.9, test_Diagnostic29)
 run(2.7, test_Cursor)
 run(2.8, test_Cursor28)
+run(2.9, test_Cursor29)
 run(2.7, test_Token)
 run(2.8, test_Type28)
 run(2.9, test_Type29)

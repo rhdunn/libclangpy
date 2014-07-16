@@ -864,6 +864,34 @@ AccessSpecifier.PUBLIC = AccessSpecifier(1) # 2.8
 AccessSpecifier.PROTECTED = AccessSpecifier(2) # 2.8
 AccessSpecifier.PRIVATE = AccessSpecifier(3) # 2.8
 
+class OverriddenCursors:
+	@requires(2.9)
+	def __init__(self, tu, cursors, length):
+		self._tu = tu
+		self._data = cursors
+		if cursors:
+			self._cursors = cast(cursors, POINTER(_CXCursor * length)).contents
+		else:
+			self._cursors = []
+		self._length = length
+
+	@requires(2.9, 'clang_disposeOverriddenCursors', [POINTER(_CXCursor)])
+	def __del__(self):
+		_libclang.clang_disposeOverriddenCursors(self._data)
+
+	@requires(2.9)
+	def __len__(self):
+		return self._length
+
+	@requires(2.9)
+	def __getitem__(self, key):
+		return Cursor(self._cursors[key], None, self._tu)
+
+	@requires(2.9)
+	def __iter__(self):
+		for i in range(0, len(self)):
+			yield self[i]
+
 class Cursor:
 	@requires(2.7)
 	def __init__(self, c, parent, tu):
@@ -882,6 +910,10 @@ class Cursor:
 	@requires(2.7)
 	def __str__(self):
 		return self.spelling
+
+	@requires(2.9, 'clang_hashCursor', [_CXCursor], c_uint)
+	def __hash__(self):
+		return _libclang.clang_hashCursor(self._c)
 
 	@staticmethod
 	@requires(2.7, 'clang_getNullCursor', [], _CXCursor)
@@ -1016,6 +1048,59 @@ class Cursor:
 	@requires(2.8, 'clang_CXXMethod_isStatic', [_CXCursor], c_uint)
 	def is_static(self):
 		return bool(_libclang.clang_CXXMethod_isStatic(self._c))
+
+	@property
+	@requires(2.9, 'clang_getCursorSemanticParent', [_CXCursor], _CXCursor)
+	def semantic_parent(self):
+		c = _libclang.clang_getCursorSemanticParent(self._c)
+		return Cursor(c, None, self._tu)
+
+	@property
+	@requires(2.9, 'clang_getCursorLexicalParent', [_CXCursor], _CXCursor)
+	def lexical_parent(self):
+		c = _libclang.clang_getCursorLexicalParent(self._c)
+		return Cursor(c, None, self._tu)
+
+	@property
+	@requires(2.9, 'clang_getIncludedFile', [_CXCursor], c_void_p)
+	def included_file(self):
+		f = _libclang.clang_getIncludedFile(self._c)
+		return File(f)
+
+	@property
+	@requires(2.9, 'clang_getDeclObjCTypeEncoding', [_CXCursor], _CXString)
+	def objc_decltype_encoding(self):
+		s = _libclang.clang_getDeclObjCTypeEncoding(self._c)
+		return _to_str(s)
+
+	@property
+	@requires(2.9, 'clang_getNumOverloadedDecls', [_CXCursor], c_uint)
+	@requires(2.9, 'clang_getOverloadedDecl', [_CXCursor, c_uint], _CXCursor)
+	def overloads(self):
+		for i in range(0, _libclang.clang_getNumOverloadedDecls(self._c)):
+			c  = _libclang.clang_getOverloadedDecl(self._c, i)
+			yield Cursor(c, None, self._tu)
+
+	@property
+	@requires(2.9, 'clang_getCursorDisplayName', [_CXCursor], _CXString)
+	def display_name(self):
+		s = _libclang.clang_getCursorDisplayName(self._c)
+		return _to_str(s)
+
+	@property
+	@requires(2.9, 'clang_getCanonicalCursor', [_CXCursor], _CXCursor)
+	def canonical(self):
+		c = _libclang.clang_getCanonicalCursor(self._c)
+		return Cursor(c, None, self._tu)
+
+	@property
+	@requires(2.9, 'clang_getOverriddenCursors', [_CXCursor, POINTER(POINTER(_CXCursor)), POINTER(c_uint)])
+	def overridden(self):
+		cursors = POINTER(_CXCursor)()
+		length = c_uint()
+		_libclang.clang_getOverriddenCursors(self._c, byref(cursors), byref(length))
+		length = int(length.value)
+		return OverriddenCursors(self, cursors, length)
 
 class TranslationUnitFlags:
 	@requires(2.8)
