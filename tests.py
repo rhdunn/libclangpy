@@ -74,6 +74,17 @@ def test_CursorKind():
 	equals(kind.is_invalid, False)
 	equals(kind.is_translation_unit, False)
 
+def test_Index(index):
+	filename = 'tests/enumeration.hpp'
+	# no args
+	tu = index.from_source(filename)
+	equals(tu.spelling, filename)
+	equals(len(list(tu.diagnostics)), 0)
+	# no args -- as keyword argument
+	tu = index.from_source(filename=filename)
+	equals(tu.spelling, filename)
+	equals(len(list(tu.diagnostics)), 0)
+
 def test_TranslationUnit(index):
 	filename = 'tests/enumeration.hpp'
 	tu = index.from_source(filename)
@@ -165,6 +176,7 @@ test_CursorKind()
 
 index = libclang.Index()
 
+test_Index(index)
 test_TranslationUnit(index)
 test_Diagnostic(index)
 test_Cursor(index)

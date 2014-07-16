@@ -138,10 +138,10 @@ def requires(version, name=None, argtypes=None, restype=None):
 	""" Python decorator to annotate required libclang API call dependencies, or libclang version. """
 
 	def new(f):
-		def call(*args):
+		def call(*args, **kwargs):
 			if name:
 				_bind_api(name, argtypes=argtypes, restype=restype)
-			return f(*args)
+			return f(*args, **kwargs)
 		return call
 	return new
 
@@ -149,13 +149,13 @@ def optional(version, name, argtypes=None, restype=None):
 	""" Python decorator to annotate optional libclang API call dependencies. """
 
 	def new(f):
-		def call(*args):
+		def call(*args, **kwargs):
 			global _libclang
 			try:
 				_bind_api(name, argtypes=argtypes, restype=restype)
 			except MissingFunction:
 				setattr(_libclang, name, None)
-			return f(*args)
+			return f(*args, **kwargs)
 		return call
 	return new
 
