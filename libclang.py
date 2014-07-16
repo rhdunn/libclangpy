@@ -99,8 +99,10 @@ def _marshall_unsaved_files(unsaved_files):
 	ret = (_CXUnsavedFile * len(unsaved_files))()
 	for i, (name, contents) in enumerate(unsaved_files):
 		if hasattr(contents, 'read'):
-			contents = contents.read()
-		ret[i].name = name
+			contents = contents.read().encode('utf-8')
+		else:
+			contents = contents.encode('utf-8')
+		ret[i].filename = name.encode('utf-8')
 		ret[i].contents = contents
 		ret[i].length = len(contents)
 	return len(unsaved_files), ret
