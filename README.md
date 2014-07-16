@@ -24,7 +24,7 @@ The support status for libclang 2.8 is as follows:
 | `CXCompletionResult`    | 2.8      | No         |
 | `CXCompletionString`    | 2.8      | No         |
 | `CXCursor`              | 2.8      | Yes        |
-| `CXCursorKind`          | 2.8      | Yes        |
+| `CXCursorKind`          | 2.9      | Yes        |
 | `CXDiagnostic`          | 2.9      | Yes        |
 | `CXFile`                | 2.7      | Yes        |
 | `CXIndex`               | 2.8      | Yes        |

@@ -655,6 +655,9 @@ CursorKind.TYPE_REF = CursorKind(43) # 2.7
 CursorKind.CXX_BASE_SPECIFIER = CursorKind(44) # 2.8
 CursorKind.TEMPLATE_REF = CursorKind(45) # 2.8
 CursorKind.NAMESPACE_REF = CursorKind(46) # 2.8
+CursorKind.MEMBER_REF = CursorKind(47) # 2.9
+CursorKind.LABEL_REF = CursorKind(48) # 2.9
+CursorKind.OVERLOADED_DECL_REF = CursorKind(49) # 2.9
 
 CursorKind.INVALID_FILE = CursorKind(70) # 2.7
 CursorKind.NO_DECL_FOUND = CursorKind(71) # 2.7
@@ -669,6 +672,7 @@ CursorKind.OBJC_MESSAGE_EXPR = CursorKind(104) # 2.7
 CursorKind.BLOCK_EXPR = CursorKind(105) # 2.8
 
 CursorKind.UNEXPOSED_STMT = CursorKind(200) # 2.7
+CursorKind.LABEL_STMT = CursorKind(201) # 2.9
 
 CursorKind.TRANSLATION_UNIT = CursorKind(300) # 2.7
 
