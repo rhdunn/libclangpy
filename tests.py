@@ -74,7 +74,8 @@ def test_CursorKind():
 	equals(kind.is_invalid, False)
 	equals(kind.is_translation_unit, False)
 
-def test_Index(index):
+def test_Index():
+	index = libclang.Index()
 	filename = 'tests/enumeration.hpp'
 	# no args
 	tu = index.from_source(filename)
@@ -97,7 +98,8 @@ def test_Index(index):
 	equals(tu.spelling, '')
 	equals(len(list(tu.diagnostics)), 0)
 
-def test_TranslationUnit(index):
+def test_TranslationUnit():
+	index = libclang.Index()
 	filename = 'tests/enumeration.hpp'
 	tu = index.from_source(filename)
 	equals(tu.spelling, filename)
@@ -106,7 +108,8 @@ def test_TranslationUnit(index):
 	match_location(tu.location(tu.file(filename), 3, 2), filename, 3, 2, 13)
 	equals(list(tu.diagnostics), [])
 
-def test_Diagnostic(index):
+def test_Diagnostic():
+	index = libclang.Index()
 	tu = index.from_source('tests/error.hpp')
 	diagnostics = list(tu.diagnostics)
 	equals(len(diagnostics), 1)
@@ -130,7 +133,8 @@ def test_Diagnostic(index):
 	match_location(r.end, 'tests/error.hpp', 6, 2, 25)
 	equals(msg, ';')
 
-def test_Cursor(index):
+def test_Cursor():
+	index = libclang.Index()
 	tu = index.from_source('tests/enumeration.hpp')
 	c = tu.cursor()
 	equals(c == c, True)
@@ -157,7 +161,8 @@ def test_Cursor(index):
 	equals(len(tokens), 11)
 	equals(tokens[0].kind, libclang.TokenKind.KEYWORD)
 
-def test_Token(index):
+def test_Token():
+	index = libclang.Index()
 	tu = index.from_source('tests/enumeration.hpp')
 	f = tu.file('tests/enumeration.hpp')
 	rng = libclang.SourceRange.create(tu.location(f, 1, 1), tu.location(f, 2, 1))
@@ -185,13 +190,10 @@ libclang.load()
 test_SourceLocation()
 test_SourceRange()
 test_CursorKind()
-
-index = libclang.Index()
-
-test_Index(index)
-test_TranslationUnit(index)
-test_Diagnostic(index)
-test_Cursor(index)
-test_Token(index)
+test_Index()
+test_TranslationUnit()
+test_Diagnostic()
+test_Cursor()
+test_Token()
 
 print('success')
