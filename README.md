@@ -1,7 +1,7 @@
-# libclangpy
+# libclangpy 2.8
 
-The libclangpy project is a Python binding to the libclang API. It differs from
-the cindex bindings from LLVM/clang in that it:
+The libclangpy project is a Python binding to the libclang 2.8 API. It differs
+from the cindex bindings from LLVM/clang in that it:
 
 1.  a more complete libclang binding (see Implementation Status below);
 
@@ -15,30 +15,39 @@ the cindex bindings from LLVM/clang in that it:
 
 ## Implementation Status
 
-| API                     | Version | Supported |
-|-------------------------|---------|-----------|
-| `CXDiagnostic`          | 2.7     | Yes       |
-| `CXCodeCompleteResults` | 2.7     | No        |
-| `CXCompletionChunkKind` | 2.7     | No        |
-| `CXCompletionResult`    | 2.7     | No        |
-| `CXCursor`              | 2.8     | Yes       |
-| `CXCursorKind`          | 2.8     | Yes       |
-| `CXFile`                | 2.7     | Yes       |
-| `CXIndex`               | 2.8     | Yes       |
-| `CXSourceLocation`      | 2.7     | Yes       |
-| `CXSourceRange`         | 2.7     | Yes       |
-| `CXString`              | 2.7     | Yes       |
-| `CXToken`               | 2.7     | Yes       |
-| `CXTokenKind`           | 2.7     | Yes       |
-| `CXTranslationUnit`     | 2.8     | Yes       |
-| `CXType`                | 2.8     | Yes       |
-| `CXTypeKind`            | 2.8     | Yes       |
-| `clang_getClangVersion` | 2.7     | No        |
-| `clang_getInclusions`   | 2.7     | No        |
+The support status for libclang 2.8 is as follows:
 
-Here, `API` is the name of the API type in libclang, `Version` is the version
-of libclang supported for that API, and `Supported` indicates whether the API
-is supported by libclangpy.
+| API                     | libclang | libclangpy |
+|-------------------------|----------|------------|
+| `CXDiagnostic`          | 2.7      | Yes        |
+| `CXCodeCompleteResults` | 2.8      | No         |
+| `CXCompletionChunkKind` | 2.7      | No         |
+| `CXCompletionResult`    | 2.8      | No         |
+| `CXCompletionString`    | 2.8      | No         |
+| `CXCursor`              | 2.8      | Yes        |
+| `CXCursorKind`          | 2.8      | Yes        |
+| `CXFile`                | 2.7      | Yes        |
+| `CXIndex`               | 2.8      | Yes        |
+| `CXSourceLocation`      | 2.7      | Yes        |
+| `CXSourceRange`         | 2.7      | Yes        |
+| `CXString`              | 2.7      | Yes        |
+| `CXToken`               | 2.7      | Yes        |
+| `CXTokenKind`           | 2.7      | Yes        |
+| `CXTranslationUnit`     | 2.8      | Yes        |
+| `CXType`                | 2.8      | Yes        |
+| `CXTypeKind`            | 2.8      | Yes        |
+| `clang_constructUSR_*`  | 2.8      | No         |
+| `clang_getClangVersion` | 2.7      | No         |
+| `clang_getInclusions`   | 2.7      | No         |
+
+Where:
+*  `API` is the name of the API type in libclang,
+*  `libclang` is the version of libclang the API was updated in,
+*  `libclangpy` is the support status of the API in libclangpy -- `No` means
+   the API is not supported, `Yes` means the API is fully supported for this
+   version of libclang, a version number specifies the version of libclang
+   this API is fully supported by libclangpy in (e.g. `2.7` indicates that
+   libclangpy supports the libclang 2.7 version of this API).
 
 ## License
 
