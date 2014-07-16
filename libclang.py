@@ -217,6 +217,7 @@ class SourceLocation:
 	def __init__(self, sl):
 		self._sl = sl
 		self._instantiation = None
+		self._spelling = None
 
 	@requires(2.7, 'clang_equalLocations', [_CXSourceLocation, _CXSourceLocation], c_uint)
 	def __eq__(self, other):
@@ -234,6 +235,15 @@ class SourceLocation:
 			_libclang.clang_getInstantiationLocation(self._sl, byref(f), byref(l), byref(c), byref(o))
 			self._instantiation = SourceLocationData(f, l, c, o)
 		return self._instantiation
+
+	@property
+	@requires(2.9, 'clang_getSpellingLocation', [_CXSourceLocation, POINTER(c_void_p), POINTER(c_uint), POINTER(c_uint), POINTER(c_uint)])
+	def spelling_location(self):
+		if self._spelling is None:
+			f, l, c, o = c_void_p(), c_uint(), c_uint(), c_uint()
+			_libclang.clang_getSpellingLocation(self._sl, byref(f), byref(l), byref(c), byref(o))
+			self._spelling = SourceLocationData(f, l, c, o)
+		return self._spelling
 
 	@staticmethod
 	@requires(2.7, 'clang_getNullLocation', [], _CXSourceLocation)

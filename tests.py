@@ -66,6 +66,10 @@ def test_SourceLocation():
 	equals(loc == libclang.SourceLocation.null(), True)
 	equals(loc != libclang.SourceLocation.null(), False)
 
+def test_SourceLocation29():
+	loc = libclang.SourceLocation.null()
+	match_location(loc.spelling_location, None, 0, 0, 0)
+
 def test_SourceRange():
 	rng1 = libclang.SourceRange.null()
 	equals(rng1.start, libclang.SourceLocation.null())
@@ -274,6 +278,7 @@ def test_Type28():
 libclang.load()
 
 run(2.7, test_SourceLocation)
+run(2.9, test_SourceLocation29)
 run(2.7, test_SourceRange)
 run(2.7, test_CursorKind)
 run(2.8, test_CursorKind28)
