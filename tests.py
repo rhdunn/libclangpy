@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with libclangpy.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 import libclang
 
 def equals(a, b):
@@ -25,6 +26,17 @@ def equals(a, b):
 		raise AssertionError('Type mismatch: `{0}` != `{1}`'.format(ta.__name__, tb.__name__))
 	if a != b:
 		raise AssertionError('Value mismatch: `{0}` != `{1}`'.format(str(a), str(b)))
+
+def run(version, test):
+	sys.stdout.write('Running {0} ... '.format(test.__name__))
+	try:
+		test()
+		print('passed')
+	except libclang.MissingFunction:
+		print('skipping ... missing APIs')
+	except e:
+		print('failed')
+		print(e.format_exc())
 
 def match_location(loc, filename, line, column, offset):
 	if filename:
@@ -187,13 +199,11 @@ def test_Token():
 
 libclang.load()
 
-test_SourceLocation()
-test_SourceRange()
-test_CursorKind()
-test_Index()
-test_TranslationUnit()
-test_Diagnostic()
-test_Cursor()
-test_Token()
-
-print('success')
+run(2.7, test_SourceLocation)
+run(2.7, test_SourceRange)
+run(2.7, test_CursorKind)
+run(2.7, test_Index)
+run(2.7, test_TranslationUnit)
+run(2.7, test_Diagnostic)
+run(2.7, test_Cursor)
+run(2.7, test_Token)
