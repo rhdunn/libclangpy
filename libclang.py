@@ -334,6 +334,9 @@ class DiagnosticDisplayOptions:
 DiagnosticDisplayOptions.SOURCE_LOCATION = DiagnosticDisplayOptions(1) # 2.7
 DiagnosticDisplayOptions.COLUMN = DiagnosticDisplayOptions(2) # 2.7
 DiagnosticDisplayOptions.SOURCE_RANGES = DiagnosticDisplayOptions(4) # 2.7
+DiagnosticDisplayOptions.OPTION = DiagnosticDisplayOptions(8) # 2.9
+DiagnosticDisplayOptions.CATEGORY_ID = DiagnosticDisplayOptions(16) # 2.9
+DiagnosticDisplayOptions.CATEGORY_NAME = DiagnosticDisplayOptions(32) # 2.9
 
 class DiagnosticSeverity:
 	@requires(2.7)
@@ -353,6 +356,29 @@ DiagnosticSeverity.NOTE = DiagnosticSeverity(1) # 2.7
 DiagnosticSeverity.WARNING = DiagnosticSeverity(2) # 2.7
 DiagnosticSeverity.ERROR = DiagnosticSeverity(3) # 2.7
 DiagnosticSeverity.FATAL = DiagnosticSeverity(4) # 2.7
+
+class DiagnosticCategory:
+	@requires(2.9)
+	def __init__(self, value):
+		self.value = value
+
+	@requires(2.9)
+	def __eq__(self, other):
+		return self.value == other.value
+
+	@requires(2.9)
+	def __ne__(self, other):
+		return self.value != other.value
+
+	@requires(2.9)
+	def __str__(self):
+		return self.name
+
+	@property
+	@requires(2.9, 'clang_getDiagnosticCategoryName', [c_uint], _CXString)
+	def name(self):
+		s = _libclang.clang_getDiagnosticCategoryName(self.value)
+		return _to_str(s)
 
 class Diagnostic:
 	@requires(2.7)
@@ -405,6 +431,18 @@ class Diagnostic:
 			sr = _CXSourceRange()
 			s  = _libclang.clang_getDiagnosticFixIt(self._d, i, byref(sr))
 			yield (SourceRange(sr), _to_str(s))
+
+	@property
+	@requires(2.9, 'clang_getDiagnosticOption', [c_void_p, POINTER(_CXString)], _CXString)
+	def option(self):
+		disable = _CXString()
+		o = _libclang.clang_getDiagnosticOption(self._d, byref(disable))
+		return (_to_str(o), _to_str(disable))
+
+	@property
+	@requires(2.9, 'clang_getDiagnosticCategory', [c_void_p], c_uint)
+	def category(self):
+		return DiagnosticCategory(_libclang.clang_getDiagnosticCategory(self._d))
 
 class Linkage:
 	@requires(2.7)

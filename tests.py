@@ -193,6 +193,17 @@ def test_Diagnostic():
 	match_location(r.end, 'tests/error.hpp', 6, 2, 25)
 	equals(msg, ';')
 
+def test_Diagnostic29():
+	index = libclang.Index()
+	tu = index.from_source('tests/error.hpp')
+	diagnostics = list(tu.diagnostics)
+	equals(len(diagnostics), 1)
+	d = diagnostics[0]
+	opt, disable = d.option
+	equals(opt, '')
+	equals(disable, '')
+	equals(d.category.name, 'Parse Issue')
+
 def test_Cursor():
 	index = libclang.Index()
 	tu = index.from_source('tests/enumeration.hpp')
@@ -287,6 +298,7 @@ run(2.7, test_Index)
 run(2.8, test_Index28)
 run(2.7, test_TranslationUnit)
 run(2.7, test_Diagnostic)
+run(2.9, test_Diagnostic29)
 run(2.7, test_Cursor)
 run(2.8, test_Cursor28)
 run(2.7, test_Token)
