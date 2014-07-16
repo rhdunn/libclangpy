@@ -529,7 +529,10 @@ class TokenList:
 	def __init__(self, tu, tokens, length):
 		self._tu = tu
 		self._data = tokens
-		self._tokens = cast(tokens, POINTER(_CXToken * length)).contents
+		if tokens:
+			self._tokens = cast(tokens, POINTER(_CXToken * length)).contents
+		else:
+			self._tokens = []
 		self._length = length
 
 	@requires(2.7, 'clang_disposeTokens', [c_void_p, POINTER(_CXToken), c_uint])
@@ -1224,8 +1227,6 @@ class TranslationUnit:
 		length = c_uint()
 		_libclang.clang_tokenize(self._tu, srcrange._sr, byref(tokens), byref(length))
 		length = int(length.value)
-		if length < 1:
-			return None
 		return TokenList(self, tokens, length)
 
 	@staticmethod

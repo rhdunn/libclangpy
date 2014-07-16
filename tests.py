@@ -275,6 +275,8 @@ def test_Token():
 	rng = libclang.SourceRange.create(tu.location(f, 1, 1), tu.location(f, 2, 1))
 	children = [child for child in tu.cursor().children if child.location.file]
 	# tokenize
+	tokens = tu.tokenize(libclang.SourceRange.null())
+	equals(len(tokens), 0)
 	tokens = tu.tokenize(rng)
 	equals(len(tokens), 3)
 	equals(tokens[0].spelling, 'enum')
