@@ -68,6 +68,30 @@ def test_TranslationUnit(index):
 	match_location(tu.location(tu.file(filename), 3, 2), filename, 3, 2, 13)
 	equals(list(tu.diagnostics), [])
 
+def test_Diagnostic(index):
+	tu = index.from_source('tests/error.hpp')
+	diagnostics = list(tu.diagnostics)
+	equals(len(diagnostics), 1)
+	d = diagnostics[0]
+	equals(d.spelling, 'expected \';\' after enum')
+	equals(str(d), 'expected \';\' after enum')
+	equals(d.format(),
+	       'tests/error.hpp:6:2: error: expected \';\' after enum')
+	equals(d.format(libclang.DiagnosticDisplayOptions.SOURCE_LOCATION),
+	       'tests/error.hpp:6: error: expected \';\' after enum')
+	equals(d.severity, libclang.DiagnosticSeverity.ERROR)
+	match_location(d.location, 'tests/error.hpp', 6, 2, 25)
+	# ranges
+	r = list(d.ranges)
+	equals(len(r), 0)
+	# fixits
+	f = list(d.fixits)
+	equals(len(f), 1)
+	r, msg = f[0]
+	match_location(r.start, 'tests/error.hpp', 6, 2, 25)
+	match_location(r.end, 'tests/error.hpp', 6, 2, 25)
+	equals(msg, ';')
+
 libclang.load()
 
 test_SourceLocation()
@@ -76,3 +100,6 @@ test_SourceRange()
 index = libclang.Index()
 
 test_TranslationUnit(index)
+test_Diagnostic(index)
+
+print('success')

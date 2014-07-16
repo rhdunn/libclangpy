@@ -366,7 +366,7 @@ class Diagnostic:
 	@requires(2.7, 'clang_getDiagnosticNumFixIts', [c_void_p], c_uint)
 	@requires(2.7, 'clang_getDiagnosticFixIt', [c_void_p, c_uint, POINTER(_CXSourceRange)], _CXString)
 	def fixits(self):
-		for i in range(0, _libclang.clang_getNumDiagnosticFixIts(self._d)):
+		for i in range(0, _libclang.clang_getDiagnosticNumFixIts(self._d)):
 			sr = _CXSourceRange()
 			s  = _libclang.clang_getDiagnosticFixIt(self._d, i, byref(sr))
 			yield (SourceRange(sr), _to_str(s))
