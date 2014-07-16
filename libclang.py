@@ -1258,10 +1258,6 @@ class Index:
 	def __del__(self):
 		_libclang.clang_disposeIndex(self._index)
 
-	@requires(2.7, 'clang_setUseExternalASTGeneration', [c_void_p, c_int])
-	def use_external_ast_generation(self, use_external_ast):
-		_libclang.clang_setUseExternalASTGeneration(self._index, use_external_ast)
-
 	@requires(2.7, 'clang_createTranslationUnit', [c_void_p, c_utf8_p], c_void_p)
 	def from_ast(self, filename):
 		tu = _libclang.clang_createTranslationUnit(self._index, filename)

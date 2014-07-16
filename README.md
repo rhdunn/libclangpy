@@ -27,7 +27,7 @@ The support status for libclang 2.8 is as follows:
 | `CXCursorKind`          | 2.9      | Yes        |
 | `CXDiagnostic`          | 2.9      | Yes        |
 | `CXFile`                | 2.7      | Yes        |
-| `CXIndex`               | 2.8      | Yes        |
+| `CXIndex`               | 2.9      | Yes        |
 | `CXSourceLocation`      | 2.9      | Yes        |
 | `CXSourceRange`         | 2.7      | Yes        |
 | `CXString`              | 2.7      | Yes        |
@@ -48,6 +48,9 @@ Where:
    version of libclang, a version number specifies the version of libclang
    this API is fully supported by libclangpy in (e.g. `2.7` indicates that
    libclangpy supports the libclang 2.7 version of this API).
+
+__NOTE__: The `clang_setUseExternalASTGeneration` API was removed in libclang
+2.9, so is not supported in libclangpy.
 
 ## License
 
