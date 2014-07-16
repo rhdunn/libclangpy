@@ -88,7 +88,10 @@ cb_cursor_visitor = CFUNCTYPE(c_int, _CXCursor, _CXCursor, py_object)
 def _marshall_args(args):
 	if not args or len(args) == 0:
 		return 0, None
-	return len(args), (c_utf8_p * len(args))(*args)
+	ret = (c_utf8_p * len(args))()
+	for i, arg in enumerate(args):
+		ret[i] = arg.encode('utf-8')
+	return len(args), ret
 
 def _marshall_unsaved_files(unsaved_files):
 	if not unsaved_files or len(unsaved_files) == 0:

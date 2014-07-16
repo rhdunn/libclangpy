@@ -84,6 +84,14 @@ def test_Index(index):
 	tu = index.from_source(filename=filename)
 	equals(tu.spelling, filename)
 	equals(len(list(tu.diagnostics)), 0)
+	# file as arg
+	tu = index.from_source(args=[filename])
+	equals(tu.spelling, filename)
+	equals(len(list(tu.diagnostics)), 0)
+	# args
+	tu = index.from_source(filename, args=['-std=c++98'])
+	equals(tu.spelling, filename)
+	equals(len(list(tu.diagnostics)), 0)
 
 def test_TranslationUnit(index):
 	filename = 'tests/enumeration.hpp'
