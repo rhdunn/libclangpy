@@ -166,7 +166,14 @@ def test_TranslationUnit():
 	equals(str(tu), filename)
 	test_File(tu.file(filename), filename)
 	match_location(tu.location(tu.file(filename), 3, 2), filename, 3, 2, 13)
+	match_location(tu.location(tu.file(filename), line=3, column=2), filename, 3, 2, 13)
 	equals(list(tu.diagnostics), [])
+
+def test_TranslationUnit29():
+	index = libclang.Index()
+	filename = 'tests/enumeration.hpp'
+	tu = index.from_source(filename)
+	match_location(tu.location(tu.file(filename), offset=13), filename, 3, 2, 13)
 
 def test_Diagnostic():
 	index = libclang.Index()
@@ -320,6 +327,7 @@ run(2.8, test_TypeKind28)
 run(2.7, test_Index)
 run(2.8, test_Index28)
 run(2.7, test_TranslationUnit)
+run(2.9, test_TranslationUnit29)
 run(2.7, test_Diagnostic)
 run(2.9, test_Diagnostic29)
 run(2.7, test_Cursor)

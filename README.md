@@ -33,7 +33,7 @@ The support status for libclang 2.8 is as follows:
 | `CXString`              | 2.7      | Yes        |
 | `CXToken`               | 2.7      | Yes        |
 | `CXTokenKind`           | 2.7      | Yes        |
-| `CXTranslationUnit`     | 2.8      | Yes        |
+| `CXTranslationUnit`     | 2.9      | Yes        |
 | `CXType`                | 2.9      | Yes        |
 | `CXTypeKind`            | 2.8      | Yes        |
 | `clang_constructUSR_*`  | 2.8      | No         |

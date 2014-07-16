@@ -1130,6 +1130,8 @@ TranslationUnitFlags.DETAILED_PREPROCESSING_RECORD = TranslationUnitFlags(1) # 2
 TranslationUnitFlags.INCOMPLETE = TranslationUnitFlags(2) # 2.8
 TranslationUnitFlags.PRECOMPILED_PREAMBLE = TranslationUnitFlags(4) # 2.8
 TranslationUnitFlags.CACHE_COMPLETION_RESULTS = TranslationUnitFlags(8) # 2.8
+TranslationUnitFlags.PRECOMPILED_PREAMBLE = TranslationUnitFlags(16) # 2.9
+TranslationUnitFlags.CHAINED_PCH = TranslationUnitFlags(32) # 2.9
 
 class SaveTranslationUnitFlags:
 	@requires(2.8)
@@ -1182,8 +1184,15 @@ class TranslationUnit:
 		return File(ret)
 
 	@requires(2.7, 'clang_getLocation', [c_void_p, c_void_p, c_uint, c_uint], _CXSourceLocation)
-	def location(self, cxfile, line, column):
-		ret = _libclang.clang_getLocation(self._tu, cxfile._f, line, column)
+	@optional(2.9, 'clang_getLocationForOffset', [c_void_p, c_void_p, c_uint], _CXSourceLocation)
+	def location(self, cxfile, line=-1, column=0, offset=-1):
+		ret = None
+		if line != -1:
+			ret = _libclang.clang_getLocation(self._tu, cxfile._f, line, column)
+		elif offset != -1 and _libclang.clang_getLocationForOffset:
+			ret = _libclang.clang_getLocationForOffset(self._tu, cxfile._f, offset)
+		if not ret:
+			raise Exception('Unable to determine the file location in this translation unit.')
 		return SourceLocation(ret)
 
 	@property
