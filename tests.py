@@ -18,6 +18,8 @@
 # along with libclangpy.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
+import traceback
+
 import libclang
 
 def equals(a, b):
@@ -34,9 +36,9 @@ def run(version, test):
 		print('passed')
 	except libclang.MissingFunction:
 		print('skipping ... missing APIs')
-	except e:
+	except Exception as e:
 		print('failed')
-		print(e.format_exc())
+		print(traceback.format_exc())
 
 def match_location(loc, filename, line, column, offset):
 	if filename:
