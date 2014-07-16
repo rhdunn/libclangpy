@@ -3,7 +3,7 @@
 The libclangpy project is a Python binding to the libclang 2.9 API. It differs
 from the cindex bindings from LLVM/clang in that it:
 
-1.  a more complete libclang binding (see Implementation Status below);
+1.  is a more complete libclang binding (see Implementation Status below);
 
 2.  annotates which libclang version is needed by each API;
 
