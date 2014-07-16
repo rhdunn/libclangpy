@@ -796,6 +796,21 @@ class Type:
 	def is_pod(self):
 		return bool(_libclang.clang_isPODType(self._t))
 
+	@property
+	@requires(2.9, 'clang_isConstQualifiedType', [_CXType], c_uint)
+	def is_const_qualified(self):
+		return bool(_libclang.clang_isConstQualifiedType(self._t))
+
+	@property
+	@requires(2.9, 'clang_isVolatileQualifiedType', [_CXType], c_uint)
+	def is_volatile_qualified(self):
+		return bool(_libclang.clang_isVolatileQualifiedType(self._t))
+
+	@property
+	@requires(2.9, 'clang_isRestrictQualifiedType', [_CXType], c_uint)
+	def is_restrict_qualified(self):
+		return bool(_libclang.clang_isRestrictQualifiedType(self._t))
+
 class AvailabilityKind:
 	@requires(2.8)
 	def __init__(self, value):

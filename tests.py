@@ -286,6 +286,14 @@ def test_Type28():
 	equals(t.declaration.kind, libclang.CursorKind.NO_DECL_FOUND)
 	equals(t.is_pod, True)
 
+def test_Type29():
+	index = libclang.Index()
+	c = parse_str(index, 'int a;')[0]
+	t = c.type
+	equals(t.is_const_qualified, False)
+	equals(t.is_volatile_qualified, False)
+	equals(t.is_restrict_qualified, False)
+
 libclang.load()
 
 run(2.7, test_SourceLocation)
@@ -303,3 +311,4 @@ run(2.7, test_Cursor)
 run(2.8, test_Cursor28)
 run(2.7, test_Token)
 run(2.8, test_Type28)
+run(2.9, test_Type29)
