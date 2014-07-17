@@ -1,6 +1,6 @@
-# libclangpy 2.9
+# libclangpy 3.0
 
-The libclangpy project is a Python binding to the libclang 2.9 API. It differs
+The libclangpy project is a Python binding to the libclang 3.0 API. It differs
 from the cindex bindings from LLVM/clang in that it:
 
 1.  is a more complete libclang binding (see Implementation Status below);
@@ -31,30 +31,37 @@ you can now start using it, e.g.:
 
 ## Implementation Status
 
-The support status for libclang 2.9 is as follows:
+The support status for libclang 3.0 is as follows:
 
 | API                     | libclang | libclangpy |
 |-------------------------|----------|------------|
 | `CXCodeCompleteResults` | 2.8      | No         |
 | `CXCompletionChunkKind` | 2.7      | No         |
-| `CXCompletionResult`    | 2.8      | No         |
-| `CXCompletionString`    | 2.8      | No         |
+| `CXCompletionContext`   | 3.0      | No         |
+| `CXCompletionResults`   | 3.0      | No         |
+| `CXCompletionString`    | 3.0      | No         |
 | `CXCursor`              | 3.0      | Yes        |
+| `CXCursorAndRangeVisitor`| 3.0     | No         |
 | `CXCursorKind`          | 3.0      | Yes        |
 | `CXCursorSet`           | 2.9      | No         |
 | `CXDiagnostic`          | 2.9      | Yes        |
 | `CXFile`                | 2.7      | Yes        |
 | `CXIndex`               | 2.9      | Yes        |
+| `CXRemapping`           | 3.0      | No         |
 | `CXSourceLocation`      | 3.0      | Yes        |
 | `CXSourceRange`         | 3.0      | Yes        |
 | `CXString`              | 2.7      | Yes        |
 | `CXToken`               | 2.7      | Yes        |
 | `CXTokenKind`           | 2.7      | Yes        |
 | `CXTranslationUnit`     | 3.0      | Yes        |
+| `CXTUResourceUsage`     | 3.0      | No         |
+| `CXTUResourceUsageEntry`| 3.0      | No         |
+| `CXTUResourceUsageKind` | 3.0      | No         |
 | `CXType`                | 3.0      | Yes        |
 | `CXTypeKind`            | 2.8      | Yes        |
 | `clang_constructUSR_*`  | 2.8      | No         |
 | `clang_executeOnThread` | 2.9      | No         |
+| `clang_toggleCrashRecovery` | 3.0  | No         |
 | `clang_getClangVersion` | 2.7      | No         |
 | `clang_getInclusions`   | 2.7      | No         |
 
