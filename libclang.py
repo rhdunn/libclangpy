@@ -651,6 +651,11 @@ class CursorKind:
 	def is_unexposed(self):
 		return bool(_libclang.clang_isUnexposed(self.value))
 
+	@property
+	@requires(3.0, 'clang_isAttribute', [c_uint], c_uint)
+	def is_attribute(self):
+		return bool(_libclang.clang_isAttribute(self.value))
+
 CursorKind.UNEXPOSED_DECL = CursorKind(1) # 2.7
 CursorKind.STRUCT_DECL = CursorKind(2) # 2.7
 CursorKind.UNION_DECL = CursorKind(3) # 2.7
@@ -686,6 +691,10 @@ CursorKind.CLASS_TEMPLATE_PARTIAL_SPECIALIZATION = CursorKind(32) # 2.8
 CursorKind.NAMESPACE_ALIAS = CursorKind(33) # 2.8
 CursorKind.USING_DIRECTIVE = CursorKind(34) # 2.8
 CursorKind.USING_DECLARATION = CursorKind(35) # 2.8
+CursorKind.TYPE_ALIAS_DECL = CursorKind(36) # 3.0
+CursorKind.OBJC_SYNTHESIZE_DECL = CursorKind(37) # 3.0
+CursorKind.OBJC_DYNAMIC_DECL = CursorKind(38) # 3.0
+CursorKind.CXX_ACCESS_SPECIFIER = CursorKind(39) # 3.0
 
 CursorKind.OBJC_SUPER_CLASS_REF = CursorKind(40) # 2.7
 CursorKind.OBJC_PROTOCOL_REF = CursorKind(41) # 2.7
@@ -709,9 +718,76 @@ CursorKind.MEMBER_REF_EXPR = CursorKind(102) # 2.7
 CursorKind.CALL_EXPR = CursorKind(103) # 2.7
 CursorKind.OBJC_MESSAGE_EXPR = CursorKind(104) # 2.7
 CursorKind.BLOCK_EXPR = CursorKind(105) # 2.8
+CursorKind.INTEGER_LITERAL = CursorKind(106) # 3.0
+CursorKind.FLOATING_LITERAL = CursorKind(107) # 3.0
+CursorKind.IMAGINARY_LITERAL = CursorKind(108) # 3.0
+CursorKind.STRING_LITERAL = CursorKind(109) # 3.0
+CursorKind.CHARACTER_LITERAL = CursorKind(110) # 3.0
+CursorKind.PAREN_EXPR = CursorKind(111) # 3.0
+CursorKind.UNARY_OPERATOR = CursorKind(112) # 3.0
+CursorKind.ARRAY_SUBSCRIPT_EXPR = CursorKind(113) # 3.0
+CursorKind.BINARY_OPERATOR = CursorKind(114) # 3.0
+CursorKind.COMPOUND_ASSIGN_OPERATOR = CursorKind(115) # 3.0
+CursorKind.CONDITIONAL_OPERATOR = CursorKind(116) # 3.0
+CursorKind.C_STYLE_CAST_EXPR = CursorKind(117) # 3.0
+CursorKind.COMPOUND_LITERAL_EXPR = CursorKind(118) # 3.0
+CursorKind.INIT_LIST_EXPR = CursorKind(119) # 3.0
+CursorKind.ADDR_LABEL_EXPR = CursorKind(120) # 3.0
+CursorKind.STMT_EXPR = CursorKind(121) # 3.0
+CursorKind.GENERIC_SELECTION_EXPR = CursorKind(122) # 3.0
+CursorKind.GNU_NULL_EXPR = CursorKind(123) # 3.0
+CursorKind.CXX_STATIC_CAST_EXPR = CursorKind(124) # 3.0
+CursorKind.CXX_DYNAMIC_CAST_EXPR = CursorKind(125) # 3.0
+CursorKind.CXX_REINTERPRET_CAST_EXPR = CursorKind(126) # 3.0
+CursorKind.CXX_CONST_CAST_EXPR = CursorKind(127) # 3.0
+CursorKind.CXX_FUNCTIONAL_CAST_EXPR = CursorKind(128) # 3.0
+CursorKind.CXX_TYPEID_EXPR = CursorKind(129) # 3.0
+CursorKind.CXX_BOOL_LITERAL_EXPR = CursorKind(130) # 3.0
+CursorKind.CXX_NULLPTR_LITERAL_EXPR = CursorKind(131) # 3.0
+CursorKind.CXX_THIS_EXPR = CursorKind(132) # 3.0
+CursorKind.CXX_THROW_EXPR = CursorKind(133) # 3.0
+CursorKind.CXX_NEW_EXPR = CursorKind(134) # 3.0
+CursorKind.CXX_DELETE_EXPR = CursorKind(135) # 3.0
+CursorKind.UNARY_EXPR = CursorKind(136) # 3.0
+CursorKind.OBJC_STRING_LITERAL = CursorKind(137) # 3.0
+CursorKind.OBJC_ENCODE_EXPR = CursorKind(138) # 3.0
+CursorKind.OBJC_SELECTOR_EXPR = CursorKind(139) # 3.0
+CursorKind.OBJC_PROTOCOL_EXPR = CursorKind(140) # 3.0
+CursorKind.OBJC_BRIDGED_CAST_EXPR = CursorKind(141) # 3.0
+CursorKind.PACK_EXPANSION_EXPR = CursorKind(142) # 3.0
+CursorKind.SIZEOF_PACK_EXPR = CursorKind(143) # 3.0
 
 CursorKind.UNEXPOSED_STMT = CursorKind(200) # 2.7
 CursorKind.LABEL_STMT = CursorKind(201) # 2.9
+CursorKind.COMPOUND_STMT = CursorKind(202) # 3.0
+CursorKind.CASE_STMT = CursorKind(203) # 3.0
+CursorKind.DEFAULT_STMT = CursorKind(204) # 3.0
+CursorKind.IF_STMT = CursorKind(205) # 3.0
+CursorKind.SWITCH_STMT = CursorKind(206) # 3.0
+CursorKind.WHILE_STMT = CursorKind(207) # 3.0
+CursorKind.DO_STMT = CursorKind(208) # 3.0
+CursorKind.FOR_STMT = CursorKind(209) # 3.0
+CursorKind.GOTO_STMT = CursorKind(210) # 3.0
+CursorKind.INDIRECT_GOTO_STMT = CursorKind(211) # 3.0
+CursorKind.CONTINUE_STMT = CursorKind(212) # 3.0
+CursorKind.BREAK_STMT = CursorKind(213) # 3.0
+CursorKind.RETURN_STMT = CursorKind(214) # 3.0
+CursorKind.ASM_STMT = CursorKind(215) # 3.0
+CursorKind.OBJC_AT_TRY_STMT = CursorKind(216) # 3.0
+CursorKind.OBJC_AT_CATCH_STMT = CursorKind(217) # 3.0
+CursorKind.OBJC_AT_FINALLY_STMT = CursorKind(218) # 3.0
+CursorKind.OBJC_AT_THROW_STMT = CursorKind(219) # 3.0
+CursorKind.OBJC_AT_SYNCHRONIZED_STMT = CursorKind(220) # 3.0
+CursorKind.OBJC_AUTORELEASE_POOL_STMT = CursorKind(221) # 3.0
+CursorKind.OBJC_FOR_COLLECTION_STMT = CursorKind(222) # 3.0
+CursorKind.CXX_CATCH_STMT = CursorKind(223) # 3.0
+CursorKind.CXX_TRY_STMT = CursorKind(224) # 3.0
+CursorKind.CXX_FOR_RANGE_STMT = CursorKind(225) # 3.0
+CursorKind.SEH_TRY_STMT = CursorKind(226) # 3.0
+CursorKind.SEH_EXCEPT_STMT = CursorKind(227) # 3.0
+CursorKind.SEH_FINALLY_STMT = CursorKind(228) # 3.0
+CursorKind.NULL_STMT = CursorKind(230) # 3.0
+CursorKind.DECL_STMT = CursorKind(231) # 3.0
 
 CursorKind.TRANSLATION_UNIT = CursorKind(300) # 2.7
 
@@ -719,10 +795,14 @@ CursorKind.UNEXPOSED_ATTR = CursorKind(400) # 2.7
 CursorKind.IB_ACTION_ATTR = CursorKind(401) # 2.7
 CursorKind.IB_OUTLET_ATTR = CursorKind(402) # 2.7
 CursorKind.IB_OUTLET_COLLECTION_ATTR = CursorKind(403) # 2.8
+CursorKind.CXX_FINALLY_ATTR = CursorKind(404) # 3.0
+CursorKind.CXX_OVERRIDE_ATTR = CursorKind(405) # 3.0
+CursorKind.ANNOTATE_ATTR = CursorKind(406) # 3.0
 
 CursorKind.PREPROCESSING_DIRECTIVE = CursorKind(500) # 2.8
 CursorKind.MACRO_DEFINITION = CursorKind(501) # 2.8
-CursorKind.MACRO_INSTANTIATION = CursorKind(502) # 2.8
+CursorKind.MACRO_EXPANSION = CursorKind(502) # 3.0
+CursorKind.MACRO_INSTANTIATION = CursorKind.MACRO_EXPANSION # 2.8
 
 class TypeKind:
 	@requires(2.8)
