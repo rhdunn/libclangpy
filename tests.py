@@ -338,6 +338,13 @@ def test_Type29():
 	equals(t.is_volatile_qualified, False)
 	equals(t.is_restrict_qualified, False)
 
+def test_Type30():
+	index = libclang.Index()
+	c = parse_str(index, 'long a[4];')[0]
+	t = c.type
+	equals(t.array_element_type.kind, libclang.TypeKind.LONG)
+	equals(t.array_size, 4)
+
 libclang.load()
 
 run(2.7, test_SourceLocation)
@@ -361,3 +368,4 @@ run(3.0, test_Cursor30)
 run(2.7, test_Token)
 run(2.8, test_Type28)
 run(2.9, test_Type29)
+run(3.0, test_Type30)

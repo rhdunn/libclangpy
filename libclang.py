@@ -954,6 +954,17 @@ class Type:
 	def is_restrict_qualified(self):
 		return bool(_libclang.clang_isRestrictQualifiedType(self._t))
 
+	@property
+	@requires(3.0, 'clang_getArrayElementType', [_CXType], _CXType)
+	def array_element_type(self):
+		t = _libclang.clang_getArrayElementType(self._t)
+		return Type(t, self._tu)
+
+	@property
+	@requires(3.0, 'clang_getArraySize', [_CXType], c_longlong)
+	def array_size(self):
+		return _libclang.clang_getArraySize(self._t)
+
 class AvailabilityKind:
 	@requires(2.8)
 	def __init__(self, value):
