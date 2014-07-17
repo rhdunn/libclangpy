@@ -96,6 +96,8 @@ def test_DiagnosticDisplayOptions():
 	equals(a != b, True)
 	equals(a.value, 2)
 	equals((a | b).value, 6)
+	equals(hash(a) == hash(a), True)
+	equals(hash(a) == hash(b), False)
 
 def test_DiagnosticSeverity():
 	a = libclang.DiagnosticSeverity.NOTE
@@ -105,8 +107,10 @@ def test_DiagnosticSeverity():
 	equals(a != a, False)
 	equals(a != b, True)
 	equals(a.value, 1)
+	equals(hash(a) == hash(a), True)
+	equals(hash(a) == hash(b), False)
 
-def test_DiagnosticCategory():
+def test_DiagnosticCategory29():
 	a = libclang.DiagnosticCategory(1)
 	b = libclang.DiagnosticCategory(2)
 	equals(a == a, True)
@@ -115,6 +119,8 @@ def test_DiagnosticCategory():
 	equals(a != b, True)
 	equals(a.value, 1)
 	equals(a.name, 'Lexical or Preprocessor Issue')
+	equals(hash(a) == hash(a), True)
+	equals(hash(a) == hash(b), False)
 
 def test_Linkage():
 	a = libclang.Linkage.NO_LINKAGE
@@ -124,6 +130,8 @@ def test_Linkage():
 	equals(a != a, False)
 	equals(a != b, True)
 	equals(a.value, 1)
+	equals(hash(a) == hash(a), True)
+	equals(hash(a) == hash(b), False)
 
 def test_TokenKind():
 	a = libclang.TokenKind.KEYWORD
@@ -133,6 +141,8 @@ def test_TokenKind():
 	equals(a != a, False)
 	equals(a != b, True)
 	equals(a.value, 1)
+	equals(hash(a) == hash(a), True)
+	equals(hash(a) == hash(b), False)
 
 def test_CursorKind():
 	equals(libclang.CursorKind.CLASS_DECL == libclang.CursorKind.CLASS_DECL, True)
@@ -148,6 +158,10 @@ def test_CursorKind():
 	equals(kind.is_statement, False)
 	equals(kind.is_invalid, False)
 	equals(kind.is_translation_unit, False)
+	a = libclang.CursorKind.VAR_DECL
+	b = libclang.CursorKind.FIELD_DECL
+	equals(hash(a) == hash(a), True)
+	equals(hash(a) == hash(b), False)
 
 def test_CursorKind28():
 	kind = libclang.CursorKind.STRUCT_DECL
@@ -166,6 +180,10 @@ def test_TypeKind28():
 	kind = libclang.TypeKind.FLOAT
 	equals(kind.spelling, 'Float')
 	equals(str(kind), 'Float')
+	a = libclang.TypeKind.LONG
+	b = libclang.TypeKind.SHORT
+	equals(hash(a) == hash(a), True)
+	equals(hash(a) == hash(b), False)
 
 def test_AvailabilityKind28():
 	a = libclang.AvailabilityKind.DEPRECATED
@@ -175,6 +193,8 @@ def test_AvailabilityKind28():
 	equals(a != a, False)
 	equals(a != b, True)
 	equals(a.value, 1)
+	equals(hash(a) == hash(a), True)
+	equals(hash(a) == hash(b), False)
 
 def test_LanguageKind28():
 	a = libclang.LanguageKind.C
@@ -184,6 +204,8 @@ def test_LanguageKind28():
 	equals(a != a, False)
 	equals(a != b, True)
 	equals(a.value, 1)
+	equals(hash(a) == hash(a), True)
+	equals(hash(a) == hash(b), False)
 
 def test_AccessSpecifier28():
 	a = libclang.AccessSpecifier.PUBLIC
@@ -193,6 +215,8 @@ def test_AccessSpecifier28():
 	equals(a != a, False)
 	equals(a != b, True)
 	equals(a.value, 1)
+	equals(hash(a) == hash(a), True)
+	equals(hash(a) == hash(b), False)
 
 def test_NameRefFlags30():
 	a = libclang.NameRefFlags.WANT_QUALIFIER
@@ -203,6 +227,8 @@ def test_NameRefFlags30():
 	equals(a != b, True)
 	equals(a.value, 1)
 	equals((a | b).value, 3)
+	equals(hash(a) == hash(a), True)
+	equals(hash(a) == hash(b), False)
 
 def test_TranslationUnitFlags28():
 	a = libclang.TranslationUnitFlags.INCOMPLETE
@@ -213,6 +239,8 @@ def test_TranslationUnitFlags28():
 	equals(a != b, True)
 	equals(a.value, 2)
 	equals((a | b).value, 10)
+	equals(hash(a) == hash(a), True)
+	equals(hash(a) == hash(b), False)
 
 def test_SaveTranslationUnitFlags28():
 	a = libclang.SaveTranslationUnitFlags(2)
@@ -223,6 +251,8 @@ def test_SaveTranslationUnitFlags28():
 	equals(a != b, True)
 	equals(a.value, 2)
 	equals((a | b).value, 10)
+	equals(hash(a) == hash(a), True)
+	equals(hash(a) == hash(b), False)
 
 def test_ReparseTranslationUnitFlags28():
 	a = libclang.ReparseTranslationUnitFlags(2)
@@ -233,6 +263,8 @@ def test_ReparseTranslationUnitFlags28():
 	equals(a != b, True)
 	equals(a.value, 2)
 	equals((a | b).value, 10)
+	equals(hash(a) == hash(a), True)
+	equals(hash(a) == hash(b), False)
 
 def test_Index():
 	index = libclang.Index()
@@ -473,7 +505,7 @@ run(3.0, test_SourceLocation30)
 run(2.7, test_SourceRange)
 run(2.7, test_DiagnosticDisplayOptions)
 run(2.7, test_DiagnosticSeverity)
-run(2.9, test_DiagnosticCategory)
+run(2.9, test_DiagnosticCategory29)
 run(2.7, test_Linkage)
 run(2.7, test_TokenKind)
 run(2.7, test_CursorKind)
