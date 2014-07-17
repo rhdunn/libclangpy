@@ -24,6 +24,7 @@ import sys
 _lib_extension = { 'Darwin': 'dylib', 'Linux': 'so', 'Windows': 'dll' }
 _system = platform.system()
 _libclang = None
+_dynamic_types = {}
 
 time_t = c_uint
 
@@ -77,9 +78,16 @@ class _CXToken(Structure):
 		('ptr_data', c_void_p)
 	]
 
-class _CXCursor(Structure):
+class _CXCursor27(Structure):
 	_fields_ = [
 		('kind', c_uint),
+		('data', c_void_p * 3)
+	]
+
+class _CXCursor30(Structure):
+	_fields_ = [
+		('kind', c_uint),
+		('xdata', c_int),
 		('data', c_void_p * 3)
 	]
 
@@ -88,8 +96,6 @@ class _CXType(Structure):
 		('kind', c_uint),
 		('data', c_void_p * 2)
 	]
-
-cb_cursor_visitor = CFUNCTYPE(c_int, _CXCursor, _CXCursor, py_object)
 
 def _marshall_args(args):
 	if not args or len(args) == 0:
@@ -116,17 +122,35 @@ def _marshall_unsaved_files(unsaved_files):
 def load(name=None, version=None):
 	""" Load libclang from the specified name and/or version. """
 
+	import inspect
+
 	global _libclang
+	global cb_cursor_visitor
 	if not name:
 		name = 'libclang'
 	if version:
 		name = '{0}-{1}'.format(name, version)
 	_libclang = cdll.LoadLibrary('{0}.{1}'.format(name, _lib_extension[_system]))
+	if hasattr(_libclang, 'clang_Range_isNull'): # libclang 3.0 or later ...
+		_dynamic_types['_CXCursor'] = _CXCursor30
+		_dynamic_types['_CXCursor*'] = POINTER(_CXCursor30)
+		_dynamic_types['_CXCursor**'] = POINTER(POINTER(_CXCursor30))
+		_dynamic_types['cb_cursor_visitor'] = CFUNCTYPE(c_int, _CXCursor30, _CXCursor30, py_object)
+	else:
+		_dynamic_types['_CXCursor'] = _CXCursor27
+		_dynamic_types['_CXCursor*'] = POINTER(_CXCursor27)
+		_dynamic_types['_CXCursor**'] = POINTER(POINTER(_CXCursor27))
+		_dynamic_types['cb_cursor_visitor'] = CFUNCTYPE(c_int, _CXCursor27, _CXCursor27, py_object)
 
 class MissingFunction(Exception):
 	""" The requested function was not found in the loaded libclang library. """
 
 	pass
+
+def _map_type(t):
+	if isinstance(t, str):
+		return _dynamic_types[t]
+	return t
 
 def _bind_api(name, argtypes, restype):
 	global _libclang
@@ -141,8 +165,8 @@ def _bind_api(name, argtypes, restype):
 		registered = False
 
 	if not registered:
-		api.argtypes = argtypes
-		api.restype = restype
+		api.argtypes = [_map_type(x) for x in argtypes]
+		api.restype = _map_type(restype)
 		api.registered = True
 
 def requires(version, name=None, argtypes=None, restype=None):
@@ -554,7 +578,7 @@ class Token:
 		return SourceRange(sr)
 
 	@property
-	@requires(2.7, 'clang_getCursor', [c_void_p, _CXSourceLocation], _CXCursor)
+	@requires(2.7, 'clang_getCursor', [c_void_p, _CXSourceLocation], '_CXCursor')
 	def cursor(self):
 		# NOTE: This is doing what clang_annotateTokens does, but on one token only.
 		c = _libclang.clang_getCursor(self._tu._tu, self.location._sl)
@@ -905,7 +929,7 @@ class Type:
 		return Type(t, self._tu)
 
 	@property
-	@requires(2.8, 'clang_getTypeDeclaration', [_CXType], _CXCursor)
+	@requires(2.8, 'clang_getTypeDeclaration', [_CXType], '_CXCursor')
 	def declaration(self):
 		c = _libclang.clang_getTypeDeclaration(self._t)
 		return Cursor(c, None, self._tu)
@@ -989,12 +1013,12 @@ class OverriddenCursors:
 		self._tu = tu
 		self._data = cursors
 		if cursors:
-			self._cursors = cast(cursors, POINTER(_CXCursor * length)).contents
+			self._cursors = cast(cursors, POINTER(_map_type('_CXCursor') * length)).contents
 		else:
 			self._cursors = []
 		self._length = length
 
-	@requires(2.9, 'clang_disposeOverriddenCursors', [POINTER(_CXCursor)])
+	@requires(2.9, 'clang_disposeOverriddenCursors', ['_CXCursor*'])
 	def __del__(self):
 		_libclang.clang_disposeOverriddenCursors(self._data)
 
@@ -1018,7 +1042,7 @@ class Cursor:
 		self.parent = parent
 		self._tu = tu
 
-	@requires(2.7, 'clang_equalCursors', [_CXCursor, _CXCursor], c_uint)
+	@requires(2.7, 'clang_equalCursors', ['_CXCursor', '_CXCursor'], c_uint)
 	def __eq__(self, other):
 		return bool(_libclang.clang_equalCursors(self._c, other._c))
 
@@ -1030,41 +1054,41 @@ class Cursor:
 	def __str__(self):
 		return self.spelling
 
-	@requires(2.9, 'clang_hashCursor', [_CXCursor], c_uint)
+	@requires(2.9, 'clang_hashCursor', ['_CXCursor'], c_uint)
 	def __hash__(self):
 		return _libclang.clang_hashCursor(self._c)
 
 	@staticmethod
-	@requires(2.7, 'clang_getNullCursor', [], _CXCursor)
+	@requires(2.7, 'clang_getNullCursor', [], '_CXCursor')
 	def null():
 		c = _libclang.clang_getNullCursor()
 		return Cursor(c, None, None)
 
 	@property
-	@requires(2.7, 'clang_getCursorKind', [_CXCursor], c_uint)
+	@requires(2.7, 'clang_getCursorKind', ['_CXCursor'], c_uint)
 	def kind(self):
 		kind = _libclang.clang_getCursorKind(self._c)
 		return CursorKind(kind)
 
 	@property
-	@requires(2.7, 'clang_getCursorLinkage', [_CXCursor], c_uint)
+	@requires(2.7, 'clang_getCursorLinkage', ['_CXCursor'], c_uint)
 	def linkage(self):
 		return Linkage(_libclang.clang_getCursorLinkage(self._c))
 
 	@property
-	@requires(2.7, 'clang_getCursorLocation', [_CXCursor], _CXSourceLocation)
+	@requires(2.7, 'clang_getCursorLocation', ['_CXCursor'], _CXSourceLocation)
 	def location(self):
 		sl = _libclang.clang_getCursorLocation(self._c)
 		return SourceLocation(sl)
 
 	@property
-	@requires(2.7, 'clang_getCursorExtent', [_CXCursor], _CXSourceRange)
+	@requires(2.7, 'clang_getCursorExtent', ['_CXCursor'], _CXSourceRange)
 	def extent(self):
 		sr = _libclang.clang_getCursorExtent(self._c)
 		return SourceRange(sr)
 
 	@property
-	@requires(2.7, 'clang_visitChildren', [_CXCursor, cb_cursor_visitor, py_object], c_uint)
+	@requires(2.7, 'clang_visitChildren', ['_CXCursor', 'cb_cursor_visitor', py_object], c_uint)
 	def children(self):
 		def visitor(child, parent_cursor, args):
 			(children, parent) = args
@@ -1073,35 +1097,35 @@ class Cursor:
 				children.append(c)
 			return 1 # continue
 		ret = []
-		_libclang.clang_visitChildren(self._c, cb_cursor_visitor(visitor), (ret, self))
+		_libclang.clang_visitChildren(self._c, _map_type('cb_cursor_visitor')(visitor), (ret, self))
 		return ret
 
 	@property
-	@requires(2.7, 'clang_getCursorUSR', [_CXCursor], _CXString)
+	@requires(2.7, 'clang_getCursorUSR', ['_CXCursor'], _CXString)
 	def usr(self):
 		s = _libclang.clang_getCursorUSR(self._c)
 		return _to_str(s)
 
 	@property
-	@requires(2.7, 'clang_getCursorSpelling', [_CXCursor], _CXString)
+	@requires(2.7, 'clang_getCursorSpelling', ['_CXCursor'], _CXString)
 	def spelling(self):
 		s = _libclang.clang_getCursorSpelling(self._c)
 		return _to_str(s)
 
 	@property
-	@requires(2.7, 'clang_getCursorReferenced', [_CXCursor], _CXCursor)
+	@requires(2.7, 'clang_getCursorReferenced', ['_CXCursor'], '_CXCursor')
 	def referenced(self):
 		c = _libclang.clang_getCursorReferenced(self._c)
 		return Cursor(c, None, self._tu)
 
 	@property
-	@requires(2.7, 'clang_getCursorDefinition', [_CXCursor], _CXCursor)
+	@requires(2.7, 'clang_getCursorDefinition', ['_CXCursor'], '_CXCursor')
 	def definition(self):
 		c = _libclang.clang_getCursorDefinition(self._c)
 		return Cursor(c, None, self._tu)
 
 	@property
-	@requires(2.7, 'clang_isCursorDefinition', [_CXCursor], c_uint)
+	@requires(2.7, 'clang_isCursorDefinition', ['_CXCursor'], c_uint)
 	def is_definition(self):
 		return bool(_libclang.clang_isCursorDefinition(self._c))
 
@@ -1111,111 +1135,111 @@ class Cursor:
 		return self._tu.tokenize(self.extent)
 
 	@property
-	@requires(2.8, 'clang_getCursorType', [_CXCursor], _CXType)
+	@requires(2.8, 'clang_getCursorType', ['_CXCursor'], _CXType)
 	def type(self):
 		t = _libclang.clang_getCursorType(self._c)
 		return Type(t, self._tu)
 
 	@property
-	@requires(2.8, 'clang_getCursorResultType', [_CXCursor], _CXType)
+	@requires(2.8, 'clang_getCursorResultType', ['_CXCursor'], _CXType)
 	def result_type(self):
 		t = _libclang.clang_getCursorResultType(self._c)
 		return Type(t, self._tu)
 
 	@property
-	@requires(2.8, 'clang_getIBOutletCollectionType', [_CXCursor], _CXType)
+	@requires(2.8, 'clang_getIBOutletCollectionType', ['_CXCursor'], _CXType)
 	def ib_outlet_collection_type(self):
 		t = _libclang.clang_getIBOutletCollectionType(self._c)
 		return Type(t, self._tu)
 
 	@property
-	@requires(2.8, 'clang_getCursorAvailability', [_CXCursor], c_uint)
+	@requires(2.8, 'clang_getCursorAvailability', ['_CXCursor'], c_uint)
 	def availability(self):
 		kind = _libclang.clang_getCursorAvailability(self._c)
 		return AvailabilityKind(kind)
 
 	@property
-	@requires(2.8, 'clang_getCursorLanguage', [_CXCursor], c_uint)
+	@requires(2.8, 'clang_getCursorLanguage', ['_CXCursor'], c_uint)
 	def language(self):
 		kind = _libclang.clang_getCursorLanguage(self._c)
 		return LanguageKind(kind)
 
 	@property
-	@requires(2.8, 'clang_getCXXAccessSpecifier', [_CXCursor], c_uint)
+	@requires(2.8, 'clang_getCXXAccessSpecifier', ['_CXCursor'], c_uint)
 	def access_specifier(self):
 		access = _libclang.clang_getCXXAccessSpecifier(self._c)
 		return AccessSpecifier(access)
 
 	@property
-	@requires(2.8, 'clang_getTemplateCursorKind', [_CXCursor], c_uint)
+	@requires(2.8, 'clang_getTemplateCursorKind', ['_CXCursor'], c_uint)
 	def template_kind(self):
 		kind = _libclang.clang_getTemplateCursorKind(self._c)
 		return CursorKind(kind)
 
 	@property
-	@requires(2.8, 'clang_getSpecializedCursorTemplate', [_CXCursor], _CXCursor)
+	@requires(2.8, 'clang_getSpecializedCursorTemplate', ['_CXCursor'], '_CXCursor')
 	def specialized_template(self):
 		c = _libclang.clang_getSpecializedCursorTemplate(self._c)
 		return Cursor(c, None, self._tu)
 
 	@property
-	@requires(2.8, 'clang_isVirtualBase', [_CXCursor], c_uint)
+	@requires(2.8, 'clang_isVirtualBase', ['_CXCursor'], c_uint)
 	def is_virtual_base(self):
 		return bool(_libclang.clang_isVirtualBase(self._c))
 
 	@property
-	@requires(2.8, 'clang_CXXMethod_isStatic', [_CXCursor], c_uint)
+	@requires(2.8, 'clang_CXXMethod_isStatic', ['_CXCursor'], c_uint)
 	def is_static(self):
 		return bool(_libclang.clang_CXXMethod_isStatic(self._c))
 
 	@property
-	@requires(2.9, 'clang_getCursorSemanticParent', [_CXCursor], _CXCursor)
+	@requires(2.9, 'clang_getCursorSemanticParent', ['_CXCursor'], '_CXCursor')
 	def semantic_parent(self):
 		c = _libclang.clang_getCursorSemanticParent(self._c)
 		return Cursor(c, None, self._tu)
 
 	@property
-	@requires(2.9, 'clang_getCursorLexicalParent', [_CXCursor], _CXCursor)
+	@requires(2.9, 'clang_getCursorLexicalParent', ['_CXCursor'], '_CXCursor')
 	def lexical_parent(self):
 		c = _libclang.clang_getCursorLexicalParent(self._c)
 		return Cursor(c, None, self._tu)
 
 	@property
-	@requires(2.9, 'clang_getIncludedFile', [_CXCursor], c_void_p)
+	@requires(2.9, 'clang_getIncludedFile', ['_CXCursor'], c_void_p)
 	def included_file(self):
 		f = _libclang.clang_getIncludedFile(self._c)
 		return File(f)
 
 	@property
-	@requires(2.9, 'clang_getDeclObjCTypeEncoding', [_CXCursor], _CXString)
+	@requires(2.9, 'clang_getDeclObjCTypeEncoding', ['_CXCursor'], _CXString)
 	def objc_decltype_encoding(self):
 		s = _libclang.clang_getDeclObjCTypeEncoding(self._c)
 		return _to_str(s)
 
 	@property
-	@requires(2.9, 'clang_getNumOverloadedDecls', [_CXCursor], c_uint)
-	@requires(2.9, 'clang_getOverloadedDecl', [_CXCursor, c_uint], _CXCursor)
+	@requires(2.9, 'clang_getNumOverloadedDecls', ['_CXCursor'], c_uint)
+	@requires(2.9, 'clang_getOverloadedDecl', ['_CXCursor', c_uint], '_CXCursor')
 	def overloads(self):
 		for i in range(0, _libclang.clang_getNumOverloadedDecls(self._c)):
 			c  = _libclang.clang_getOverloadedDecl(self._c, i)
 			yield Cursor(c, None, self._tu)
 
 	@property
-	@requires(2.9, 'clang_getCursorDisplayName', [_CXCursor], _CXString)
+	@requires(2.9, 'clang_getCursorDisplayName', ['_CXCursor'], _CXString)
 	def display_name(self):
 		s = _libclang.clang_getCursorDisplayName(self._c)
 		return _to_str(s)
 
 	@property
-	@requires(2.9, 'clang_getCanonicalCursor', [_CXCursor], _CXCursor)
+	@requires(2.9, 'clang_getCanonicalCursor', ['_CXCursor'], '_CXCursor')
 	def canonical(self):
 		c = _libclang.clang_getCanonicalCursor(self._c)
 		return Cursor(c, None, self._tu)
 
 	@property
-	@requires(2.9, 'clang_getOverriddenCursors', [_CXCursor, POINTER(POINTER(_CXCursor)), POINTER(c_uint)])
+	@requires(2.9, 'clang_getOverriddenCursors', ['_CXCursor', '_CXCursor**', POINTER(c_uint)])
 	def overridden(self):
-		cursors = POINTER(_CXCursor)()
+		cursors = _map_type('_CXCursor*')()
 		length = c_uint()
 		_libclang.clang_getOverriddenCursors(self._c, byref(cursors), byref(length))
 		length = int(length.value)
@@ -1328,8 +1352,8 @@ class TranslationUnit:
 		s = _libclang.clang_getTranslationUnitSpelling(self._tu)
 		return _to_str(s)
 
-	@requires(2.7, 'clang_getTranslationUnitCursor', [c_void_p], _CXCursor)
-	@requires(2.7, 'clang_getCursor', [c_void_p, _CXSourceLocation], _CXCursor)
+	@requires(2.7, 'clang_getTranslationUnitCursor', [c_void_p], '_CXCursor')
+	@requires(2.7, 'clang_getCursor', [c_void_p, _CXSourceLocation], '_CXCursor')
 	def cursor(self, source_location=None):
 		if not source_location:
 			c = _libclang.clang_getTranslationUnitCursor(self._tu)
