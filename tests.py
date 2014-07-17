@@ -87,6 +87,53 @@ def test_SourceRange():
 	equals(rng1 != rng2, False)
 	equals(rng1.is_null, True)
 
+def test_DiagnosticDisplayOptions():
+	a = libclang.DiagnosticDisplayOptions.COLUMN
+	b = libclang.DiagnosticDisplayOptions.SOURCE_RANGES
+	equals(a == a, True)
+	equals(a == b, False)
+	equals(a != a, False)
+	equals(a != b, True)
+	equals(a.value, 2)
+	equals((a | b).value, 6)
+
+def test_DiagnosticSeverity():
+	a = libclang.DiagnosticSeverity.NOTE
+	b = libclang.DiagnosticSeverity.ERROR
+	equals(a == a, True)
+	equals(a == b, False)
+	equals(a != a, False)
+	equals(a != b, True)
+	equals(a.value, 1)
+
+def test_DiagnosticCategory():
+	a = libclang.DiagnosticCategory(1)
+	b = libclang.DiagnosticCategory(2)
+	equals(a == a, True)
+	equals(a == b, False)
+	equals(a != a, False)
+	equals(a != b, True)
+	equals(a.value, 1)
+	equals(a.name, 'Lexical or Preprocessor Issue')
+
+def test_Linkage():
+	a = libclang.Linkage.NO_LINKAGE
+	b = libclang.Linkage.INTERNAL
+	equals(a == a, True)
+	equals(a == b, False)
+	equals(a != a, False)
+	equals(a != b, True)
+	equals(a.value, 1)
+
+def test_TokenKind():
+	a = libclang.TokenKind.KEYWORD
+	b = libclang.TokenKind.LITERAL
+	equals(a == a, True)
+	equals(a == b, False)
+	equals(a != a, False)
+	equals(a != b, True)
+	equals(a.value, 1)
+
 def test_CursorKind():
 	equals(libclang.CursorKind.CLASS_DECL == libclang.CursorKind.CLASS_DECL, True)
 	equals(libclang.CursorKind.CLASS_DECL == libclang.CursorKind.UNION_DECL, False)
@@ -119,6 +166,73 @@ def test_TypeKind28():
 	kind = libclang.TypeKind.FLOAT
 	equals(kind.spelling, 'Float')
 	equals(str(kind), 'Float')
+
+def test_AvailabilityKind28():
+	a = libclang.AvailabilityKind.DEPRECATED
+	b = libclang.AvailabilityKind.NOT_AVAILABLE
+	equals(a == a, True)
+	equals(a == b, False)
+	equals(a != a, False)
+	equals(a != b, True)
+	equals(a.value, 1)
+
+def test_LanguageKind28():
+	a = libclang.LanguageKind.C
+	b = libclang.LanguageKind.OBJC
+	equals(a == a, True)
+	equals(a == b, False)
+	equals(a != a, False)
+	equals(a != b, True)
+	equals(a.value, 1)
+
+def test_AccessSpecifier28():
+	a = libclang.AccessSpecifier.PUBLIC
+	b = libclang.AccessSpecifier.PRIVATE
+	equals(a == a, True)
+	equals(a == b, False)
+	equals(a != a, False)
+	equals(a != b, True)
+	equals(a.value, 1)
+
+def test_NameRefFlags30():
+	a = libclang.NameRefFlags.WANT_QUALIFIER
+	b = libclang.NameRefFlags.WANT_TEMPLATE_ARGS
+	equals(a == a, True)
+	equals(a == b, False)
+	equals(a != a, False)
+	equals(a != b, True)
+	equals(a.value, 1)
+	equals((a | b).value, 3)
+
+def test_TranslationUnitFlags28():
+	a = libclang.TranslationUnitFlags.INCOMPLETE
+	b = libclang.TranslationUnitFlags.CACHE_COMPLETION_RESULTS
+	equals(a == a, True)
+	equals(a == b, False)
+	equals(a != a, False)
+	equals(a != b, True)
+	equals(a.value, 2)
+	equals((a | b).value, 10)
+
+def test_SaveTranslationUnitFlags28():
+	a = libclang.SaveTranslationUnitFlags(2)
+	b = libclang.SaveTranslationUnitFlags(8)
+	equals(a == a, True)
+	equals(a == b, False)
+	equals(a != a, False)
+	equals(a != b, True)
+	equals(a.value, 2)
+	equals((a | b).value, 10)
+
+def test_ReparseTranslationUnitFlags28():
+	a = libclang.ReparseTranslationUnitFlags(2)
+	b = libclang.ReparseTranslationUnitFlags(8)
+	equals(a == a, True)
+	equals(a == b, False)
+	equals(a != a, False)
+	equals(a != b, True)
+	equals(a.value, 2)
+	equals((a | b).value, 10)
 
 def test_Index():
 	index = libclang.Index()
@@ -357,10 +471,22 @@ run(2.7, test_SourceLocation)
 run(2.9, test_SourceLocation29)
 run(3.0, test_SourceLocation30)
 run(2.7, test_SourceRange)
+run(2.7, test_DiagnosticDisplayOptions)
+run(2.7, test_DiagnosticSeverity)
+run(2.9, test_DiagnosticCategory)
+run(2.7, test_Linkage)
+run(2.7, test_TokenKind)
 run(2.7, test_CursorKind)
 run(2.8, test_CursorKind28)
 run(3.0, test_CursorKind30)
 run(2.8, test_TypeKind28)
+run(2.8, test_AvailabilityKind28)
+run(2.8, test_LanguageKind28)
+run(2.8, test_AccessSpecifier28)
+run(3.0, test_NameRefFlags30)
+run(2.8, test_TranslationUnitFlags28)
+run(2.8, test_SaveTranslationUnitFlags28)
+run(2.8, test_ReparseTranslationUnitFlags28)
 run(2.7, test_Index)
 run(2.8, test_Index28)
 run(2.7, test_TranslationUnit)

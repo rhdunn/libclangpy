@@ -1317,11 +1317,11 @@ class TranslationUnitFlags:
 	def __or__(self, other):
 		return TranslationUnitFlags(self.value | other.value)
 
-	@requires(2.7)
+	@requires(2.8)
 	def __eq__(self, other):
 		return self.value == other.value
 
-	@requires(2.7)
+	@requires(2.8)
 	def __ne__(self, other):
 		return self.value != other.value
 
@@ -1346,11 +1346,15 @@ class SaveTranslationUnitFlags:
 	def __init__(self, value):
 		self.value = value
 
-	@requires(2.7)
+	@requires(2.8)
+	def __or__(self, other):
+		return SaveTranslationUnitFlags(self.value | other.value)
+
+	@requires(2.8)
 	def __eq__(self, other):
 		return self.value == other.value
 
-	@requires(2.7)
+	@requires(2.8)
 	def __ne__(self, other):
 		return self.value != other.value
 
@@ -1361,11 +1365,15 @@ class ReparseTranslationUnitFlags:
 	def __init__(self, value):
 		self.value = value
 
-	@requires(2.7)
+	@requires(2.8)
+	def __or__(self, other):
+		return ReparseTranslationUnitFlags(self.value | other.value)
+
+	@requires(2.8)
 	def __eq__(self, other):
 		return self.value == other.value
 
-	@requires(2.7)
+	@requires(2.8)
 	def __ne__(self, other):
 		return self.value != other.value
 
