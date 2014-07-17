@@ -730,6 +730,7 @@ CursorKind.NAMESPACE_REF = CursorKind(46) # 2.8
 CursorKind.MEMBER_REF = CursorKind(47) # 2.9
 CursorKind.LABEL_REF = CursorKind(48) # 2.9
 CursorKind.OVERLOADED_DECL_REF = CursorKind(49) # 2.9
+CursorKind.VARIABLE_REF = CursorKind(50) # 3.1
 
 CursorKind.INVALID_FILE = CursorKind(70) # 2.7
 CursorKind.NO_DECL_FOUND = CursorKind(71) # 2.7
@@ -780,6 +781,8 @@ CursorKind.OBJC_PROTOCOL_EXPR = CursorKind(140) # 3.0
 CursorKind.OBJC_BRIDGED_CAST_EXPR = CursorKind(141) # 3.0
 CursorKind.PACK_EXPANSION_EXPR = CursorKind(142) # 3.0
 CursorKind.SIZEOF_PACK_EXPR = CursorKind(143) # 3.0
+CursorKind.LAMBDA_EXPR = CursorKind(144) # 3.1
+CursorKind.OBJC_BOOL_LITERAL_EXPR = CursorKind(145) # 3.1
 
 CursorKind.UNEXPOSED_STMT = CursorKind(200) # 2.7
 CursorKind.LABEL_STMT = CursorKind(201) # 2.9
@@ -822,6 +825,7 @@ CursorKind.IB_OUTLET_COLLECTION_ATTR = CursorKind(403) # 2.8
 CursorKind.CXX_FINALLY_ATTR = CursorKind(404) # 3.0
 CursorKind.CXX_OVERRIDE_ATTR = CursorKind(405) # 3.0
 CursorKind.ANNOTATE_ATTR = CursorKind(406) # 3.0
+CursorKind.ASM_LABEL_ATTR = CursorKind(407) # 3.1
 
 CursorKind.PREPROCESSING_DIRECTIVE = CursorKind(500) # 2.8
 CursorKind.MACRO_DEFINITION = CursorKind(501) # 2.8
