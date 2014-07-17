@@ -39,7 +39,7 @@ The support status for libclang 2.9 is as follows:
 | `CXCompletionChunkKind` | 2.7      | No         |
 | `CXCompletionResult`    | 2.8      | No         |
 | `CXCompletionString`    | 2.8      | No         |
-| `CXCursor`              | 2.9      | Yes        |
+| `CXCursor`              | 3.0      | Yes        |
 | `CXCursorKind`          | 3.0      | Yes        |
 | `CXCursorSet`           | 2.9      | No         |
 | `CXDiagnostic`          | 2.9      | Yes        |

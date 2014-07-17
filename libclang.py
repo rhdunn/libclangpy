@@ -1035,6 +1035,27 @@ class OverriddenCursors:
 		for i in range(0, len(self)):
 			yield self[i]
 
+class NameRefFlags:
+	@requires(3.0)
+	def __init__(self, value):
+		self.value = value
+
+	@requires(3.0)
+	def __or__(self, other):
+		return NameRefFlags(self.value | other.value)
+
+	@requires(3.0)
+	def __eq__(self, other):
+		return self.value == other.value
+
+	@requires(3.0)
+	def __ne__(self, other):
+		return self.value != other.value
+
+NameRefFlags.WANT_QUALIFIER = NameRefFlags(1) # 3.0
+NameRefFlags.WANT_TEMPLATE_ARGS = NameRefFlags(2) # 3.0
+NameRefFlags.WANT_SINGLE_PIECE = NameRefFlags(4) # 3.0
+
 class Cursor:
 	@requires(2.7)
 	def __init__(self, c, parent, tu):
@@ -1063,6 +1084,22 @@ class Cursor:
 	def null():
 		c = _libclang.clang_getNullCursor()
 		return Cursor(c, None, None)
+
+	@property
+	@requires(2.7)
+	@optional(3.0, 'clang_Cursor_isNull', ['_CXCursor'], c_int)
+	def is_null(self):
+		if _libclang.clang_Cursor_isNull:
+			return bool(_libclang.clang_Cursor_isNull(self._c))
+		return self == Cursor.null()
+
+	@property
+	@requires(2.7)
+	def translation_unit(self):
+		# libclang 3.0 provides a clang_Cursor_getTranslationUnit API,
+		# but this already tracked in the libclangpy binding so it does
+		# not need to be called.
+		return self._tu
 
 	@property
 	@requires(2.7, 'clang_getCursorKind', ['_CXCursor'], c_uint)
@@ -1244,6 +1281,16 @@ class Cursor:
 		_libclang.clang_getOverriddenCursors(self._c, byref(cursors), byref(length))
 		length = int(length.value)
 		return OverriddenCursors(self, cursors, length)
+
+	@requires(3.0, 'clang_getCursorReferenceNameRange', ['_CXCursor', c_uint, c_uint], _CXSourceRange)
+	def reference_name_range(self, flags, index):
+		sr = _libclang.clang_getCursorReferenceNameRange(self._c, flags.value, index)
+		return SourceRange(sr)
+
+	@property
+	@requires(3.0, 'clang_CXXMethod_isVirtual', ['_CXCursor'], c_uint)
+	def is_virtual(self):
+		return bool(_libclang.clang_CXXMethod_isVirtual(self._c))
 
 class TranslationUnitFlags:
 	@requires(2.8)

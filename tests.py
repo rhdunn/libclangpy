@@ -40,8 +40,8 @@ def run(version, test):
 		print('failed')
 		print(traceback.format_exc())
 
-def parse_str(index, contents):
-	tu = index.from_source('parse_str.cpp', unsaved_files=[('parse_str.cpp', contents)])
+def parse_str(index, contents, filename='parse_str.cpp'):
+	tu = index.from_source(filename, unsaved_files=[(filename, contents)])
 	return [child for child in tu.cursor().children if child.location.file]
 
 def match_location(loc, filename, line, column, offset):
@@ -229,6 +229,7 @@ def test_Cursor():
 	equals(c == libclang.Cursor.null(), False)
 	equals(c != c, False)
 	equals(c != libclang.Cursor.null(), True)
+	equals(c.is_null, False)
 	equals(c.spelling, 'tests/enumeration.hpp')
 	equals(str(c), 'tests/enumeration.hpp')
 	equals(c.kind, libclang.CursorKind.TRANSLATION_UNIT)
@@ -241,6 +242,7 @@ def test_Cursor():
 	equals(c.referenced, libclang.Cursor.null())
 	equals(c.definition, libclang.Cursor.null())
 	equals(c.is_definition, False)
+	equals(c.translation_unit.spelling, tu.spelling)
 	# children
 	children = [child for child in c.children if child.location.file]
 	equals(len(children), 1)
@@ -277,6 +279,14 @@ def test_Cursor29():
 	equals(c.display_name, 'test')
 	equals(c.canonical, c)
 	equals(len(c.overridden), 0)
+
+def test_Cursor30():
+	index = libclang.Index()
+	c = parse_str(index, 'enum test {};', filename='cursor30.hpp')[0]
+	equals(c.is_virtual, False)
+	rng = c.reference_name_range(libclang.NameRefFlags.WANT_TEMPLATE_ARGS, 0)
+	match_location(rng.start, 'cursor30.hpp', 1, 1, 0)
+	match_location(rng.end, 'cursor30.hpp', 1, 1, 0)
 
 def test_Token():
 	index = libclang.Index()
@@ -347,6 +357,7 @@ run(2.9, test_Diagnostic29)
 run(2.7, test_Cursor)
 run(2.8, test_Cursor28)
 run(2.9, test_Cursor29)
+run(3.0, test_Cursor30)
 run(2.7, test_Token)
 run(2.8, test_Type28)
 run(2.9, test_Type29)
