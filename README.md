@@ -50,7 +50,7 @@ The support status for libclang 2.9 is as follows:
 | `CXString`              | 2.7      | Yes        |
 | `CXToken`               | 2.7      | Yes        |
 | `CXTokenKind`           | 2.7      | Yes        |
-| `CXTranslationUnit`     | 2.9      | Yes        |
+| `CXTranslationUnit`     | 3.0      | Yes        |
 | `CXType`                | 3.0      | Yes        |
 | `CXTypeKind`            | 2.8      | Yes        |
 | `clang_constructUSR_*`  | 2.8      | No         |

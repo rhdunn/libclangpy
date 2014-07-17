@@ -981,6 +981,7 @@ class AvailabilityKind:
 AvailabilityKind.AVAILABLE = AvailabilityKind(0) # 2.8
 AvailabilityKind.DEPRECATED = AvailabilityKind(1) # 2.8
 AvailabilityKind.NOT_AVAILABLE = AvailabilityKind(2) # 2.8
+AvailabilityKind.NOT_ACCESSIBLE = AvailabilityKind(3) # 3.0
 
 class LanguageKind:
 	@requires(2.8)
@@ -1333,6 +1334,8 @@ TranslationUnitFlags.PRECOMPILED_PREAMBLE = TranslationUnitFlags(4) # 2.8
 TranslationUnitFlags.CACHE_COMPLETION_RESULTS = TranslationUnitFlags(8) # 2.8
 TranslationUnitFlags.PRECOMPILED_PREAMBLE = TranslationUnitFlags(16) # 2.9
 TranslationUnitFlags.CHAINED_PCH = TranslationUnitFlags(32) # 2.9
+TranslationUnitFlags.NESTED_MACRO_EXPANSIONS = TranslationUnitFlags(64) # 3.0
+TranslationUnitFlags.NESTED_MACRO_INSTANTIATIONS = TranslationUnitFlags.NESTED_MACRO_EXPANSIONS # 3.0
 
 class SaveTranslationUnitFlags:
 	@requires(2.8)
@@ -1447,6 +1450,10 @@ class TranslationUnit:
 	def reparse(self, unsaved_files, options=ReparseTranslationUnitFlags.NONE):
 		unsavedc, unsavedv = _marshall_unsaved_files(unsaved_files)
 		return bool(_libclang.clang_saveTranslationUnit(self._tu, unsavedc, unsavedv, options.value))
+
+	@requires(3.0, 'clang_isFileMultipleIncludeGuarded', [c_void_p, c_void_p], c_uint)
+	def is_multiple_include_guarded(self, srcfile):
+		return bool(_libclang.clang_isFileMultipleIncludeGuarded(self._tu, srcfile._f))
 
 class Index:
 	@requires(2.7, 'clang_createIndex', [c_int, c_int], c_void_p)

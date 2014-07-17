@@ -185,6 +185,12 @@ def test_TranslationUnit29():
 	tu = index.from_source(filename)
 	match_location(tu.location(tu.file(filename), offset=13), filename, 3, 2, 13)
 
+def test_TranslationUnit30():
+	index = libclang.Index()
+	filename = 'tests/enumeration.hpp'
+	tu = index.from_source(filename)
+	equals(tu.is_multiple_include_guarded(tu.file(filename)), False)
+
 def test_Diagnostic():
 	index = libclang.Index()
 	tu = index.from_source('tests/error.hpp')
@@ -359,6 +365,7 @@ run(2.7, test_Index)
 run(2.8, test_Index28)
 run(2.7, test_TranslationUnit)
 run(2.9, test_TranslationUnit29)
+run(3.0, test_TranslationUnit30)
 run(2.7, test_Diagnostic)
 run(2.9, test_Diagnostic29)
 run(2.7, test_Cursor)
