@@ -13,6 +13,22 @@ from the cindex bindings from LLVM/clang in that it:
 
 5.  supports Python 2 and Python 3.
 
+## Using In Your Own Projects
+
+To use libclangpy in your own git projects, add libclangpy as a submodule:
+
+	git submodule add git://github.com/rhdunn/libclangpy.git
+
+then, in your python file, add:
+
+	from libclangpy import libclang
+
+you can now start using it, e.g.:
+
+	libclang.load()
+	index = libclang.Index()
+	tu = index.parse('test.hpp')
+
 ## Implementation Status
 
 The support status for libclang 2.9 is as follows:
