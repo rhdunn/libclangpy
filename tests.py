@@ -43,8 +43,12 @@ def run(version, test):
 		print('passed')
 		_passed = _passed + 1
 	except libclang.MissingFunction:
-		print('skipping ... missing APIs')
-		_skipped = _skipped + 1
+		if libclang.version > version:
+			print('skipping ... missing APIs')
+			_skipped = _skipped + 1
+		else:
+			print('failed ... incorrect API binding')
+			_failed = _failed + 1
 	except Exception as e:
 		print('failed')
 		print(traceback.format_exc())
@@ -67,6 +71,9 @@ def match_location(loc, filename, line, column, offset):
 	equals(loc.line, line)
 	equals(loc.column, column)
 	equals(loc.offset, offset)
+
+def test_version():
+	equals(libclang.version in [2.7, 2.8, 2.9, 3.0], True)
 
 def test_File(f, filename):
 	equals(f.name, filename)
@@ -520,6 +527,7 @@ def test_Type30():
 
 libclang.load()
 
+run(2.7, test_version)
 run(2.7, test_SourceLocation)
 run(2.9, test_SourceLocation29)
 run(3.0, test_SourceLocation30)

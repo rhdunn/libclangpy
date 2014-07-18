@@ -26,6 +26,8 @@ _system = platform.system()
 _libclang = None
 _dynamic_types = {}
 
+version = None
+
 time_t = c_uint
 
 if sys.version_info.major >= 3:
@@ -119,10 +121,28 @@ def _marshall_unsaved_files(unsaved_files):
 		ret[i].length = len(contents)
 	return len(unsaved_files), ret
 
+def _detect_version(name):
+	# The libclang documentation says that clang_getClangVersion is not
+	# intended to be (a) machine parsable, or (b) stable. Therefore,
+	# this uses the presence of different APIs to infer the version.
+	#
+	# This will only detect libclang versions upto and including the
+	# version supported by libclangpy using this method.
+	global version
+	_version_checks = [
+		(3.0, 'clang_Range_isNull'),
+		(2.9, 'clang_getDiagnosticOption'),
+		(2.8, 'clang_isUnexposed'),
+		(2.7, 'clang_isInvalid')
+	]
+	for v, api in _version_checks:
+		if hasattr(_libclang, api):
+			version = v
+			return version
+	raise Exception('Library {0} is not a libclang library.'.format(name))
+
 def load(name=None, version=None):
 	""" Load libclang from the specified name and/or version. """
-
-	import inspect
 
 	global _libclang
 	if not name:
@@ -130,7 +150,8 @@ def load(name=None, version=None):
 	if version:
 		name = '{0}-{1}'.format(name, version)
 	_libclang = cdll.LoadLibrary('{0}.{1}'.format(name, _lib_extension[_system]))
-	if hasattr(_libclang, 'clang_Range_isNull'): # libclang 3.0 or later ...
+	lib_version = _detect_version(name)
+	if lib_version >= 3.0:
 		_dynamic_types['_CXCursor'] = _CXCursor30
 		_dynamic_types['_CXCursor*'] = POINTER(_CXCursor30)
 		_dynamic_types['_CXCursor**'] = POINTER(POINTER(_CXCursor30))
