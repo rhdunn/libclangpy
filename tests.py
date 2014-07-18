@@ -70,6 +70,7 @@ def match_location(loc, filename, line, column, offset):
 
 def test_File(f, filename):
 	equals(f.name, filename)
+	equals(f.time > 0, True)
 	equals(str(f), filename)
 	equals(f == f, True)
 	equals(f != f, False)
