@@ -292,6 +292,18 @@ def test_ReparseTranslationUnitFlags28():
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
 
+def test_GlobalOptionFlags31():
+	a = libclang.GlobalOptionFlags(2)
+	b = libclang.GlobalOptionFlags(8)
+	equals(a == a, True)
+	equals(a == b, False)
+	equals(a != a, False)
+	equals(a != b, True)
+	equals(a.value, 2)
+	equals((a | b).value, 10)
+	equals(hash(a) == hash(a), True)
+	equals(hash(a) == hash(b), False)
+
 def test_Index():
 	index = libclang.Index()
 	filename = 'tests/enumeration.hpp'
@@ -339,6 +351,12 @@ def test_Index28():
 	tu = index.parse('unsaved.hxx', unsaved_files=[('unsaved.hxx', 'struct test {};')])
 	equals(tu.spelling, '')
 	equals(len(list(tu.diagnostics)), 0)
+
+def test_Index31():
+	index = libclang.Index()
+	equals(index.global_options, libclang.GlobalOptionFlags.NONE)
+	index.global_options = libclang.GlobalOptionFlags.THREAD_BACKGROUND_PRIORITY_FOR_INDEXING
+	equals(index.global_options, libclang.GlobalOptionFlags.THREAD_BACKGROUND_PRIORITY_FOR_INDEXING)
 
 def test_TranslationUnit():
 	index = libclang.Index()
@@ -549,8 +567,10 @@ run(3.0, test_NameRefFlags30)
 run(2.8, test_TranslationUnitFlags28)
 run(2.8, test_SaveTranslationUnitFlags28)
 run(2.8, test_ReparseTranslationUnitFlags28)
+run(3.1, test_GlobalOptionFlags31)
 run(2.7, test_Index)
 run(2.8, test_Index28)
+run(3.1, test_Index31)
 run(2.7, test_TranslationUnit)
 run(2.9, test_TranslationUnit29)
 run(3.0, test_TranslationUnit30)

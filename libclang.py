@@ -1591,6 +1591,32 @@ class TranslationUnit:
 	def is_multiple_include_guarded(self, srcfile):
 		return bool(_libclang.clang_isFileMultipleIncludeGuarded(self._tu, srcfile._f))
 
+class GlobalOptionFlags:
+	@requires(3.1)
+	def __init__(self, value):
+		self.value = value
+
+	@requires(3.1)
+	def __or__(self, other):
+		return GlobalOptionFlags(self.value | other.value)
+
+	@requires(3.1)
+	def __eq__(self, other):
+		return self.value == other.value
+
+	@requires(3.1)
+	def __ne__(self, other):
+		return self.value != other.value
+
+	@requires(3.1)
+	def __hash__(self):
+		return hash(self.value)
+
+GlobalOptionFlags.NONE = GlobalOptionFlags(0) # 3.1
+GlobalOptionFlags.THREAD_BACKGROUND_PRIORITY_FOR_INDEXING = GlobalOptionFlags(1) # 3.1
+GlobalOptionFlags.THREAD_BACKGROUND_PRIORITY_FOR_EDITING = GlobalOptionFlags(2) # 3.1
+GlobalOptionFlags.THREAD_BACKGROUND_PRIORITY_FOR_ALL = GlobalOptionFlags.THREAD_BACKGROUND_PRIORITY_FOR_INDEXING | GlobalOptionFlags.THREAD_BACKGROUND_PRIORITY_FOR_EDITING # 3.1
+
 class Index:
 	@requires(2.7, 'clang_createIndex', [c_int, c_int], c_void_p)
 	def __init__(self, exclude_from_pch=True, display_diagnostics=False):
@@ -1618,3 +1644,14 @@ class Index:
 		unsavedc, unsavedv = _marshall_unsaved_files(unsaved_files)
 		tu = _libclang.clang_parseTranslationUnit(self._index, filename, argv, argc, unsavedv, unsavedc, options.value)
 		return TranslationUnit(tu, self)
+
+	@property
+	@requires(3.1, 'clang_CXIndex_getGlobalOptions', [c_void_p], c_uint)
+	def global_options(self):
+		value = _libclang.clang_CXIndex_getGlobalOptions(self._index)
+		return GlobalOptionFlags(value)
+
+	@global_options.setter
+	@requires(3.1, 'clang_CXIndex_setGlobalOptions', [c_void_p, c_uint])
+	def global_options(self, options):
+		_libclang.clang_CXIndex_setGlobalOptions(self._index, options.value)
