@@ -21,7 +21,25 @@ import sys
 
 import libclang
 
-def print_cursor(c, level=0, indentation='... ', cursors=set()):
+def print_type(t, level=0, indentation='... ', cursors=set(), ctx=''):
+	if t.kind == libclang.TypeKind.INVALID:
+		return
+	sys.stdout.write('{0}{1}'.format(level * indentation, ctx))
+	sys.stdout.write('[{0}|{1}]'.format(t.kind.value, t.kind))
+	if t.canonical_type != t:
+		kind = t.canonical_type.kind
+		sys.stdout.write(' canonical=[{0}|{1}]'.format(kind.value, kind))
+	if t.pointee_type != t and t.pointee_type.kind != libclang.TypeKind.INVALID:
+		kind = t.pointee_type.kind
+		sys.stdout.write(' pointee=[{0}|{1}]'.format(kind.value, kind))
+	if t.result_type != t and t.result_type.kind != libclang.TypeKind.INVALID:
+		kind = t.result_type.kind
+		sys.stdout.write(' result=[{0}|{1}]'.format(kind.value, kind))
+	if t.declaration.kind != libclang.CursorKind.NO_DECL_FOUND:
+		sys.stdout.write(' decl="{0}"@{1}'.format(t.declaration.spelling, hash(t.declaration)))
+	sys.stdout.write('\n')
+
+def print_cursor(c, level=0, indentation='... ', cursors=set(), print_types=False):
 	sys.stdout.write(level * indentation)
 	sys.stdout.write('[{0}|{1}]'.format(c.kind.value, c.kind))
 	sys.stdout.write(' "{0}"@{1}'.format(c.spelling, hash(c)))
@@ -30,9 +48,14 @@ def print_cursor(c, level=0, indentation='... ', cursors=set()):
 	if c.definition != c:
 		sys.stdout.write(' def="{0}"@{1}'.format(c.definition.spelling, hash(c.definition)))
 	sys.stdout.write('\n')
+	if print_types:
+		try:
+			print_type(c.type, level=level, indentation=indentation, cursors=cursors, ctx='|=> ')
+		except libclang.MethodException:
+			pass
 	if not c in cursors:
 		for child in c.children:
-			print_cursor(child, level=level+1, indentation=indentation, cursors=cursors)
+			print_cursor(child, level=level+1, indentation=indentation, cursors=cursors, print_types=print_types)
 	cursors.add(c)
 
 def should_print_cursor(c, tu, restrict_to_input_file):
@@ -55,6 +78,7 @@ except:
 	args = sys.argv[2:]
 
 restrict_to_input_file = '--only-input-file' in args
+print_types = '--print-types' in args
 
 libclang.load()
 
@@ -65,4 +89,4 @@ for diagnostic in tu.diagnostics:
 
 for child in tu.cursor().children:
 	if should_print_cursor(child, tu, restrict_to_input_file):
-		print_cursor(child)
+		print_cursor(child, print_types=print_types)
