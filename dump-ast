@@ -1,0 +1,57 @@
+#!/usr/bin/python
+
+# Copyright (C) 2014 Reece H. Dunn
+#
+# This file is part of libclangpy.
+#
+# libclangpy is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# libclangpy is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with libclangpy.  If not, see <http://www.gnu.org/licenses/>.
+
+import sys
+
+import libclang
+
+def print_cursor(c, level=0, indentation='... '):
+	sys.stdout.write(level * indentation)
+	sys.stdout.write('[{0}|{1}]'.format(c.kind.value, c.kind))
+	sys.stdout.write(' "{0}"'.format(c.spelling))
+	if c.referenced != c:
+		sys.stdout.write(' ref="{0}"'.format(c.referenced.spelling))
+	if c.definition != c:
+		sys.stdout.write(' def="{0}"'.format(c.definition.spelling))
+	sys.stdout.write('\n')
+	for child in c.children:
+		print_cursor(child, level=level+1, indentation=indentation)
+
+try:
+	filename = sys.argv[1]
+	unsaved_files = []
+except IndexError:
+	filename = 'stdin.cpp'
+	unsaved_files = [('stdin.cpp', sys.stdin.read())]
+
+try:
+	args = sys.argv[sys.argv.index('--')+1:]
+except:
+	args = []
+
+libclang.load()
+
+index = libclang.Index()
+tu = index.parse(filename, args=args, unsaved_files=unsaved_files)
+for diagnostic in tu.diagnostics:
+	print(diagnostic.format())
+
+for child in tu.cursor().children:
+	if child.location.file:
+		print_cursor(child)
