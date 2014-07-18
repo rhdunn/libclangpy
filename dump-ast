@@ -35,6 +35,11 @@ def print_cursor(c, level=0, indentation='... ', cursors=set()):
 			print_cursor(child, level=level+1, indentation=indentation, cursors=cursors)
 	cursors.add(c)
 
+def should_print_cursor(c, tu, restrict_to_input_file):
+	if restrict_to_input_file:
+		return c.location.file == tu.spelling
+	return True
+
 try:
 	filename = sys.argv[1]
 	unsaved_files = []
@@ -43,17 +48,21 @@ except IndexError:
 	unsaved_files = [('stdin.cpp', sys.stdin.read())]
 
 try:
-	args = sys.argv[sys.argv.index('--')+1:]
+	clang_args = sys.argv[sys.argv.index('--')+1:]
+	args = sys.argv[2:sys.argv.index('--')]
 except:
-	args = []
+	clang_args = []
+	args = sys.argv[2:]
+
+restrict_to_input_file = '--only-input-file' in args
 
 libclang.load()
 
 index = libclang.Index()
-tu = index.parse(filename, args=args, unsaved_files=unsaved_files)
+tu = index.parse(filename, args=clang_args, unsaved_files=unsaved_files)
 for diagnostic in tu.diagnostics:
 	print(diagnostic.format())
 
 for child in tu.cursor().children:
-	if child.location.file:
+	if should_print_cursor(child, tu, restrict_to_input_file):
 		print_cursor(child)
