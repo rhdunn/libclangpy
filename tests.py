@@ -438,7 +438,7 @@ def test_Cursor28():
 	equals(c.template_kind, libclang.CursorKind.NO_DECL_FOUND)
 	equals(c.specialized_template.kind, libclang.CursorKind.INVALID_FILE)
 	equals(c.is_virtual_base, False)
-	equals(c.is_static, False)
+	equals(c.is_static_method, False)
 
 def test_Cursor29():
 	index = libclang.Index()

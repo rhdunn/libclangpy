@@ -1311,7 +1311,7 @@ class Cursor:
 
 	@property
 	@requires(2.8, 'clang_CXXMethod_isStatic', ['_CXCursor'], c_uint)
-	def is_static(self):
+	def is_static_method(self):
 		return bool(_libclang.clang_CXXMethod_isStatic(self._c))
 
 	@property
