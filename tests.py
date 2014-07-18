@@ -82,6 +82,7 @@ def test_SourceLocation():
 	match_location(loc.instantiation_location, None, 0, 0, 0)
 	equals(loc == libclang.SourceLocation.null(), True)
 	equals(loc != libclang.SourceLocation.null(), False)
+	equals(loc.is_null, True)
 
 def test_SourceLocation29():
 	loc = libclang.SourceLocation.null()

@@ -304,6 +304,11 @@ class SourceLocation:
 
 	@property
 	@requires(2.7)
+	def is_null(self):
+		return self == SourceLocation.null()
+
+	@property
+	@requires(2.7)
 	def file(self):
 		return self.instantiation_location.file
 
