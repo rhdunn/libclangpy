@@ -21,7 +21,7 @@ import sys
 
 import libclang
 
-def print_cursor(c, level=0, indentation='... '):
+def print_cursor(c, level=0, indentation='... ', cursors=set()):
 	sys.stdout.write(level * indentation)
 	sys.stdout.write('[{0}|{1}]'.format(c.kind.value, c.kind))
 	sys.stdout.write(' "{0}"@{1}'.format(c.spelling, hash(c)))
@@ -30,8 +30,10 @@ def print_cursor(c, level=0, indentation='... '):
 	if c.definition != c:
 		sys.stdout.write(' def="{0}"@{1}'.format(c.definition.spelling, hash(c.definition)))
 	sys.stdout.write('\n')
-	for child in c.children:
-		print_cursor(child, level=level+1, indentation=indentation)
+	if not c in cursors:
+		for child in c.children:
+			print_cursor(child, level=level+1, indentation=indentation, cursors=cursors)
+	cursors.add(c)
 
 try:
 	filename = sys.argv[1]
