@@ -96,8 +96,8 @@ def test_SourceRange():
 	rng1 = libclang.SourceRange.null()
 	equals(rng1.start, libclang.SourceLocation.null())
 	equals(rng1.end,   libclang.SourceLocation.null())
-	rng2 = libclang.SourceRange.create(libclang.SourceLocation.null(),
-	                                   libclang.SourceLocation.null())
+	rng2 = libclang.SourceRange(libclang.SourceLocation.null(),
+	                            libclang.SourceLocation.null())
 	equals(rng2.start, libclang.SourceLocation.null())
 	equals(rng2.end,   libclang.SourceLocation.null())
 	equals(rng1 == rng2, True)
@@ -465,7 +465,7 @@ def test_Token():
 	index = libclang.Index()
 	tu = index.from_source('tests/enumeration.hpp')
 	f = tu.file('tests/enumeration.hpp')
-	rng = libclang.SourceRange.create(tu.location(f, 1, 1), tu.location(f, 2, 1))
+	rng = libclang.SourceRange(tu.location(f, 1, 1), tu.location(f, 2, 1))
 	children = [child for child in tu.cursor().children if child.location.file]
 	# tokenize
 	tokens = tu.tokenize(libclang.SourceRange.null())

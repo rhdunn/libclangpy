@@ -324,8 +324,12 @@ class SourceLocation:
 
 class SourceRange:
 	@requires(2.7)
-	def __init__(self, sr):
-		self._sr = sr
+	@requires(2.7, 'clang_getRange', [_CXSourceLocation, _CXSourceLocation], _CXSourceRange)
+	def __init__(self, start, end):
+		if isinstance(start, _CXSourceRange):
+			self._sr = start
+		else:
+			self._sr = _libclang.clang_getRange(start._sl, end._sl)
 
 	@requires(2.7)
 	@optional(3.0, 'clang_equalRanges', [_CXSourceRange, _CXSourceRange], c_uint)
@@ -342,7 +346,7 @@ class SourceRange:
 	@requires(2.7, 'clang_getNullRange', [], _CXSourceRange)
 	def null():
 		sr = _libclang.clang_getNullRange()
-		return SourceRange(sr)
+		return SourceRange(sr, None)
 
 	@property
 	@requires(2.7)
@@ -351,12 +355,6 @@ class SourceRange:
 		if _libclang.clang_Range_isNull:
 			return bool(_libclang.clang_Range_isNull(self._sr))
 		return self == SourceRange.null()
-
-	@staticmethod
-	@requires(2.7, 'clang_getRange', [_CXSourceLocation, _CXSourceLocation], _CXSourceRange)
-	def create(start, end):
-		sr = _libclang.clang_getRange(start._sl, end._sl)
-		return SourceRange(sr)
 
 	@property
 	@requires(2.7, 'clang_getRangeStart', [_CXSourceRange], _CXSourceLocation)
@@ -495,7 +493,7 @@ class Diagnostic:
 	def ranges(self):
 		for i in range(0, _libclang.clang_getDiagnosticNumRanges(self._d)):
 			sr = _libclang.clang_getDiagnosticRange(self._d, i)
-			yield SourceRange(sr)
+			yield SourceRange(sr, None)
 
 	@property
 	@requires(2.7, 'clang_getDiagnosticNumFixIts', [c_void_p], c_uint)
@@ -504,7 +502,7 @@ class Diagnostic:
 		for i in range(0, _libclang.clang_getDiagnosticNumFixIts(self._d)):
 			sr = _CXSourceRange()
 			s  = _libclang.clang_getDiagnosticFixIt(self._d, i, byref(sr))
-			yield (SourceRange(sr), _to_str(s))
+			yield (SourceRange(sr, None), _to_str(s))
 
 	@property
 	@requires(2.9, 'clang_getDiagnosticOption', [c_void_p, POINTER(_CXString)], _CXString)
@@ -597,7 +595,7 @@ class Token:
 	@requires(2.7, 'clang_getTokenExtent', [c_void_p, _CXToken], _CXSourceRange)
 	def extent(self):
 		sr = _libclang.clang_getTokenExtent(self._tu._tu, self._t)
-		return SourceRange(sr)
+		return SourceRange(sr, None)
 
 	@property
 	@requires(2.7, 'clang_getCursor', [c_void_p, _CXSourceLocation], '_CXCursor')
@@ -1187,7 +1185,7 @@ class Cursor:
 	@requires(2.7, 'clang_getCursorExtent', ['_CXCursor'], _CXSourceRange)
 	def extent(self):
 		sr = _libclang.clang_getCursorExtent(self._c)
-		return SourceRange(sr)
+		return SourceRange(sr, None)
 
 	@property
 	@requires(2.7, 'clang_visitChildren', ['_CXCursor', 'cb_cursor_visitor', py_object], c_uint)
@@ -1350,7 +1348,7 @@ class Cursor:
 	@requires(3.0, 'clang_getCursorReferenceNameRange', ['_CXCursor', c_uint, c_uint], _CXSourceRange)
 	def reference_name_range(self, flags, index):
 		sr = _libclang.clang_getCursorReferenceNameRange(self._c, flags.value, index)
-		return SourceRange(sr)
+		return SourceRange(sr, None)
 
 	@property
 	@requires(3.0, 'clang_CXXMethod_isVirtual', ['_CXCursor'], c_uint)
