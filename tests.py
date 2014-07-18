@@ -323,6 +323,8 @@ def test_TranslationUnit():
 	test_File(tu.file(filename), filename)
 	match_location(tu.location(tu.file(filename), 3, 2), filename, 3, 2, 13)
 	match_location(tu.location(tu.file(filename), line=3, column=2), filename, 3, 2, 13)
+	match_location(tu.location(filename, 3, 2), filename, 3, 2, 13)
+	match_location(tu.location(filename, line=3, column=2), filename, 3, 2, 13)
 	equals(list(tu.diagnostics), [])
 
 def test_TranslationUnit29():
