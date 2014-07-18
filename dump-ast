@@ -64,18 +64,27 @@ def should_print_cursor(c, tu, restrict_to_input_file):
 	return True
 
 try:
-	filename = sys.argv[1]
-	unsaved_files = []
-except IndexError:
-	filename = 'stdin.cpp'
-	unsaved_files = [('stdin.cpp', sys.stdin.read())]
-
-try:
 	clang_args = sys.argv[sys.argv.index('--')+1:]
-	args = sys.argv[2:sys.argv.index('--')]
+	argv = sys.argv[1:sys.argv.index('--')]
 except:
 	clang_args = []
-	args = sys.argv[2:]
+	argv = sys.argv[1:]
+
+args = []
+filenames = []
+for arg in argv:
+	if arg.startswith('--'):
+		args.append(arg)
+	elif arg == '-':
+		pass
+	else:
+		filenames.append(arg)
+
+if len(filenames) == 0:
+	filenames.append('stdin.cpp')
+	unsaved_files = [('stdin.cpp', sys.stdin.read())]
+else:
+	unsaved_files = []
 
 restrict_to_input_file = '--only-input-file' in args
 print_types = '--print-types' in args
@@ -83,10 +92,12 @@ print_types = '--print-types' in args
 libclang.load()
 
 index = libclang.Index()
-tu = index.parse(filename, args=clang_args, unsaved_files=unsaved_files)
-for diagnostic in tu.diagnostics:
-	print(diagnostic.format())
 
-for child in tu.cursor().children:
-	if should_print_cursor(child, tu, restrict_to_input_file):
-		print_cursor(child, print_types=print_types)
+for filename in filenames:
+	tu = index.parse(filename, args=clang_args, unsaved_files=unsaved_files)
+	for diagnostic in tu.diagnostics:
+		print(diagnostic.format())
+
+	for child in tu.cursor().children:
+		if should_print_cursor(child, tu, restrict_to_input_file):
+			print_cursor(child, print_types=print_types)
