@@ -29,16 +29,31 @@ def equals(a, b):
 	if a != b:
 		raise AssertionError('Value mismatch: `{0}` != `{1}`'.format(str(a), str(b)))
 
+_passed  = 0
+_skipped = 0
+_failed  = 0
+
 def run(version, test):
+	global _passed
+	global _skipped
+	global _failed
 	sys.stdout.write('Running {0} ... '.format(test.__name__))
 	try:
 		test()
 		print('passed')
+		_passed = _passed + 1
 	except libclang.MissingFunction:
 		print('skipping ... missing APIs')
+		_skipped = _skipped + 1
 	except Exception as e:
 		print('failed')
 		print(traceback.format_exc())
+		_failed = _failed + 1
+
+def summary():
+	print('-'*60)
+	print('   {0} passed, {1} skipped, {2} failed'.format(_passed, _skipped, _failed))
+	print('')
 
 def parse_str(index, contents, filename='parse_str.cpp'):
 	tu = index.from_source(filename, unsaved_files=[(filename, contents)])
@@ -540,3 +555,5 @@ run(2.7, test_Token)
 run(2.8, test_Type28)
 run(2.9, test_Type29)
 run(3.0, test_Type30)
+
+summary()
