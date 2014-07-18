@@ -212,6 +212,8 @@ class File:
 
 	@requires(2.7)
 	def __eq__(self, other):
+		if isinstance(other, str):
+			return self.name == other
 		return self.name == other.name
 
 	@requires(2.7)

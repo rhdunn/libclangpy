@@ -58,6 +58,8 @@ def test_File(f, filename):
 	equals(str(f), filename)
 	equals(f == f, True)
 	equals(f != f, False)
+	equals(f == filename, True)
+	equals(f != filename, False)
 
 def test_SourceLocation():
 	loc = libclang.SourceLocation.null()
@@ -325,6 +327,8 @@ def test_TranslationUnit():
 	match_location(tu.location(tu.file(filename), line=3, column=2), filename, 3, 2, 13)
 	match_location(tu.location(filename, 3, 2), filename, 3, 2, 13)
 	match_location(tu.location(filename, line=3, column=2), filename, 3, 2, 13)
+	match_location(tu.location(tu.spelling, 3, 2), filename, 3, 2, 13)
+	match_location(tu.location(tu.spelling, line=3, column=2), filename, 3, 2, 13)
 	equals(list(tu.diagnostics), [])
 
 def test_TranslationUnit29():
