@@ -43,7 +43,7 @@ def run(version, test):
 		print('passed')
 		_passed = _passed + 1
 	except libclang.MissingFunction:
-		if libclang.version > version:
+		if libclang.version < version:
 			print('skipping ... missing APIs')
 			_skipped = _skipped + 1
 		else:
