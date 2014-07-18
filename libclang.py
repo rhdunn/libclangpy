@@ -125,7 +125,6 @@ def load(name=None, version=None):
 	import inspect
 
 	global _libclang
-	global cb_cursor_visitor
 	if not name:
 		name = 'libclang'
 	if version:
