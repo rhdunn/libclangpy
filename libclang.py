@@ -1334,7 +1334,7 @@ class Cursor:
 
 	@property
 	@requires(2.9, 'clang_getDeclObjCTypeEncoding', ['_CXCursor'], _CXString)
-	def objc_decltype_encoding(self):
+	def objc_type_encoding(self):
 		s = _libclang.clang_getDeclObjCTypeEncoding(self._c)
 		return _to_str(s)
 

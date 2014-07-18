@@ -446,7 +446,7 @@ def test_Cursor29():
 	equals(c.semantic_parent, c.parent)
 	equals(c.lexical_parent, c.parent)
 	equals(c.included_file.name, None)
-	equals(c.objc_decltype_encoding, '?')
+	equals(c.objc_type_encoding, '?')
 	equals(len(list(c.overloads)), 0)
 	equals(c.display_name, 'test')
 	equals(c.canonical, c)
