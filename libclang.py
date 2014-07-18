@@ -1442,8 +1442,9 @@ ReparseTranslationUnitFlags.NONE = ReparseTranslationUnitFlags(0) # 2.8
 
 class TranslationUnit:
 	@requires(2.7)
-	def __init__(self, tu):
+	def __init__(self, tu, index):
 		self._tu = tu
+		self._index = index
 
 	@requires(2.7, 'clang_disposeTranslationUnit', [c_void_p])
 	def __del__(self):
@@ -1542,18 +1543,18 @@ class Index:
 	@requires(2.7, 'clang_createTranslationUnit', [c_void_p, c_utf8_p], c_void_p)
 	def from_ast(self, filename):
 		tu = _libclang.clang_createTranslationUnit(self._index, filename)
-		return TranslationUnit(tu)
+		return TranslationUnit(tu, self)
 
 	@requires(2.7, 'clang_createTranslationUnitFromSourceFile', [c_void_p, c_utf8_p, c_int, POINTER(c_utf8_p), c_uint, POINTER(_CXUnsavedFile)], c_void_p)
 	def from_source(self, filename=None, args=None, unsaved_files=None):
 		argc, argv = _marshall_args(args)
 		unsavedc, unsavedv = _marshall_unsaved_files(unsaved_files)
 		tu = _libclang.clang_createTranslationUnitFromSourceFile(self._index, filename, argc, argv, unsavedc, unsavedv)
-		return TranslationUnit(tu)
+		return TranslationUnit(tu, self)
 
 	@requires(2.8, 'clang_parseTranslationUnit', [c_void_p, c_utf8_p, POINTER(c_utf8_p), c_uint, POINTER(_CXUnsavedFile), c_uint, c_uint], c_void_p)
 	def parse(self, filename=None, args=None, unsaved_files=None, options=TranslationUnitFlags.NONE):
 		argc, argv = _marshall_args(args)
 		unsavedc, unsavedv = _marshall_unsaved_files(unsaved_files)
 		tu = _libclang.clang_parseTranslationUnit(self._index, filename, argv, argc, unsavedv, unsavedc, options.value)
-		return TranslationUnit(tu)
+		return TranslationUnit(tu, self)
