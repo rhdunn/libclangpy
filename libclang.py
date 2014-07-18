@@ -457,6 +457,11 @@ class DiagnosticCategory:
 		s = _libclang.clang_getDiagnosticCategoryName(self.value)
 		return _to_str(s)
 
+class FixIt:
+	def __init__(self, extent, spelling):
+		self.extent = extent
+		self.spelling = spelling
+
 class Diagnostic:
 	@requires(2.7)
 	def __init__(self, d):
@@ -507,7 +512,7 @@ class Diagnostic:
 		for i in range(0, _libclang.clang_getDiagnosticNumFixIts(self._d)):
 			sr = _CXSourceRange()
 			s  = _libclang.clang_getDiagnosticFixIt(self._d, i, byref(sr))
-			yield (SourceRange(sr, None), _to_str(s))
+			yield FixIt(SourceRange(sr, None), _to_str(s))
 
 	@cached_property
 	@requires(2.9, 'clang_getDiagnosticOption', [c_void_p, POINTER(_CXString)], _CXString)

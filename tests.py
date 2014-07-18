@@ -379,10 +379,9 @@ def test_Diagnostic():
 	# fixits
 	f = list(d.fixits)
 	equals(len(f), 1)
-	r, msg = f[0]
-	match_location(r.start, 'tests/error.hpp', 6, 2, 25)
-	match_location(r.end, 'tests/error.hpp', 6, 2, 25)
-	equals(msg, ';')
+	match_location(f[0].extent.start, 'tests/error.hpp', 6, 2, 25)
+	match_location(f[0].extent.end, 'tests/error.hpp', 6, 2, 25)
+	equals(f[0].spelling, ';')
 
 def test_Diagnostic29():
 	index = libclang.Index()
