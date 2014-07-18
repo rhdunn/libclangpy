@@ -1135,9 +1135,12 @@ class Cursor:
 	def __str__(self):
 		return self.spelling
 
-	@requires(2.9, 'clang_hashCursor', ['_CXCursor'], c_uint)
+	@requires(2.7)
+	@optional(2.9, 'clang_hashCursor', ['_CXCursor'], c_uint)
 	def __hash__(self):
-		return _libclang.clang_hashCursor(self._c)
+		if _libclang.clang_hashCursor:
+			return _libclang.clang_hashCursor(self._c)
+		return hash((self._c.kind, self._c.data[0], self._c.data[1], self._c.data[2]))
 
 	@staticmethod
 	@requires(2.7, 'clang_getNullCursor', [], '_CXCursor')

@@ -382,6 +382,7 @@ def test_Cursor():
 	equals(c != c, False)
 	equals(c != libclang.Cursor.null(), True)
 	equals(c.is_null, False)
+	equals(hash(c), hash(c))
 	equals(c.spelling, 'tests/enumeration.hpp')
 	equals(str(c), 'tests/enumeration.hpp')
 	equals(c.kind, libclang.CursorKind.TRANSLATION_UNIT)
@@ -422,7 +423,6 @@ def test_Cursor28():
 def test_Cursor29():
 	index = libclang.Index()
 	c = parse_str(index, 'enum test {};')[0]
-	equals(hash(c), hash(c))
 	equals(c.semantic_parent, c.parent)
 	equals(c.lexical_parent, c.parent)
 	equals(c.included_file.name, None)
