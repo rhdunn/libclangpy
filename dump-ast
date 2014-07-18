@@ -24,11 +24,11 @@ import libclang
 def print_cursor(c, level=0, indentation='... '):
 	sys.stdout.write(level * indentation)
 	sys.stdout.write('[{0}|{1}]'.format(c.kind.value, c.kind))
-	sys.stdout.write(' "{0}"'.format(c.spelling))
+	sys.stdout.write(' "{0}"@{1}'.format(c.spelling, hash(c)))
 	if c.referenced != c:
-		sys.stdout.write(' ref="{0}"'.format(c.referenced.spelling))
+		sys.stdout.write(' ref="{0}"@{1}'.format(c.referenced.spelling, hash(c.referenced)))
 	if c.definition != c:
-		sys.stdout.write(' def="{0}"'.format(c.definition.spelling))
+		sys.stdout.write(' def="{0}"@{1}'.format(c.definition.spelling, hash(c.definition)))
 	sys.stdout.write('\n')
 	for child in c.children:
 		print_cursor(child, level=level+1, indentation=indentation)
