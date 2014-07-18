@@ -509,12 +509,24 @@ class Diagnostic:
 			s  = _libclang.clang_getDiagnosticFixIt(self._d, i, byref(sr))
 			yield (SourceRange(sr, None), _to_str(s))
 
-	@property
+	@cached_property
 	@requires(2.9, 'clang_getDiagnosticOption', [c_void_p, POINTER(_CXString)], _CXString)
-	def option(self):
+	def _option(self):
 		disable = _CXString()
 		o = _libclang.clang_getDiagnosticOption(self._d, byref(disable))
 		return (_to_str(o), _to_str(disable))
+
+	@property
+	@requires(2.9)
+	def option(self):
+		o, d = self._option
+		return o
+
+	@property
+	@requires(2.9)
+	def disable_option(self):
+		o, d = self._option
+		return d
 
 	@property
 	@requires(2.9, 'clang_getDiagnosticCategory', [c_void_p], c_uint)

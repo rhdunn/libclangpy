@@ -390,9 +390,8 @@ def test_Diagnostic29():
 	diagnostics = list(tu.diagnostics)
 	equals(len(diagnostics), 1)
 	d = diagnostics[0]
-	opt, disable = d.option
-	equals(opt, '')
-	equals(disable, '')
+	equals(d.option, '')
+	equals(d.disable_option, '')
 	equals(d.category.name, 'Parse Issue')
 
 def test_Cursor():
