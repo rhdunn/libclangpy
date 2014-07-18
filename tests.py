@@ -400,6 +400,7 @@ def test_Diagnostic29():
 	equals(d.option, '')
 	equals(d.disable_option, '')
 	equals(d.category.name, 'Parse Issue')
+	equals(d.category_text, 'Parse Issue')
 
 def test_Cursor():
 	index = libclang.Index()

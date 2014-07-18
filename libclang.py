@@ -214,6 +214,15 @@ def optional(version, name, argtypes=None, restype=None):
 		return call
 	return new
 
+def deprecated(version, message):
+	""" Python decorator to annotate libclang APIs that have been deprecated. """
+
+	def new(f):
+		def call(*args, **kwargs):
+			return f(*args, **kwargs)
+		return call
+	return new
+
 class cached_property(object):
 	def __init__(self, wrapped):
 		self.wrapped = wrapped
@@ -473,6 +482,7 @@ class DiagnosticCategory:
 
 	@property
 	@requires(2.9, 'clang_getDiagnosticCategoryName', [c_uint], _CXString)
+	@deprecated(3.1, 'Use Diagnostic.category_text instead.')
 	def name(self):
 		s = _libclang.clang_getDiagnosticCategoryName(self.value)
 		return _to_str(s)
@@ -557,6 +567,15 @@ class Diagnostic:
 	@requires(2.9, 'clang_getDiagnosticCategory', [c_void_p], c_uint)
 	def category(self):
 		return DiagnosticCategory(_libclang.clang_getDiagnosticCategory(self._d))
+
+	@property
+	@requires(2.9)
+	@optional(3.1, 'clang_getDiagnosticCategoryText', [c_void_p], _CXString)
+	def category_text(self):
+		if _libclang.clang_getDiagnosticCategoryText:
+			s = _libclang.clang_getDiagnosticCategoryText(self._d)
+			return _to_str(s)
+		return self.category.name
 
 class Linkage:
 	@requires(2.7)

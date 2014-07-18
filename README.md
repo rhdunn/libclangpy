@@ -44,7 +44,7 @@ The support status for libclang 3.0 is as follows:
 | `CXCursorAndRangeVisitor`| 3.0     | No         |
 | `CXCursorKind`          | 3.1      | Yes        |
 | `CXCursorSet`           | 2.9      | No         |
-| `CXDiagnostic`          | 2.9      | Yes        |
+| `CXDiagnostic`          | 3.1      | Yes        |
 | `CXFile`                | 2.7      | Yes        |
 | `CXIndex`               | 2.9      | Yes        |
 | `CXRemapping`           | 3.0      | No         |
