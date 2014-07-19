@@ -577,6 +577,12 @@ def test_Cursor33():
 	equals(c.objc_property_attributes, libclang.ObjCPropertyAttributes.NO_ATTR)
 	equals(c.objc_decl_qualifiers, libclang.ObjCDeclQualifierKind.NONE)
 
+def test_Cursor34():
+	index = libclang.Index()
+	c = parse_str(index, 'enum test {};', filename='cursor34.hpp')[0]
+	equals(c.is_objc_optional, False)
+	equals(c.is_pure_virtual, False)
+
 def test_Token():
 	index = libclang.Index()
 	tu = index.from_source('tests/enumeration.hpp')
@@ -706,6 +712,7 @@ run(3.0, test_Cursor30)
 run(3.1, test_Cursor31)
 run(3.2, test_Cursor32)
 run(3.3, test_Cursor33)
+run(3.4, test_Cursor34)
 run(2.7, test_Token)
 run(2.8, test_Type28)
 run(2.9, test_Type29)

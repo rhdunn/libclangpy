@@ -1737,6 +1737,16 @@ class Cursor:
 	def bit_field_width(self):
 		return _libclang.clang_getFieldDeclBitWidth(self._c)
 
+	@property
+	@requires(3.4, 'clang_Cursor_isObjCOptional', ['_CXCursor'], c_uint)
+	def is_objc_optional(self):
+		return bool(_libclang.clang_Cursor_isObjCOptional(self._c))
+
+	@property
+	@requires(3.4, 'clang_CXXMethod_isPureVirtual', ['_CXCursor'], c_uint)
+	def is_pure_virtual(self):
+		return bool(_libclang.clang_CXXMethod_isPureVirtual(self._c))
+
 class TranslationUnitFlags:
 	@requires(2.8)
 	def __init__(self, value):
