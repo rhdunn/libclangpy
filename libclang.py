@@ -664,6 +664,7 @@ CallingConvention.X86_PASCAL = CallingConvention(5) # 3.1
 CallingConvention.AAPCS = CallingConvention(6) # 3.1
 CallingConvention.AAPCS_VFP = CallingConvention(7) # 3.1
 CallingConvention.PNACL_CALL = CallingConvention(8) # 3.2
+CallingConvention.INTEL_OCL_BICC = CallingConvention(9) # 3.3
 CallingConvention.INVALID = CallingConvention(100) # 3.1
 CallingConvention.UNEXPOSED = CallingConvention(200) # 3.1
 
