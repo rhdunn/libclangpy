@@ -1116,6 +1116,12 @@ TypeKind.OBJC_INTERFACE = TypeKind(108) # 2.8
 TypeKind.OBJC_OBJECT_POINTER = TypeKind(109) # 2.8
 TypeKind.FUNCTION_NO_PROTO = TypeKind(110) # 2.8
 TypeKind.FUNCTION_PROTO = TypeKind(111) # 2.8
+TypeKind.CONSTANT_ARRAY = TypeKind(112) # 2.9
+TypeKind.VECTOR = TypeKind(113) # 3.0
+TypeKind.INCOMPLETE_ARRAY = TypeKind(114) # 3.4
+TypeKind.VARIABLE_ARRAY = TypeKind(115) # 3.4
+TypeKind.DEPENDENT_SIZED_ARRAY = TypeKind(116) # 3.4
+TypeKind.MEMBER_POINTER = TypeKind(117) # 3.4
 
 class Type:
 	@requires(2.8)
