@@ -919,6 +919,7 @@ CursorKind.INDIRECT_GOTO_STMT = CursorKind(211) # 3.0
 CursorKind.CONTINUE_STMT = CursorKind(212) # 3.0
 CursorKind.BREAK_STMT = CursorKind(213) # 3.0
 CursorKind.RETURN_STMT = CursorKind(214) # 3.0
+CursorKind.GCC_ASM_STMT = CursorKind(215) # 3.0
 CursorKind.ASM_STMT = CursorKind(215) # 3.0
 CursorKind.OBJC_AT_TRY_STMT = CursorKind(216) # 3.0
 CursorKind.OBJC_AT_CATCH_STMT = CursorKind(217) # 3.0
@@ -933,6 +934,7 @@ CursorKind.CXX_FOR_RANGE_STMT = CursorKind(225) # 3.0
 CursorKind.SEH_TRY_STMT = CursorKind(226) # 3.0
 CursorKind.SEH_EXCEPT_STMT = CursorKind(227) # 3.0
 CursorKind.SEH_FINALLY_STMT = CursorKind(228) # 3.0
+CursorKind.MS_ASM_STMT = CursorKind(229) # 3.2
 CursorKind.NULL_STMT = CursorKind(230) # 3.0
 CursorKind.DECL_STMT = CursorKind(231) # 3.0
 
@@ -951,6 +953,8 @@ CursorKind.PREPROCESSING_DIRECTIVE = CursorKind(500) # 2.8
 CursorKind.MACRO_DEFINITION = CursorKind(501) # 2.8
 CursorKind.MACRO_EXPANSION = CursorKind(502) # 3.0
 CursorKind.MACRO_INSTANTIATION = CursorKind.MACRO_EXPANSION # 2.8
+
+CursorKind.MODULE_IMPORT_DECL = CursorKind(600) # 3.2
 
 class TypeKind:
 	@requires(2.8)

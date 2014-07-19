@@ -42,7 +42,7 @@ The support status for libclang 3.1 is as follows:
 | `CXCompletionString`    | 3.1      | No         |
 | `CXCursor`              | 3.1      | Yes        |
 | `CXCursorAndRangeVisitor`| 3.0     | No         |
-| `CXCursorKind`          | 3.1      | Yes        |
+| `CXCursorKind`          | 3.2      | Yes        |
 | `CXCursorSet`           | 2.9      | No         |
 | `CXDiagnostic`          | 3.1      | Yes        |
 | `CXFile`                | 2.7      | Yes        |
