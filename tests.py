@@ -561,6 +561,7 @@ def test_Cursor33():
 	index = libclang.Index()
 	c = parse_str(index, 'enum test {};', filename='cursor33.hpp')[0]
 	equals(c.is_bit_field, False)
+	equals(c.bit_field_width, -1)
 	equals(c.is_variadic, False)
 	equals(c.objc_property_attributes, libclang.ObjCPropertyAttributes.NO_ATTR)
 	equals(c.objc_decl_qualifiers, libclang.ObjCDeclQualifierKind.NONE)

@@ -1693,6 +1693,11 @@ class Cursor:
 		a = _libclang.clang_Cursor_getObjCDeclQualifiers(self._c)
 		return ObjCDeclQualifierKind(a)
 
+	@property
+	@requires(3.3, 'clang_getFieldDeclBitWidth', ['_CXCursor'], c_int)
+	def bit_field_width(self):
+		return _libclang.clang_getFieldDeclBitWidth(self._c)
+
 class TranslationUnitFlags:
 	@requires(2.8)
 	def __init__(self, value):
