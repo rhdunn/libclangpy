@@ -76,7 +76,7 @@ def match_location(loc, filename, line, column, offset):
 	equals(loc.offset, offset)
 
 def test_version():
-	equals(libclang.version in [2.7, 2.8, 2.9, 3.0, 3.1, 3.2], True)
+	equals(libclang.version in [2.7, 2.8, 2.9, 3.0, 3.1, 3.2, 3.3], True)
 
 def test_File(f, filename):
 	equals(f.name, filename)
