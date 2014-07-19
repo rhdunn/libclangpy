@@ -53,7 +53,7 @@ The support status for libclang 3.2 is as follows:
 | `CXModule`              | 3.2      | No         |
 | `CXPlatformAvailability`| 3.2      | No         |
 | `CXRemapping`           | 3.1      | No         |
-| `CXSourceLocation`      | 3.0      | Yes        |
+| `CXSourceLocation`      | 3.3      | Yes        |
 | `CXSourceRange`         | 3.0      | Yes        |
 | `CXString`              | 2.7      | Yes        |
 | `CXToken`               | 2.7      | Yes        |

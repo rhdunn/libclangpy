@@ -328,6 +328,13 @@ class SourceLocation:
 		_libclang.clang_getPresumedLocation(self._sl, byref(f), byref(l), byref(c), byref(o))
 		return SourceLocationData(l, c, o, filename=f)
 
+	@cached_property
+	@requires(3.3, 'clang_getFileLocation', [_CXSourceLocation, POINTER(c_void_p), POINTER(c_uint), POINTER(c_uint), POINTER(c_uint)])
+	def file_location(self):
+		f, l, c, o = c_void_p(), c_uint(), c_uint(), c_uint()
+		_libclang.clang_getFileLocation(self._sl, byref(f), byref(l), byref(c), byref(o))
+		return SourceLocationData(l, c, o, cxfile=f)
+
 	@staticmethod
 	@requires(2.7, 'clang_getNullLocation', [], _CXSourceLocation)
 	def null():
@@ -358,6 +365,11 @@ class SourceLocation:
 	@requires(2.7)
 	def offset(self):
 		return self.instantiation_location.offset
+
+	@property
+	@requires(3.3, 'clang_Location_isInSystemHeader', [_CXSourceLocation], c_int)
+	def is_in_system_header(self):
+		return bool(_libclang.clang_Location_isInSystemHeader(self._sl))
 
 class SourceRange:
 	@requires(2.7)
