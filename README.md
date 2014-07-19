@@ -1,6 +1,6 @@
-# libclangpy 3.1
+# libclangpy 3.2
 
-The libclangpy project is a Python binding to the libclang 3.1 API. It differs
+The libclangpy project is a Python binding to the libclang 3.2 API. It differs
 from the cindex bindings from LLVM/clang in that it:
 
 1.  is a more complete libclang binding (see Implementation Status below);
@@ -31,11 +31,12 @@ you can now start using it, e.g.:
 
 ## Implementation Status
 
-The support status for libclang 3.1 is as follows:
+The support status for libclang 3.2 is as follows:
 
 | API                     | libclang | libclangpy |
 |-------------------------|----------|------------|
 | `CXCodeCompleteResults` | 2.8      | No         |
+| `CXComment`             | 3.2      | No         |
 | `CXCompletionChunkKind` | 2.7      | No         |
 | `CXCompletionContext`   | 3.0      | No         |
 | `CXCompletionResults`   | 3.0      | No         |
@@ -46,9 +47,11 @@ The support status for libclang 3.1 is as follows:
 | `CXCursorSet`           | 2.9      | No         |
 | `CXDiagnostic`          | 3.1      | Yes        |
 | `CXFile`                | 2.7      | Yes        |
-| `CXIdx*`                | 3.1      | Yes        |
+| `CXIdx*`                | 3.2      | Yes        |
 | `CXIndex`               | 3.1      | Yes        |
 | `CXIndexAction`         | 3.1      | No         |
+| `CXModule`              | 3.2      | No         |
+| `CXPlatformAvailability`| 3.2      | No         |
 | `CXRemapping`           | 3.1      | No         |
 | `CXSourceLocation`      | 3.0      | Yes        |
 | `CXSourceRange`         | 3.0      | Yes        |
