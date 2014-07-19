@@ -1556,11 +1556,13 @@ TranslationUnitFlags.DETAILED_PREPROCESSING_RECORD = TranslationUnitFlags(1) # 2
 TranslationUnitFlags.INCOMPLETE = TranslationUnitFlags(2) # 2.8
 TranslationUnitFlags.PRECOMPILED_PREAMBLE = TranslationUnitFlags(4) # 2.8
 TranslationUnitFlags.CACHE_COMPLETION_RESULTS = TranslationUnitFlags(8) # 2.8
-TranslationUnitFlags.PRECOMPILED_PREAMBLE = TranslationUnitFlags(16) # 2.9
+TranslationUnitFlags.PRECOMPILED_PREAMBLE = TranslationUnitFlags(16) # 2.9 to 3.1
+TranslationUnitFlags.FOR_SERIALIZATION = TranslationUnitFlags(16) # 3.2
 TranslationUnitFlags.CHAINED_PCH = TranslationUnitFlags(32) # 2.9
 TranslationUnitFlags.NESTED_MACRO_EXPANSIONS = TranslationUnitFlags(64) # 3.0 only
 TranslationUnitFlags.NESTED_MACRO_INSTANTIATIONS = TranslationUnitFlags.NESTED_MACRO_EXPANSIONS # 3.0 only
 TranslationUnitFlags.SKIP_FUNCTION_BODIES = TranslationUnitFlags(64) # 3.1
+TranslationUnitFlags.INCLUDE_BRIEF_COMMENTS_IN_CODE_COMPLETION = TranslationUnitFlags(128) # 3.2
 
 class SaveTranslationUnitFlags:
 	@requires(2.8)
