@@ -351,6 +351,17 @@ def test_ObjCDeclQualifierKind33():
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
 
+def test_RefQualifierKind34():
+	a = libclang.RefQualifierKind.LVALUE
+	b = libclang.RefQualifierKind.RVALUE
+	equals(a == a, True)
+	equals(a == b, False)
+	equals(a != a, False)
+	equals(a != b, True)
+	equals(a.value, 1)
+	equals(hash(a) == hash(a), True)
+	equals(hash(a) == hash(b), False)
+
 def test_Index():
 	index = libclang.Index()
 	filename = 'tests/enumeration.hpp'
@@ -643,6 +654,13 @@ def test_Type33():
 	equals(t.size, 8)
 	equals(t.offset('a'), -1)
 
+def test_Type34():
+	index = libclang.Index()
+	c = parse_str(index, 'long a[4];')[0]
+	t = c.type
+	equals(t.cxx_ref_qualifier, libclang.RefQualifierKind.NONE)
+	equals(t.class_type.kind, libclang.TypeKind.INVALID)
+
 libclang.load()
 
 run(2.7, test_version)
@@ -672,6 +690,7 @@ run(3.1, test_GlobalOptionFlags31)
 run(3.1, test_CallingConvention31)
 run(3.3, test_ObjCPropertyAttributes33)
 run(3.3, test_ObjCDeclQualifierKind33)
+run(3.4, test_RefQualifierKind34)
 run(2.7, test_Index)
 run(2.8, test_Index28)
 run(3.1, test_Index31)
@@ -693,5 +712,6 @@ run(2.9, test_Type29)
 run(3.0, test_Type30)
 run(3.1, test_Type31)
 run(3.3, test_Type33)
+run(3.4, test_Type34)
 
 summary()

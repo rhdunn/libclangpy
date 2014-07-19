@@ -1123,6 +1123,27 @@ TypeKind.VARIABLE_ARRAY = TypeKind(115) # 3.4
 TypeKind.DEPENDENT_SIZED_ARRAY = TypeKind(116) # 3.4
 TypeKind.MEMBER_POINTER = TypeKind(117) # 3.4
 
+class RefQualifierKind:
+	@requires(3.4)
+	def __init__(self, value):
+		self.value = value
+
+	@requires(3.4)
+	def __eq__(self, other):
+		return self.value == other.value
+
+	@requires(3.4)
+	def __ne__(self, other):
+		return self.value != other.value
+
+	@requires(3.4)
+	def __hash__(self):
+		return hash(self.value)
+
+RefQualifierKind.NONE = RefQualifierKind(0) # 3.4
+RefQualifierKind.LVALUE = RefQualifierKind(1) # 3.4
+RefQualifierKind.RVALUE = RefQualifierKind(2) # 3.4
+
 class Type:
 	@requires(2.8)
 	def __init__(self, t, tu):
@@ -1246,6 +1267,18 @@ class Type:
 	@requires(3.3, 'clang_Type_getOffsetOf', [_CXType, c_utf8_p], c_longlong)
 	def offset(self, field):
 		return _libclang.clang_Type_getOffsetOf(self._t, field)
+
+	@property
+	@requires(3.4, 'clang_Type_getCXXRefQualifier', [_CXType], c_uint)
+	def cxx_ref_qualifier(self):
+		q = _libclang.clang_Type_getCXXRefQualifier(self._t)
+		return RefQualifierKind(q)
+
+	@property
+	@requires(3.4, 'clang_Type_getClassType', [_CXType], _CXType)
+	def class_type(self):
+		t = _libclang.clang_Type_getClassType(self._t)
+		return Type(t, self._tu)
 
 class AvailabilityKind:
 	@requires(2.8)
