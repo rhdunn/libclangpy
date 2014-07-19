@@ -41,7 +41,7 @@ The support status for libclang 3.2 is as follows:
 | `CXCompletionContext`   | 3.0      | No         |
 | `CXCompletionResults`   | 3.0      | No         |
 | `CXCompletionString`    | 3.1      | No         |
-| `CXCursor`              | 3.2      | Yes        |
+| `CXCursor`              | 3.3      | Yes        |
 | `CXCursorAndRangeVisitor`| 3.0     | No         |
 | `CXCursorKind`          | 3.3      | Yes        |
 | `CXCursorSet`           | 2.9      | No         |

@@ -323,6 +323,30 @@ def test_CallingConvention31():
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
 
+def test_ObjCPropertyAttributes33():
+	a = libclang.ObjCPropertyAttributes(2)
+	b = libclang.ObjCPropertyAttributes(8)
+	equals(a == a, True)
+	equals(a == b, False)
+	equals(a != a, False)
+	equals(a != b, True)
+	equals(a.value, 2)
+	equals((a | b).value, 10)
+	equals(hash(a) == hash(a), True)
+	equals(hash(a) == hash(b), False)
+
+def test_ObjCDeclQualifierKind33():
+	a = libclang.ObjCDeclQualifierKind(2)
+	b = libclang.ObjCDeclQualifierKind(8)
+	equals(a == a, True)
+	equals(a == b, False)
+	equals(a != a, False)
+	equals(a != b, True)
+	equals(a.value, 2)
+	equals((a | b).value, 10)
+	equals(hash(a) == hash(a), True)
+	equals(hash(a) == hash(b), False)
+
 def test_Index():
 	index = libclang.Index()
 	filename = 'tests/enumeration.hpp'
@@ -529,6 +553,14 @@ def test_Cursor32():
 	equals(c.raw_comment, None)
 	equals(c.brief_comment, None)
 
+def test_Cursor33():
+	index = libclang.Index()
+	c = parse_str(index, 'enum test {};', filename='cursor33.hpp')[0]
+	equals(c.is_bit_field, False)
+	equals(c.is_variadic, False)
+	equals(c.objc_property_attributes, libclang.ObjCPropertyAttributes.NO_ATTR)
+	equals(c.objc_decl_qualifiers, libclang.ObjCDeclQualifierKind.NONE)
+
 def test_Token():
 	index = libclang.Index()
 	tu = index.from_source('tests/enumeration.hpp')
@@ -632,6 +664,8 @@ run(2.8, test_SaveTranslationUnitFlags28)
 run(2.8, test_ReparseTranslationUnitFlags28)
 run(3.1, test_GlobalOptionFlags31)
 run(3.1, test_CallingConvention31)
+run(3.3, test_ObjCPropertyAttributes33)
+run(3.3, test_ObjCDeclQualifierKind33)
 run(2.7, test_Index)
 run(2.8, test_Index28)
 run(3.1, test_Index31)
@@ -646,6 +680,7 @@ run(2.9, test_Cursor29)
 run(3.0, test_Cursor30)
 run(3.1, test_Cursor31)
 run(3.2, test_Cursor32)
+run(3.3, test_Cursor33)
 run(2.7, test_Token)
 run(2.8, test_Type28)
 run(2.9, test_Type29)

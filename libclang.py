@@ -674,6 +674,70 @@ CallingConvention.INTEL_OCL_BICC = CallingConvention(9) # 3.3
 CallingConvention.INVALID = CallingConvention(100) # 3.1
 CallingConvention.UNEXPOSED = CallingConvention(200) # 3.1
 
+class ObjCPropertyAttributes:
+	@requires(3.3)
+	def __init__(self, value):
+		self.value = value
+
+	@requires(3.3)
+	def __or__(self, other):
+		return ObjCPropertyAttributes(self.value | other.value)
+
+	@requires(3.3)
+	def __eq__(self, other):
+		return self.value == other.value
+
+	@requires(3.3)
+	def __ne__(self, other):
+		return self.value != other.value
+
+	@requires(3.3)
+	def __hash__(self):
+		return hash(self.value)
+
+ObjCPropertyAttributes.NO_ATTR = ObjCPropertyAttributes(0) # 3.3
+ObjCPropertyAttributes.READONLY = ObjCPropertyAttributes(1) # 3.3
+ObjCPropertyAttributes.GETTER = ObjCPropertyAttributes(2) # 3.3
+ObjCPropertyAttributes.ASSIGN = ObjCPropertyAttributes(4) # 3.3
+ObjCPropertyAttributes.READ_WRITE = ObjCPropertyAttributes(8) # 3.3
+ObjCPropertyAttributes.RETAIN = ObjCPropertyAttributes(16) # 3.3
+ObjCPropertyAttributes.COPY = ObjCPropertyAttributes(32) # 3.3
+ObjCPropertyAttributes.NON_ATOMIC = ObjCPropertyAttributes(64) # 3.3
+ObjCPropertyAttributes.SETTER = ObjCPropertyAttributes(128) # 3.3
+ObjCPropertyAttributes.ATOMIC = ObjCPropertyAttributes(256) # 3.3
+ObjCPropertyAttributes.WEAK = ObjCPropertyAttributes(512) # 3.3
+ObjCPropertyAttributes.STRONG = ObjCPropertyAttributes(1024) # 3.3
+ObjCPropertyAttributes.UNSAFE_UNRETAINED = ObjCPropertyAttributes(2048) # 3.3
+
+class ObjCDeclQualifierKind:
+	@requires(3.3)
+	def __init__(self, value):
+		self.value = value
+
+	@requires(3.3)
+	def __or__(self, other):
+		return ObjCDeclQualifierKind(self.value | other.value)
+
+	@requires(3.3)
+	def __eq__(self, other):
+		return self.value == other.value
+
+	@requires(3.3)
+	def __ne__(self, other):
+		return self.value != other.value
+
+	@requires(3.3)
+	def __hash__(self):
+		return hash(self.value)
+
+ObjCDeclQualifierKind.NONE = ObjCDeclQualifierKind(0) # 3.3
+ObjCDeclQualifierKind.IN = ObjCDeclQualifierKind(1) # 3.3
+ObjCDeclQualifierKind.INOUT = ObjCDeclQualifierKind(2) # 3.3
+ObjCDeclQualifierKind.OUT = ObjCDeclQualifierKind(4) # 3.3
+ObjCDeclQualifierKind.BYCOPY = ObjCDeclQualifierKind(8) # 3.3
+ObjCDeclQualifierKind.BYREF = ObjCDeclQualifierKind(16) # 3.3
+ObjCDeclQualifierKind.ONEWAY = ObjCDeclQualifierKind(32) # 3.3
+
 class Token:
 	@requires(2.7)
 	def __init__(self, t, tokens, tu):
@@ -1597,6 +1661,28 @@ class Cursor:
 	def brief_comment(self):
 		s = _libclang.clang_Cursor_getBriefCommentText(self._c)
 		return _to_str(s)
+
+	@property
+	@requires(3.3, 'clang_Cursor_isBitField', ['_CXCursor'], c_uint)
+	def is_bit_field(self):
+		return bool(_libclang.clang_Cursor_isBitField(self._c))
+
+	@property
+	@requires(3.3, 'clang_Cursor_isVariadic', ['_CXCursor'], c_uint)
+	def is_variadic(self):
+		return bool(_libclang.clang_Cursor_isVariadic(self._c))
+
+	@property
+	@requires(3.3, 'clang_Cursor_getObjCPropertyAttributes', ['_CXCursor', c_uint], c_uint)
+	def objc_property_attributes(self):
+		a = _libclang.clang_Cursor_getObjCPropertyAttributes(self._c, 0)
+		return ObjCPropertyAttributes(a)
+
+	@property
+	@requires(3.3, 'clang_Cursor_getObjCDeclQualifiers', ['_CXCursor'], c_uint)
+	def objc_decl_qualifiers(self):
+		a = _libclang.clang_Cursor_getObjCDeclQualifiers(self._c)
+		return ObjCDeclQualifierKind(a)
 
 class TranslationUnitFlags:
 	@requires(2.8)
