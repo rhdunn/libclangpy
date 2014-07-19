@@ -372,6 +372,11 @@ class SourceLocation:
 	def is_in_system_header(self):
 		return bool(_libclang.clang_Location_isInSystemHeader(self._sl))
 
+	@property
+	@requires(3.4, 'clang_Location_isFromMainFile', [_CXSourceLocation], c_int)
+	def is_from_main_file(self):
+		return bool(_libclang.clang_Location_isFromMainFile(self._sl))
+
 class SourceRange:
 	@requires(2.7)
 	@requires(2.7, 'clang_getRange', [_CXSourceLocation, _CXSourceLocation], _CXSourceRange)

@@ -109,6 +109,10 @@ def test_SourceLocation33():
 	equals(loc.is_in_system_header, False)
 	match_location(loc.file_location, None, 0, 0, 0)
 
+def test_SourceLocation34():
+	loc = libclang.SourceLocation.null()
+	equals(loc.is_from_main_file, False)
+
 def test_SourceRange():
 	rng1 = libclang.SourceRange.null()
 	equals(rng1.start, libclang.SourceLocation.null())
@@ -645,6 +649,7 @@ run(2.7, test_SourceLocation)
 run(2.9, test_SourceLocation29)
 run(3.0, test_SourceLocation30)
 run(3.3, test_SourceLocation33)
+run(3.4, test_SourceLocation34)
 run(2.7, test_SourceRange)
 run(2.7, test_DiagnosticDisplayOptions)
 run(2.7, test_DiagnosticSeverity)
