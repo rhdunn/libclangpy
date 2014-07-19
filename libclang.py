@@ -638,6 +638,12 @@ TokenKind.IDENTIFIER = TokenKind(2) # 2.7
 TokenKind.LITERAL = TokenKind(3) # 2.7
 TokenKind.COMMENT = TokenKind(4) # 2.7
 
+TokenKind.PUNCTUATION = TokenKind(0) # 2.7
+TokenKind.KEYWORD = TokenKind(1) # 2.7
+TokenKind.IDENTIFIER = TokenKind(2) # 2.7
+TokenKind.LITERAL = TokenKind(3) # 2.7
+TokenKind.COMMENT = TokenKind(4) # 2.7
+
 class CallingConvention:
 	@requires(3.1)
 	def __init__(self, value):
@@ -667,12 +673,6 @@ CallingConvention.PNACL_CALL = CallingConvention(8) # 3.2
 CallingConvention.INTEL_OCL_BICC = CallingConvention(9) # 3.3
 CallingConvention.INVALID = CallingConvention(100) # 3.1
 CallingConvention.UNEXPOSED = CallingConvention(200) # 3.1
-
-TokenKind.PUNCTUATION = TokenKind(0) # 2.7
-TokenKind.KEYWORD = TokenKind(1) # 2.7
-TokenKind.IDENTIFIER = TokenKind(2) # 2.7
-TokenKind.LITERAL = TokenKind(3) # 2.7
-TokenKind.COMMENT = TokenKind(4) # 2.7
 
 class Token:
 	@requires(2.7)
