@@ -1034,6 +1034,7 @@ CursorKind.PREPROCESSING_DIRECTIVE = CursorKind(500) # 2.8
 CursorKind.MACRO_DEFINITION = CursorKind(501) # 2.8
 CursorKind.MACRO_EXPANSION = CursorKind(502) # 3.0
 CursorKind.MACRO_INSTANTIATION = CursorKind.MACRO_EXPANSION # 2.8
+CursorKind.INCLUSION_DIRECTIVE = CursorKind(503) # 2.9
 
 CursorKind.MODULE_IMPORT_DECL = CursorKind(600) # 3.2
 
