@@ -1024,6 +1024,7 @@ CursorKind.SEH_FINALLY_STMT = CursorKind(228) # 3.0
 CursorKind.MS_ASM_STMT = CursorKind(229) # 3.2
 CursorKind.NULL_STMT = CursorKind(230) # 3.0
 CursorKind.DECL_STMT = CursorKind(231) # 3.0
+CursorKind.OMP_PARALLEL_DIRECTIVE = CursorKind(232) # 3.4
 
 CursorKind.TRANSLATION_UNIT = CursorKind(300) # 2.7
 
@@ -1035,6 +1036,7 @@ CursorKind.CXX_FINALLY_ATTR = CursorKind(404) # 3.0
 CursorKind.CXX_OVERRIDE_ATTR = CursorKind(405) # 3.0
 CursorKind.ANNOTATE_ATTR = CursorKind(406) # 3.0
 CursorKind.ASM_LABEL_ATTR = CursorKind(407) # 3.1
+CursorKind.PACKED_ATTR = CursorKind(408) # 3.4
 
 CursorKind.PREPROCESSING_DIRECTIVE = CursorKind(500) # 2.8
 CursorKind.MACRO_DEFINITION = CursorKind(501) # 2.8
