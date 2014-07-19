@@ -307,6 +307,17 @@ def test_GlobalOptionFlags31():
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
 
+def test_CallingConvention31():
+	a = libclang.CallingConvention.X86_STDCALL
+	b = libclang.CallingConvention.C
+	equals(a == a, True)
+	equals(a == b, False)
+	equals(a != a, False)
+	equals(a != b, True)
+	equals(a.value, 2)
+	equals(hash(a) == hash(a), True)
+	equals(hash(a) == hash(b), False)
+
 def test_Index():
 	index = libclang.Index()
 	filename = 'tests/enumeration.hpp'
@@ -560,6 +571,16 @@ def test_Type30():
 	equals(t.array_element_type.kind, libclang.TypeKind.LONG)
 	equals(t.array_size, 4)
 
+def test_Type31():
+	index = libclang.Index()
+	c = parse_str(index, 'long a[4];')[0]
+	t = c.type
+	equals(len(list(t.argument_types)), 0)
+	equals(t.element_type.kind, libclang.TypeKind.LONG)
+	equals(t.element_count, 4)
+	equals(t.is_variadic, False)
+	equals(t.calling_convention, libclang.CallingConvention.INVALID)
+
 libclang.load()
 
 run(2.7, test_version)
@@ -584,6 +605,7 @@ run(2.8, test_TranslationUnitFlags28)
 run(2.8, test_SaveTranslationUnitFlags28)
 run(2.8, test_ReparseTranslationUnitFlags28)
 run(3.1, test_GlobalOptionFlags31)
+run(3.1, test_CallingConvention31)
 run(2.7, test_Index)
 run(2.8, test_Index28)
 run(3.1, test_Index31)
@@ -601,5 +623,6 @@ run(2.7, test_Token)
 run(2.8, test_Type28)
 run(2.9, test_Type29)
 run(3.0, test_Type30)
+run(3.1, test_Type31)
 
 summary()

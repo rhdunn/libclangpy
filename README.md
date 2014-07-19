@@ -57,7 +57,7 @@ The support status for libclang 3.0 is as follows:
 | `CXTUResourceUsage`     | 3.0      | No         |
 | `CXTUResourceUsageEntry`| 3.0      | No         |
 | `CXTUResourceUsageKind` | 3.0      | No         |
-| `CXType`                | 3.0      | Yes        |
+| `CXType`                | 3.1      | Yes        |
 | `CXTypeKind`            | 2.8      | Yes        |
 | `clang_constructUSR_*`  | 2.8      | No         |
 | `clang_executeOnThread` | 2.9      | No         |

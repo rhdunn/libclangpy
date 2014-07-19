@@ -624,6 +624,40 @@ TokenKind.IDENTIFIER = TokenKind(2) # 2.7
 TokenKind.LITERAL = TokenKind(3) # 2.7
 TokenKind.COMMENT = TokenKind(4) # 2.7
 
+class CallingConvention:
+	@requires(3.1)
+	def __init__(self, value):
+		self.value = value
+
+	@requires(3.1)
+	def __eq__(self, other):
+		return self.value == other.value
+
+	@requires(3.1)
+	def __ne__(self, other):
+		return self.value != other.value
+
+	@requires(3.1)
+	def __hash__(self):
+		return hash(self.value)
+
+CallingConvention.DEFAULT = CallingConvention(0) # 3.1
+CallingConvention.C = CallingConvention(1) # 3.1
+CallingConvention.X86_STDCALL = CallingConvention(2) # 3.1
+CallingConvention.X86_FASTCALL = CallingConvention(3) # 3.1
+CallingConvention.X86_THISCALL = CallingConvention(4) # 3.1
+CallingConvention.X86_PASCAL = CallingConvention(5) # 3.1
+CallingConvention.AAPCS = CallingConvention(6) # 3.1
+CallingConvention.AAPCS_VFP = CallingConvention(7) # 3.1
+CallingConvention.INVALID = CallingConvention(100) # 3.1
+CallingConvention.UNEXPOSED = CallingConvention(200) # 3.1
+
+TokenKind.PUNCTUATION = TokenKind(0) # 2.7
+TokenKind.KEYWORD = TokenKind(1) # 2.7
+TokenKind.IDENTIFIER = TokenKind(2) # 2.7
+TokenKind.LITERAL = TokenKind(3) # 2.7
+TokenKind.COMMENT = TokenKind(4) # 2.7
+
 class Token:
 	@requires(2.7)
 	def __init__(self, t, tokens, tu):
@@ -1058,6 +1092,36 @@ class Type:
 	@requires(3.0, 'clang_getArraySize', [_CXType], c_longlong)
 	def array_size(self):
 		return _libclang.clang_getArraySize(self._t)
+
+	@property
+	@requires(3.1, 'clang_getNumArgTypes', [_CXType], c_int)
+	@requires(3.1, 'clang_getArgType', [_CXType, c_uint], _CXType)
+	def argument_types(self):
+		for i in range(0, _libclang.clang_getNumArgTypes(self._t)):
+			t = _libclang.clang_getArgTypel(self._t, i)
+			yield Type(t, self._tu)
+
+	@property
+	@requires(3.1, 'clang_getElementType', [_CXType], _CXType)
+	def element_type(self):
+		t = _libclang.clang_getElementType(self._t)
+		return Type(t, self._tu)
+
+	@property
+	@requires(3.1, 'clang_getNumElements', [_CXType], c_longlong)
+	def element_count(self):
+		return _libclang.clang_getNumElements(self._t)
+
+	@property
+	@requires(3.1, 'clang_isFunctionTypeVariadic', [_CXType], c_uint)
+	def is_variadic(self):
+		return bool(_libclang.clang_isFunctionTypeVariadic(self._t))
+
+	@property
+	@requires(3.1, 'clang_getFunctionTypeCallingConv', [_CXType], c_uint)
+	def calling_convention(self):
+		cc = _libclang.clang_getFunctionTypeCallingConv(self._t)
+		return CallingConvention(cc)
 
 class AvailabilityKind:
 	@requires(2.8)
