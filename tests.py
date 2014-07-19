@@ -22,6 +22,9 @@ import traceback
 
 import libclang
 
+if sys.version_info.major >= 3:
+	long = int
+
 def equals(a, b):
 	ta, tb = type(a), type(b)
 	if ta.__name__ != tb.__name__:
@@ -487,6 +490,19 @@ def test_Cursor30():
 	match_location(rng.start, 'cursor30.hpp', 1, 1, 0)
 	match_location(rng.end, 'cursor30.hpp', 1, 1, 0)
 
+def test_Cursor31():
+	index = libclang.Index()
+	c = parse_str(index, 'enum test { a = 7 };', filename='cursor31.hpp')[0]
+	equals(c.underlying_typedef_type.kind, libclang.TypeKind.INVALID)
+	equals(c.enum_type.kind, libclang.TypeKind.UINT)
+	equals(c.enum_value, 18446744073709551615) # ULLONG_MAX
+	equals(c.children[0].enum_value, long(7))
+	equals(len(list(c.arguments)), 0)
+	equals(c.objc_selector_index, -1)
+	rng = c.spelling_name_range(libclang.NameRefFlags.WANT_TEMPLATE_ARGS, 0)
+	match_location(rng.start, 'cursor31.hpp', 1, 6, 5)
+	match_location(rng.end, 'cursor31.hpp', 1, 6, 5)
+
 def test_Token():
 	index = libclang.Index()
 	tu = index.from_source('tests/enumeration.hpp')
@@ -580,6 +596,7 @@ run(2.7, test_Cursor)
 run(2.8, test_Cursor28)
 run(2.9, test_Cursor29)
 run(3.0, test_Cursor30)
+run(3.1, test_Cursor31)
 run(2.7, test_Token)
 run(2.8, test_Type28)
 run(2.9, test_Type29)

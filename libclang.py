@@ -1417,6 +1417,49 @@ class Cursor:
 	def is_virtual(self):
 		return bool(_libclang.clang_CXXMethod_isVirtual(self._c))
 
+	@property
+	@requires(3.1, 'clang_getTypedefDeclUnderlyingType', ['_CXCursor'], _CXType)
+	def underlying_typedef_type(self):
+		t = _libclang.clang_getTypedefDeclUnderlyingType(self._c)
+		return Type(t, self._tu)
+
+	@property
+	@requires(3.1, 'clang_getEnumDeclIntegerType', ['_CXCursor'], _CXType)
+	def enum_type(self):
+		t = _libclang.clang_getEnumDeclIntegerType(self._c)
+		return Type(t, self._tu)
+
+	@property
+	@requires(3.1, 'clang_getEnumConstantDeclValue', ['_CXCursor'], c_longlong)
+	@requires(3.1, 'clang_getEnumConstantDeclUnsignedValue', ['_CXCursor'], c_ulonglong)
+	def enum_value(self):
+		underlying_type = self.type
+		if underlying_type.kind == TypeKind.ENUM:
+			underlying_type = underlying_type.declaration.enum_type
+		if underlying_type.kind in [TypeKind.CHAR_U, TypeKind.UCHAR, TypeKind.CHAR16,
+		                            TypeKind.CHAR32, TypeKind.USHORT, TypeKind.UINT,
+		                            TypeKind.ULONG, TypeKind.ULONGLONG, TypeKind.UINT128]:
+			return _libclang.clang_getEnumConstantDeclUnsignedValue(self._c)
+		return _libclang.clang_getEnumConstantDeclValue(self._c)
+
+	@property
+	@requires(3.1, 'clang_Cursor_getNumArguments', ['_CXCursor'], c_int)
+	@requires(3.1, 'clang_Cursor_getArgument', ['_CXCursor', c_uint], '_CXCursor')
+	def arguments(self):
+		for i in range(0, _libclang.clang_Cursor_getNumArguments(self._c)):
+			c  = _libclang.clang_Cursor_getArgument(self._c, i)
+			yield Cursor(c, None, self._tu)
+
+	@requires(3.1, 'clang_Cursor_getSpellingNameRange', ['_CXCursor', c_uint, c_uint], _CXSourceRange)
+	def spelling_name_range(self, flags, index):
+		sr = _libclang.clang_Cursor_getSpellingNameRange(self._c, index, flags.value)
+		return SourceRange(sr, None)
+
+	@property
+	@requires(3.1, 'clang_Cursor_getObjCSelectorIndex', ['_CXCursor'], c_int)
+	def objc_selector_index(self):
+		return _libclang.clang_Cursor_getObjCSelectorIndex(self._c)
+
 class TranslationUnitFlags:
 	@requires(2.8)
 	def __init__(self, value):
