@@ -918,6 +918,7 @@ CursorKind.PACK_EXPANSION_EXPR = CursorKind(142) # 3.0
 CursorKind.SIZEOF_PACK_EXPR = CursorKind(143) # 3.0
 CursorKind.LAMBDA_EXPR = CursorKind(144) # 3.1
 CursorKind.OBJC_BOOL_LITERAL_EXPR = CursorKind(145) # 3.1
+CursorKind.OBJC_SELF_EXPR = CursorKind(146) # 3.3
 
 CursorKind.UNEXPOSED_STMT = CursorKind(200) # 2.7
 CursorKind.LABEL_STMT = CursorKind(201) # 2.9
