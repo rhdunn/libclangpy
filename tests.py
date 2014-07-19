@@ -596,6 +596,16 @@ def test_Type31():
 	equals(t.is_variadic, False)
 	equals(t.calling_convention, libclang.CallingConvention.INVALID)
 
+def test_Type33():
+	index = libclang.Index()
+	c = parse_str(index, 'short a[4];')[0]
+	t = c.type
+	equals(t.spelling, 'short [4]')
+	equals(str(t), 'short [4]')
+	equals(t.alignment, 2)
+	equals(t.size, 8)
+	equals(t.offset('a'), -1)
+
 libclang.load()
 
 run(2.7, test_version)
@@ -641,5 +651,6 @@ run(2.8, test_Type28)
 run(2.9, test_Type29)
 run(3.0, test_Type30)
 run(3.1, test_Type31)
+run(3.3, test_Type33)
 
 summary()

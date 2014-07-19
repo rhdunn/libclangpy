@@ -1059,6 +1059,10 @@ class Type:
 	def __ne__(self, other):
 		return not self.__eq__(other)
 
+	@requires(3.3)
+	def __str__(self):
+		return self.spelling
+
 	@property
 	@requires(2.8, 'clang_getCanonicalType', [_CXType], _CXType)
 	def canonical_type(self):
@@ -1143,6 +1147,26 @@ class Type:
 	def calling_convention(self):
 		cc = _libclang.clang_getFunctionTypeCallingConv(self._t)
 		return CallingConvention(cc)
+
+	@property
+	@requires(3.3, 'clang_getTypeSpelling', [_CXType], _CXString)
+	def spelling(self):
+		s = _libclang.clang_getTypeSpelling(self._t)
+		return _to_str(s)
+
+	@property
+	@requires(3.3, 'clang_Type_getAlignOf', [_CXType], c_longlong)
+	def alignment(self):
+		return _libclang.clang_Type_getAlignOf(self._t)
+
+	@property
+	@requires(3.3, 'clang_Type_getSizeOf', [_CXType], c_longlong)
+	def size(self):
+		return _libclang.clang_Type_getSizeOf(self._t)
+
+	@requires(3.3, 'clang_Type_getOffsetOf', [_CXType, c_utf8_p], c_longlong)
+	def offset(self, field):
+		return _libclang.clang_Type_getOffsetOf(self._t, field)
 
 class AvailabilityKind:
 	@requires(2.8)
