@@ -130,6 +130,7 @@ def _detect_version(name):
 	# version supported by libclangpy using this method.
 	global version
 	_version_checks = [
+		(3.4, 'clang_Type_getClassType'),
 		(3.3, 'clang_getTypeSpelling'),
 		(3.2, 'clang_Cursor_getReceiverType'),
 		(3.1, 'clang_Cursor_getArgument'),
