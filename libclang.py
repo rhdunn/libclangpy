@@ -1530,6 +1530,35 @@ class Cursor:
 	def objc_selector_index(self):
 		return _libclang.clang_Cursor_getObjCSelectorIndex(self._c)
 
+	@property
+	@requires(3.2, 'clang_Cursor_isDynamicCall', ['_CXCursor'], c_int)
+	def is_dynamic_call(self):
+		return bool(_libclang.clang_Cursor_isDynamicCall(self._c))
+
+	@property
+	@requires(3.2, 'clang_Cursor_getReceiverType', ['_CXCursor'], _CXType)
+	def receiver_type(self):
+		t = _libclang.clang_Cursor_getReceiverType(self._c)
+		return Type(t, self._tu)
+
+	@property
+	@requires(3.2, 'clang_Cursor_getCommentRange', ['_CXCursor'], _CXSourceRange)
+	def comment_range(self):
+		sr = _libclang.clang_Cursor_getCommentRange(self._c)
+		return SourceRange(sr, None)
+
+	@property
+	@requires(3.2, 'clang_Cursor_getRawCommentText', ['_CXCursor'], _CXString)
+	def raw_comment(self):
+		s = _libclang.clang_Cursor_getRawCommentText(self._c)
+		return _to_str(s)
+
+	@property
+	@requires(3.2, 'clang_Cursor_getBriefCommentText', ['_CXCursor'], _CXString)
+	def brief_comment(self):
+		s = _libclang.clang_Cursor_getBriefCommentText(self._c)
+		return _to_str(s)
+
 class TranslationUnitFlags:
 	@requires(2.8)
 	def __init__(self, value):

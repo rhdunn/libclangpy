@@ -514,6 +514,16 @@ def test_Cursor31():
 	match_location(rng.start, 'cursor31.hpp', 1, 6, 5)
 	match_location(rng.end, 'cursor31.hpp', 1, 6, 5)
 
+def test_Cursor32():
+	index = libclang.Index()
+	c = parse_str(index, 'enum test {};', filename='cursor32.hpp')[0]
+	equals(c.is_dynamic_call, False)
+	equals(c.receiver_type.kind, libclang.TypeKind.INVALID)
+	match_location(c.comment_range.start, None, 0, 0, 0)
+	match_location(c.comment_range.end, None, 0, 0, 0)
+	equals(c.raw_comment, None)
+	equals(c.brief_comment, None)
+
 def test_Token():
 	index = libclang.Index()
 	tu = index.from_source('tests/enumeration.hpp')
@@ -619,6 +629,7 @@ run(2.8, test_Cursor28)
 run(2.9, test_Cursor29)
 run(3.0, test_Cursor30)
 run(3.1, test_Cursor31)
+run(3.2, test_Cursor32)
 run(2.7, test_Token)
 run(2.8, test_Type28)
 run(2.9, test_Type29)
