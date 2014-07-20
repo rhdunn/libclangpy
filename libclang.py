@@ -193,7 +193,7 @@ def _bind_api(name, argtypes, restype):
 	except AttributeError:
 		registered = False
 
-	if not registered:
+	if not registered and api:
 		api.argtypes = [_map_type(x) for x in argtypes]
 		api.restype = _map_type(restype)
 		api.registered = True
