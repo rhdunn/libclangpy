@@ -2102,6 +2102,8 @@ class Index:
 		argc, argv = _marshall_args(args)
 		unsavedc, unsavedv = _marshall_unsaved_files(unsaved_files)
 		tu = _libclang.clang_parseTranslationUnit(self._index, filename, argv, argc, unsavedv, unsavedc, options.value)
+		if not tu:
+			return None
 		return TranslationUnit(tu, self)
 
 	@property
