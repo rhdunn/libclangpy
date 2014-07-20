@@ -104,6 +104,8 @@ def _marshall_args(args):
 		return 0, None
 	ret = (c_utf8_p * len(args))()
 	for i, arg in enumerate(args):
+		if arg == '-std=c++11' and version <= 2.9:
+			arg = '-std=c++0x'
 		ret[i] = arg.encode('utf-8')
 	return len(args), ret
 
