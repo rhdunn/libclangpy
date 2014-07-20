@@ -444,6 +444,10 @@ class DiagnosticDisplayOptions:
 	def __hash__(self):
 		return hash(self.value)
 
+	@requires(2.7)
+	def __repr__(self):
+		return 'DiagnosticDisplayOptions({0})'.format(self.value)
+
 	@staticmethod
 	@requires(2.7, 'clang_defaultDiagnosticDisplayOptions', [], c_uint)
 	def DEFAULT():
@@ -474,6 +478,10 @@ class DiagnosticSeverity:
 	def __hash__(self):
 		return hash(self.value)
 
+	@requires(2.7)
+	def __repr__(self):
+		return 'DiagnosticSeverity({0})'.format(self.value)
+
 DiagnosticSeverity.IGNORED = DiagnosticSeverity(0) # 2.7
 DiagnosticSeverity.NOTE = DiagnosticSeverity(1) # 2.7
 DiagnosticSeverity.WARNING = DiagnosticSeverity(2) # 2.7
@@ -500,6 +508,10 @@ class DiagnosticCategory:
 	@requires(2.9)
 	def __hash__(self):
 		return hash(self.value)
+
+	@requires(2.9)
+	def __repr__(self):
+		return 'DiagnosticCategory({0})'.format(self.value)
 
 	@property
 	@requires(2.9, 'clang_getDiagnosticCategoryName', [c_uint], _CXString)
@@ -615,6 +627,10 @@ class Linkage:
 	def __hash__(self):
 		return hash(self.value)
 
+	@requires(2.7)
+	def __repr__(self):
+		return 'Linkage({0})'.format(self.value)
+
 Linkage.INVALID = Linkage(0) # 2.7
 Linkage.NO_LINKAGE = Linkage(1) # 2.7
 Linkage.INTERNAL = Linkage(2) # 2.7
@@ -637,6 +653,10 @@ class TokenKind:
 	@requires(2.7)
 	def __hash__(self):
 		return hash(self.value)
+
+	@requires(2.7)
+	def __repr__(self):
+		return 'TokenKind({0})'.format(self.value)
 
 TokenKind.PUNCTUATION = TokenKind(0) # 2.7
 TokenKind.KEYWORD = TokenKind(1) # 2.7
@@ -666,6 +686,10 @@ class CallingConvention:
 	@requires(3.1)
 	def __hash__(self):
 		return hash(self.value)
+
+	@requires(3.1)
+	def __repr__(self):
+		return 'CallingConvention({0})'.format(self.value)
 
 CallingConvention.DEFAULT = CallingConvention(0) # 3.1
 CallingConvention.C = CallingConvention(1) # 3.1
@@ -701,6 +725,10 @@ class ObjCPropertyAttributes:
 	def __hash__(self):
 		return hash(self.value)
 
+	@requires(3.3)
+	def __repr__(self):
+		return 'ObjCPropertyAttributes({0})'.format(self.value)
+
 ObjCPropertyAttributes.NO_ATTR = ObjCPropertyAttributes(0) # 3.3
 ObjCPropertyAttributes.READONLY = ObjCPropertyAttributes(1) # 3.3
 ObjCPropertyAttributes.GETTER = ObjCPropertyAttributes(2) # 3.3
@@ -735,6 +763,10 @@ class ObjCDeclQualifierKind:
 	@requires(3.3)
 	def __hash__(self):
 		return hash(self.value)
+
+	@requires(3.3)
+	def __repr__(self):
+		return 'ObjCDeclQualifierKind({0})'.format(self.value)
 
 ObjCDeclQualifierKind.NONE = ObjCDeclQualifierKind(0) # 3.3
 ObjCDeclQualifierKind.IN = ObjCDeclQualifierKind(1) # 3.3
@@ -834,6 +866,10 @@ class CursorKind:
 	@requires(2.7)
 	def __hash__(self):
 		return hash(self.value)
+
+	@requires(2.7)
+	def __repr__(self):
+		return 'CursorKind({0}|{1})'.format(self.value, self.spelling)
 
 	@property
 	@requires(2.7, 'clang_getCursorKindSpelling', [c_uint], _CXString)
@@ -1067,6 +1103,10 @@ class TypeKind:
 	def __hash__(self):
 		return hash(self.value)
 
+	@requires(2.8)
+	def __repr__(self):
+		return 'TypeKind({0}|{1})'.format(self.value, self.spelling)
+
 	@property
 	@requires(2.8, 'clang_getTypeKindSpelling', [c_uint], _CXString)
 	def spelling(self):
@@ -1139,6 +1179,10 @@ class RefQualifierKind:
 	@requires(3.4)
 	def __hash__(self):
 		return hash(self.value)
+
+	@requires(3.4)
+	def __repr__(self):
+		return 'RefQualifierKind({0})'.format(self.value)
 
 RefQualifierKind.NONE = RefQualifierKind(0) # 3.4
 RefQualifierKind.LVALUE = RefQualifierKind(1) # 3.4
@@ -1329,6 +1373,10 @@ class AvailabilityKind:
 	def __hash__(self):
 		return hash(self.value)
 
+	@requires(2.8)
+	def __repr__(self):
+		return 'AvailabilityKind({0})'.format(self.value)
+
 AvailabilityKind.AVAILABLE = AvailabilityKind(0) # 2.8
 AvailabilityKind.DEPRECATED = AvailabilityKind(1) # 2.8
 AvailabilityKind.NOT_AVAILABLE = AvailabilityKind(2) # 2.8
@@ -1351,6 +1399,10 @@ class LanguageKind:
 	def __hash__(self):
 		return hash(self.value)
 
+	@requires(2.8)
+	def __repr__(self):
+		return 'LanguageKind({0})'.format(self.value)
+
 LanguageKind.INVALID = LanguageKind(0) # 2.8
 LanguageKind.C = LanguageKind(1) # 2.8
 LanguageKind.OBJC = LanguageKind(2) # 2.8
@@ -1372,6 +1424,10 @@ class AccessSpecifier:
 	@requires(2.8)
 	def __hash__(self):
 		return hash(self.value)
+
+	@requires(2.8)
+	def __repr__(self):
+		return 'AccessSpecifier({0})'.format(self.value)
 
 AccessSpecifier.INVALID = AccessSpecifier(0) # 2.8
 AccessSpecifier.PUBLIC = AccessSpecifier(1) # 2.8
@@ -1426,6 +1482,10 @@ class NameRefFlags:
 	@requires(3.0)
 	def __hash__(self):
 		return hash(self.value)
+
+	@requires(3.0)
+	def __repr__(self):
+		return 'NameRefFlags({0})'.format(self.value)
 
 NameRefFlags.WANT_QUALIFIER = NameRefFlags(1) # 3.0
 NameRefFlags.WANT_TEMPLATE_ARGS = NameRefFlags(2) # 3.0
@@ -1800,6 +1860,10 @@ class TranslationUnitFlags:
 	def __hash__(self):
 		return hash(self.value)
 
+	@requires(2.8)
+	def __repr__(self):
+		return 'TranslationUnitFlags({0})'.format(self.value)
+
 	@staticmethod
 	@requires(2.8, 'clang_defaultEditingTranslationUnitOptions', [], c_uint)
 	def DEFAULT_EDITING():
@@ -1840,6 +1904,10 @@ class SaveTranslationUnitFlags:
 	def __hash__(self):
 		return hash(self.value)
 
+	@requires(2.8)
+	def __repr__(self):
+		return 'SaveTranslationUnitFlags({0})'.format(self.value)
+
 SaveTranslationUnitFlags.NONE = SaveTranslationUnitFlags(0) # 2.8
 
 class ReparseTranslationUnitFlags:
@@ -1862,6 +1930,10 @@ class ReparseTranslationUnitFlags:
 	@requires(2.8)
 	def __hash__(self):
 		return hash(self.value)
+
+	@requires(2.8)
+	def __repr__(self):
+		return 'ReparseTranslationUnitFlags({0})'.format(self.value)
 
 ReparseTranslationUnitFlags.NONE = ReparseTranslationUnitFlags(0) # 2.8
 
@@ -1976,6 +2048,10 @@ class GlobalOptionFlags:
 	@requires(3.1)
 	def __hash__(self):
 		return hash(self.value)
+
+	@requires(2.8)
+	def __repr__(self):
+		return 'GlobalOptionFlags({0})'.format(self.value)
 
 GlobalOptionFlags.NONE = GlobalOptionFlags(0) # 3.1
 GlobalOptionFlags.THREAD_BACKGROUND_PRIORITY_FOR_INDEXING = GlobalOptionFlags(1) # 3.1

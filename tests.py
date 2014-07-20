@@ -140,6 +140,7 @@ def test_DiagnosticDisplayOptions():
 	equals((a | b).value, 6)
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
+	equals(repr(a), 'DiagnosticDisplayOptions(2)')
 
 def test_DiagnosticSeverity():
 	a = libclang.DiagnosticSeverity.NOTE
@@ -151,6 +152,7 @@ def test_DiagnosticSeverity():
 	equals(a.value, 1)
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
+	equals(repr(a), 'DiagnosticSeverity(1)')
 
 def test_DiagnosticCategory29():
 	a = libclang.DiagnosticCategory(1)
@@ -163,6 +165,7 @@ def test_DiagnosticCategory29():
 	equals(a.name, 'Lexical or Preprocessor Issue')
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
+	equals(repr(a), 'DiagnosticCategory(1)')
 
 def test_Linkage():
 	a = libclang.Linkage.NO_LINKAGE
@@ -174,6 +177,7 @@ def test_Linkage():
 	equals(a.value, 1)
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
+	equals(repr(a), 'Linkage(1)')
 
 def test_TokenKind():
 	a = libclang.TokenKind.KEYWORD
@@ -185,6 +189,7 @@ def test_TokenKind():
 	equals(a.value, 1)
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
+	equals(repr(a), 'TokenKind(1)')
 
 def test_CursorKind():
 	equals(libclang.CursorKind.CLASS_DECL == libclang.CursorKind.CLASS_DECL, True)
@@ -204,6 +209,7 @@ def test_CursorKind():
 	b = libclang.CursorKind.FIELD_DECL
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
+	equals(repr(a), 'CursorKind(9|VarDecl)')
 
 def test_CursorKind28():
 	kind = libclang.CursorKind.STRUCT_DECL
@@ -226,6 +232,7 @@ def test_TypeKind28():
 	b = libclang.TypeKind.SHORT
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
+	equals(repr(a), 'TypeKind(18|Long)')
 
 def test_AvailabilityKind28():
 	a = libclang.AvailabilityKind.DEPRECATED
@@ -237,6 +244,7 @@ def test_AvailabilityKind28():
 	equals(a.value, 1)
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
+	equals(repr(a), 'AvailabilityKind(1)')
 
 def test_LanguageKind28():
 	a = libclang.LanguageKind.C
@@ -248,6 +256,7 @@ def test_LanguageKind28():
 	equals(a.value, 1)
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
+	equals(repr(a), 'LanguageKind(1)')
 
 def test_AccessSpecifier28():
 	a = libclang.AccessSpecifier.PUBLIC
@@ -259,6 +268,7 @@ def test_AccessSpecifier28():
 	equals(a.value, 1)
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
+	equals(repr(a), 'AccessSpecifier(1)')
 
 def test_NameRefFlags30():
 	a = libclang.NameRefFlags.WANT_QUALIFIER
@@ -271,6 +281,7 @@ def test_NameRefFlags30():
 	equals((a | b).value, 3)
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
+	equals(repr(a), 'NameRefFlags(1)')
 
 def test_TranslationUnitFlags28():
 	a = libclang.TranslationUnitFlags.INCOMPLETE
@@ -283,6 +294,7 @@ def test_TranslationUnitFlags28():
 	equals((a | b).value, 10)
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
+	equals(repr(a), 'TranslationUnitFlags(2)')
 
 def test_SaveTranslationUnitFlags28():
 	a = libclang.SaveTranslationUnitFlags(2)
@@ -295,6 +307,7 @@ def test_SaveTranslationUnitFlags28():
 	equals((a | b).value, 10)
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
+	equals(repr(a), 'SaveTranslationUnitFlags(2)')
 
 def test_ReparseTranslationUnitFlags28():
 	a = libclang.ReparseTranslationUnitFlags(2)
@@ -307,6 +320,7 @@ def test_ReparseTranslationUnitFlags28():
 	equals((a | b).value, 10)
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
+	equals(repr(a), 'ReparseTranslationUnitFlags(2)')
 
 def test_GlobalOptionFlags31():
 	a = libclang.GlobalOptionFlags(2)
@@ -319,6 +333,7 @@ def test_GlobalOptionFlags31():
 	equals((a | b).value, 10)
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
+	equals(repr(a), 'GlobalOptionFlags(2)')
 
 def test_CallingConvention31():
 	a = libclang.CallingConvention.X86_STDCALL
@@ -330,6 +345,7 @@ def test_CallingConvention31():
 	equals(a.value, 2)
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
+	equals(repr(a), 'CallingConvention(2)')
 
 def test_ObjCPropertyAttributes33():
 	a = libclang.ObjCPropertyAttributes(2)
@@ -342,6 +358,7 @@ def test_ObjCPropertyAttributes33():
 	equals((a | b).value, 10)
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
+	equals(repr(a), 'ObjCPropertyAttributes(2)')
 
 def test_ObjCDeclQualifierKind33():
 	a = libclang.ObjCDeclQualifierKind(2)
@@ -354,6 +371,7 @@ def test_ObjCDeclQualifierKind33():
 	equals((a | b).value, 10)
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
+	equals(repr(a), 'ObjCDeclQualifierKind(2)')
 
 def test_RefQualifierKind34():
 	a = libclang.RefQualifierKind.LVALUE
@@ -365,6 +383,7 @@ def test_RefQualifierKind34():
 	equals(a.value, 1)
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
+	equals(repr(a), 'RefQualifierKind(1)')
 
 def test_Index():
 	index = libclang.Index()
