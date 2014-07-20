@@ -551,8 +551,12 @@ def test_Cursor():
 	equals(c.parent, None)
 	equals(c.linkage, libclang.Linkage.INVALID)
 	equals(c.location, libclang.SourceLocation.null())
-	match_location(c.extent.start, 'tests/enumeration.hpp', 1, 1, 0)
-	match_location(c.extent.end, 'tests/enumeration.hpp', 1, 1, 0)
+	if libclang.version >= 3.1:
+		match_location(c.extent.start, 'tests/enumeration.hpp', 1, 1, 0)
+		match_location(c.extent.end, 'tests/enumeration.hpp', 1, 1, 0)
+	else:
+		match_location(c.extent.start, None, 0, 0, 0)
+		match_location(c.extent.end, None, 0, 0, 0)
 	equals(c.usr, '')
 	equals(c.referenced, libclang.Cursor.null())
 	equals(c.definition, libclang.Cursor.null())
@@ -565,8 +569,11 @@ def test_Cursor():
 	equals(children[0].parent, c)
 	# tokens
 	tokens = list(c.tokens)
-	equals(len(tokens), 11)
-	equals(tokens[0].kind, libclang.TokenKind.KEYWORD)
+	if libclang.version >= 3.1:
+		equals(len(tokens), 11)
+		equals(tokens[0].kind, libclang.TokenKind.KEYWORD)
+	else:
+		equals(len(tokens), 0)
 
 def test_Cursor28():
 	index = libclang.Index()
