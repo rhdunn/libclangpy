@@ -125,8 +125,11 @@ def test_SourceLocation29():
 
 def test_SourceLocation30():
 	loc = libclang.SourceLocation.null()
-	match_location(loc.expansion_location, None, 0, 0, 0)
 	match_location(loc.presumed_location, '', 0, 0, 0)
+
+def test_SourceLocation31():
+	loc = libclang.SourceLocation.null()
+	match_location(loc.expansion_location, None, 0, 0, 0)
 
 def test_SourceLocation33():
 	loc = libclang.SourceLocation.null()
@@ -838,6 +841,7 @@ run(2.7, test_version)
 run(2.7, test_SourceLocation)
 run(2.9, test_SourceLocation29)
 run(3.0, test_SourceLocation30)
+run(3.1, test_SourceLocation31)
 run(3.3, test_SourceLocation33)
 run(3.4, test_SourceLocation34)
 run(2.7, test_SourceRange)

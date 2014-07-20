@@ -319,7 +319,7 @@ class SourceLocation:
 		return SourceLocationData(l, c, o, cxfile=f)
 
 	@cached_property
-	@requires(3.0, 'clang_getExpansionLocation', [_CXSourceLocation, POINTER(c_void_p), POINTER(c_uint), POINTER(c_uint), POINTER(c_uint)])
+	@requires(3.1, 'clang_getExpansionLocation', [_CXSourceLocation, POINTER(c_void_p), POINTER(c_uint), POINTER(c_uint), POINTER(c_uint)])
 	def expansion_location(self):
 		f, l, c, o = c_void_p(), c_uint(), c_uint(), c_uint()
 		_libclang.clang_getExpansionLocation(self._sl, byref(f), byref(l), byref(c), byref(o))
