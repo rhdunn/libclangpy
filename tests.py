@@ -185,7 +185,9 @@ def test_DiagnosticCategory29():
 	equals(a != a, False)
 	equals(a != b, True)
 	equals(a.value, 1)
-	equals(a.name, 'Lexical or Preprocessor Issue')
+	oneof(a.name, [
+		'Parse Issue', # 2.9 or earlier
+		'Lexical or Preprocessor Issue']) # 3.0 or later
 	equals(hash(a) == hash(a), True)
 	equals(hash(a) == hash(b), False)
 	equals(repr(a), 'DiagnosticCategory(1)')
