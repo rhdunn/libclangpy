@@ -634,14 +634,17 @@ def test_EnumDecl31():
 	equals(isinstance(x, libclang.Cursor), True)
 	equals(isinstance(x, libclang.EnumDecl), True)
 	equals(x.enum_type.kind, libclang.TypeKind.UINT)
+	equals(x.is_enum_class, False)
 	# y
 	equals(isinstance(y, libclang.Cursor), True)
 	equals(isinstance(y, libclang.EnumDecl), True)
 	equals(y.enum_type.kind, libclang.TypeKind.INT)
+	equals(y.is_enum_class, True)
 	# z
 	equals(isinstance(z, libclang.Cursor), True)
 	equals(isinstance(z, libclang.EnumDecl), True)
 	equals(z.enum_type.kind, libclang.TypeKind.UCHAR)
+	equals(z.is_enum_class, True)
 
 def test_Cursor32():
 	c = parse_str('enum test {};', filename='cursor32.hpp')[0]

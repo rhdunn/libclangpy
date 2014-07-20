@@ -1858,6 +1858,12 @@ class EnumDecl(Cursor):
 		t = _libclang.clang_getEnumDeclIntegerType(self._c)
 		return _type(t, self._tu)
 
+	@property
+	@requires(3.1)
+	def is_enum_class(self):
+		t = self.tokens[1]
+		return t.kind == TokenKind.KEYWORD and t.spelling == 'class'
+
 def _cursor(c, parent, tu):
 	kind = CursorKind(c.kind)
 	if kind == CursorKind.ENUM_DECL:
