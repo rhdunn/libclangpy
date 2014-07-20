@@ -581,9 +581,10 @@ def test_Cursor28():
 
 def test_Cursor29():
 	index = libclang.Index()
-	c = parse_str(index, 'enum test {};')[0]
-	equals(c.semantic_parent, c.parent)
-	equals(c.lexical_parent, c.parent)
+	c = parse_str(index, 'enum test { a };')[0]
+	a = c.children[0]
+	equals(a.semantic_parent, c)
+	equals(a.lexical_parent, c)
 	equals(c.included_file.name, None)
 	equals(c.objc_type_encoding, '?')
 	equals(len(list(c.overloads)), 0)
