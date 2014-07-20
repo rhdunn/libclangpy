@@ -743,11 +743,33 @@ def test_Type33():
 	equals(t.size, 8)
 	equals(t.offset('a'), -1)
 
-def test_Type34():
+def test_FunctionProtoType34():
 	index = libclang.Index()
-	c = parse_str(index, 'long a[4];')[0]
-	t = c.type
-	equals(t.cxx_ref_qualifier, libclang.RefQualifierKind.NONE)
+	s = parse_str(index, """
+		struct test {
+			int f(float x);
+			int g(float x) const &;
+			int h(float x) const &&;
+		};""", args=['-std=c++11'])[0]
+	f, g, h = s.children
+	# f -- no ref-qualifier
+	equals(f.spelling, 'f')
+	ft = f.type
+	equals(isinstance(ft, libclang.Type), True)
+	equals(isinstance(ft, libclang.FunctionProtoType), True)
+	equals(ft.cxx_ref_qualifier, libclang.RefQualifierKind.NONE)
+	# g -- const lvalue
+	equals(g.spelling, 'g')
+	gt = g.type
+	equals(isinstance(gt, libclang.Type), True)
+	equals(isinstance(gt, libclang.FunctionProtoType), True)
+	equals(gt.cxx_ref_qualifier, libclang.RefQualifierKind.LVALUE)
+	# g -- const rvalue
+	equals(h.spelling, 'h')
+	ht = h.type
+	equals(isinstance(ht, libclang.Type), True)
+	equals(isinstance(ht, libclang.FunctionProtoType), True)
+	equals(ht.cxx_ref_qualifier, libclang.RefQualifierKind.RVALUE)
 
 def test_MemberPointerType34():
 	index = libclang.Index()
@@ -810,7 +832,7 @@ run(2.9, test_Type29)
 run(3.0, test_Type30)
 run(3.1, test_Type31)
 run(3.3, test_Type33)
-run(3.4, test_Type34)
+run(3.4, test_FunctionProtoType34)
 run(3.4, test_MemberPointerType34)
 
 summary()

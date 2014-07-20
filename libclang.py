@@ -1326,6 +1326,17 @@ class BuiltinType(Type):
 		self.is_unsigned_integer = unsigned_integer
 		self.is_floating_point = floating_point
 
+class FunctionProtoType(Type):
+	@requires(2.8)
+	def __init__(self, t, kind, tu):
+		Type.__init__(self, t, kind, tu)
+
+	@property
+	@requires(3.4, 'clang_Type_getCXXRefQualifier', [_CXType], c_uint)
+	def cxx_ref_qualifier(self):
+		q = _libclang.clang_Type_getCXXRefQualifier(self._t)
+		return RefQualifierKind(q)
+
 class MemberPointerType(Type):
 	@requires(3.4)
 	def __init__(self, t, kind, tu):
@@ -1352,6 +1363,8 @@ def _type(t, tu):
 		if kind in [TypeKind.FLOAT, TypeKind.DOUBLE, TypeKind.LONG_DOUBLE]:
 			return BuiltinType(t, kind, tu, floating_point=True)
 		return BuiltinType(t, kind, tu)
+	if kind == TypeKind.FUNCTION_PROTO:
+		return FunctionProtoType(t, kind, tu)
 	if kind == TypeKind.MEMBER_POINTER:
 		return MemberPointerType(t, kind, tu)
 	return Type(t, kind, tu)
