@@ -35,6 +35,17 @@ def equals(a, b):
 	if a != b:
 		raise AssertionError('Value mismatch: `{0}` != `{1}`'.format(str(a), str(b)))
 
+def oneof(a, items):
+	for item in items:
+		if a != item:
+			continue
+		ta, tb = type(a), type(item)
+		if ta.__name__ != tb.__name__:
+			raise AssertionError('Type mismatch: `{0}` != `{1}`'.format(ta.__name__, tb.__name__))
+		return
+	itemstr = ', '.join(['`{0}`'.format(str(item)) for item in items])
+	raise AssertionError('Value mismatch: `{0}` not in [{1}]'.format(str(a), itemstr))
+
 _passed  = 0
 _skipped = 0
 _failed  = 0
@@ -86,7 +97,7 @@ def match_location(loc, filename, line, column, offset):
 	equals(loc.offset, offset)
 
 def test_version():
-	equals(libclang.version in [2.7, 2.8, 2.9, 3.0, 3.1, 3.2, 3.3, 3.4], True)
+	oneof(libclang.version, [2.7, 2.8, 2.9, 3.0, 3.1, 3.2, 3.3, 3.4])
 
 def test_File(f, filename):
 	equals(f.name, filename)
