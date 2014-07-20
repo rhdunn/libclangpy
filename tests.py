@@ -22,6 +22,9 @@ import traceback
 
 import libclang
 
+class UnsupportedException(Exception):
+	pass
+
 if sys.version_info.major >= 3:
 	long = int
 
@@ -52,6 +55,9 @@ def run(version, test):
 		else:
 			print('failed ... incorrect API binding')
 			_failed = _failed + 1
+	except UnsupportedException as e:
+		print('skipping ... {0}'.format(e))
+		_skipped = _skipped + 1
 	except Exception as e:
 		print('failed')
 		print(traceback.format_exc())
@@ -776,6 +782,8 @@ def test_MemberPointerType34():
 	s, mp = parse_str(index, 'struct A{}; int *A::* b;')
 	t = mp.type
 	equals(isinstance(t, libclang.Type), True)
+	if t.kind == libclang.TypeKind.UNEXPOSED:
+		raise UnsupportedException('MemberPointer type is not supported')
 	equals(isinstance(t, libclang.MemberPointerType), True)
 	equals(t.class_type.kind, libclang.TypeKind.RECORD)
 
