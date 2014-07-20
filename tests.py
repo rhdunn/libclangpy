@@ -437,9 +437,6 @@ def test_Index():
 	equals(tu.spelling, filename)
 	equals(len(list(tu.diagnostics)), 0)
 	# unsaved files
-	tu = index.from_source('unsaved.hxx', unsaved_files=[('unsaved.hxx', 'struct test {};')])
-	equals(tu, None)
-	# unsaved files
 	tu = index.from_source('unsaved.hpp', unsaved_files=[('unsaved.hpp', 'struct test {};')])
 	equals(tu.spelling, 'unsaved.hpp')
 	equals(len(list(tu.diagnostics)), 0)
@@ -467,9 +464,6 @@ def test_Index28():
 	tu = index.parse(filename, args=['-std=c++98'])
 	equals(tu.spelling, filename)
 	equals(len(list(tu.diagnostics)), 0)
-	# unsaved files
-	tu = index.parse('unsaved.hxx', unsaved_files=[('unsaved.hxx', 'struct test {};')])
-	equals(tu, None)
 	# unsaved files
 	tu = index.parse('unsaved.hpp', unsaved_files=[('unsaved.hpp', 'struct test {};')])
 	equals(tu.spelling, 'unsaved.hpp')
