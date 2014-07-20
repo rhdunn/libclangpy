@@ -1514,8 +1514,9 @@ class Cursor:
 	@requires(2.7)
 	def __init__(self, c, parent, tu):
 		self._c = c
-		self.parent = parent
 		self._tu = tu
+		self.parent = parent
+		self.kind = CursorKind(c.kind)
 
 	@requires(2.7, 'clang_equalCursors', ['_CXCursor', '_CXCursor'], c_uint)
 	def __eq__(self, other):
@@ -1557,12 +1558,6 @@ class Cursor:
 		# but this already tracked in the libclangpy binding so it does
 		# not need to be called.
 		return self._tu
-
-	@property
-	@requires(2.7, 'clang_getCursorKind', ['_CXCursor'], c_uint)
-	def kind(self):
-		kind = _libclang.clang_getCursorKind(self._c)
-		return CursorKind(kind)
 
 	@property
 	@requires(2.7, 'clang_getCursorLinkage', ['_CXCursor'], c_uint)
