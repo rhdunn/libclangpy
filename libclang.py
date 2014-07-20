@@ -1751,19 +1751,6 @@ class Cursor:
 		return _type(t, self._tu)
 
 	@property
-	@requires(3.1, 'clang_getEnumConstantDeclValue', ['_CXCursor'], c_longlong)
-	@requires(3.1, 'clang_getEnumConstantDeclUnsignedValue', ['_CXCursor'], c_ulonglong)
-	def enum_value(self):
-		underlying_type = self.type
-		if underlying_type.kind == TypeKind.ENUM:
-			underlying_type = underlying_type.declaration.enum_type
-		if underlying_type.kind in [TypeKind.CHAR_U, TypeKind.UCHAR, TypeKind.CHAR16,
-		                            TypeKind.CHAR32, TypeKind.USHORT, TypeKind.UINT,
-		                            TypeKind.ULONG, TypeKind.ULONGLONG, TypeKind.UINT128]:
-			return _libclang.clang_getEnumConstantDeclUnsignedValue(self._c)
-		return _libclang.clang_getEnumConstantDeclValue(self._c)
-
-	@property
 	@requires(3.1, 'clang_Cursor_getNumArguments', ['_CXCursor'], c_int)
 	@requires(3.1, 'clang_Cursor_getArgument', ['_CXCursor', c_uint], '_CXCursor')
 	def arguments(self):
@@ -1864,10 +1851,30 @@ class EnumDecl(Cursor):
 		t = self.tokens[1]
 		return t.kind == TokenKind.KEYWORD and t.spelling == 'class'
 
+class EnumConstantDecl(Cursor):
+	@requires(3.1)
+	def __init__(self, c, kind, parent, tu):
+		Cursor.__init__(self, c, kind, parent, tu)
+
+	@property
+	@requires(3.1, 'clang_getEnumConstantDeclValue', ['_CXCursor'], c_longlong)
+	@requires(3.1, 'clang_getEnumConstantDeclUnsignedValue', ['_CXCursor'], c_ulonglong)
+	def enum_value(self):
+		underlying_type = self.type
+		if underlying_type.kind == TypeKind.ENUM:
+			underlying_type = underlying_type.declaration.enum_type
+		if underlying_type.kind in [TypeKind.CHAR_U, TypeKind.UCHAR, TypeKind.CHAR16,
+		                            TypeKind.CHAR32, TypeKind.USHORT, TypeKind.UINT,
+		                            TypeKind.ULONG, TypeKind.ULONGLONG, TypeKind.UINT128]:
+			return _libclang.clang_getEnumConstantDeclUnsignedValue(self._c)
+		return _libclang.clang_getEnumConstantDeclValue(self._c)
+
 def _cursor(c, parent, tu):
 	kind = CursorKind(c.kind)
 	if kind == CursorKind.ENUM_DECL:
 		return EnumDecl(c, kind, parent, tu)
+	if kind == CursorKind.ENUM_CONSTANT_DECL:
+		return EnumConstantDecl(c, kind, parent, tu)
 	return Cursor(c, kind, parent, tu)
 
 class TranslationUnitFlags:
