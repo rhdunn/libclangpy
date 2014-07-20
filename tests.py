@@ -62,8 +62,12 @@ def summary():
 	print('   {0} passed, {1} skipped, {2} failed'.format(_passed, _skipped, _failed))
 	print('')
 
-def parse_str(index, contents, filename='parse_str.cpp', args=None):
+def parse_str(index, contents, filename='parse_str.cpp', args=None, ignore_errors=False):
 	tu = index.from_source(filename, unsaved_files=[(filename, contents)], args=args)
+	if not ignore_errors:
+		diagnostics = list(tu.diagnostics)
+		if len(diagnostics) > 0:
+			raise Exception(diagnostics[0].format())
 	return [child for child in tu.cursor().children if child.location.file]
 
 def match_location(loc, filename, line, column, offset):
@@ -625,9 +629,9 @@ def test_Type28():
 	equals(t.declaration.kind, libclang.CursorKind.NO_DECL_FOUND)
 	equals(t.is_pod, True)
 
-def test_builtin_type(program, kind, args=None, signed=False, unsigned=False, floating_point=False):
+def test_builtin_type(program, kind, args=None, ignore_errors=False, signed=False, unsigned=False, floating_point=False):
 	index = libclang.Index()
-	c = parse_str(index, program, args=args)[0]
+	c = parse_str(index, program, args=args, ignore_errors=ignore_errors)[0]
 	t = c.type
 	equals(isinstance(t, libclang.Type), True)
 	equals(isinstance(t, libclang.BuiltinType), True)
@@ -638,7 +642,7 @@ def test_builtin_type(program, kind, args=None, signed=False, unsigned=False, fl
 
 def test_BuiltinType28():
 	Kind = libclang.TypeKind
-	test_builtin_type('void a;', Kind.VOID,
+	test_builtin_type('void a;', Kind.VOID, ignore_errors=True,
 	                  signed=False, unsigned=False, floating_point=False)
 	test_builtin_type('bool a;', Kind.BOOL,
 	                  signed=False, unsigned=True,  floating_point=False)
