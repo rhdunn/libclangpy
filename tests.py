@@ -72,6 +72,13 @@ def run(version, test):
 	except UnsupportedException as e:
 		print('skipping ... {0}'.format(e))
 		_skipped = _skipped + 1
+	except ParseError as e:
+		if libclang.version < version:
+			print('skipping ... {0}'.format(e))
+			_skipped = _skipped + 1
+		else:
+			print('failed ... {0}'.format(e))
+			_failed = _failed + 1
 	except Exception as e:
 		print('failed')
 		print(traceback.format_exc())
@@ -753,13 +760,10 @@ def test_BuiltinType28():
 
 def test_BuiltinType31():
 	Kind = libclang.TypeKind
-	try:
-		test_builtin_type('__int128 a;', Kind.INT128,
-		                  signed=True,  unsigned=False, floating_point=False)
-		test_builtin_type('unsigned __int128 a;', Kind.UINT128,
-		                  signed=False, unsigned=True,  floating_point=False)
-	except ParseError as e:
-		raise UnsupportedException(e)
+	test_builtin_type('__int128 a;', Kind.INT128,
+	                  signed=True,  unsigned=False, floating_point=False)
+	test_builtin_type('unsigned __int128 a;', Kind.UINT128,
+	                  signed=False, unsigned=True,  floating_point=False)
 
 def test_Type29():
 	index = libclang.Index()
