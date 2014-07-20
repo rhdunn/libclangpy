@@ -779,7 +779,10 @@ def test_MemberPointerType34():
 	equals(isinstance(t, libclang.MemberPointerType), True)
 	equals(t.class_type.kind, libclang.TypeKind.RECORD)
 
-libclang.load()
+if len(sys.argv) > 1:
+	libclang.load(name=sys.argv[1])
+else:
+	libclang.load()
 
 run(2.7, test_version)
 run(2.7, test_SourceLocation)
