@@ -503,22 +503,22 @@ def test_Diagnostic():
 	diagnostics = list(tu.diagnostics)
 	equals(len(diagnostics), 1)
 	d = diagnostics[0]
-	equals(d.spelling, 'expected \';\' after enum')
-	equals(str(d), 'expected \';\' after enum')
+	equals(d.spelling, 'expected \';\' after struct')
+	equals(str(d), 'expected \';\' after struct')
 	equals(d.format(),
-	       'tests/error.hpp:6:2: error: expected \';\' after enum')
+	       'tests/error.hpp:3:2: error: expected \';\' after struct')
 	equals(d.format(libclang.DiagnosticDisplayOptions.SOURCE_LOCATION),
-	       'tests/error.hpp:6: error: expected \';\' after enum')
+	       'tests/error.hpp:3: error: expected \';\' after struct')
 	equals(d.severity, libclang.DiagnosticSeverity.ERROR)
-	match_location(d.location, 'tests/error.hpp', 6, 2, 25)
+	match_location(d.location, 'tests/error.hpp', 3, 2, 16)
 	# ranges
 	r = list(d.ranges)
 	equals(len(r), 0)
 	# fixits
 	f = list(d.fixits)
 	equals(len(f), 1)
-	match_location(f[0].extent.start, 'tests/error.hpp', 6, 2, 25)
-	match_location(f[0].extent.end, 'tests/error.hpp', 6, 2, 25)
+	match_location(f[0].extent.start, 'tests/error.hpp', 3, 2, 16)
+	match_location(f[0].extent.end, 'tests/error.hpp', 3, 2, 16)
 	equals(f[0].spelling, ';')
 
 def test_Diagnostic29():

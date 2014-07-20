@@ -1,6 +1,3 @@
-enum test
+struct error
 {
-	a,
-	b,
-	c,
 }
