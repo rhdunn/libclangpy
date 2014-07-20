@@ -1976,16 +1976,19 @@ class TranslationUnit:
 			raise Exception('File "%s" not in the translation unit.' % filename)
 		return File(ret)
 
+	@requires(2.9, 'clang_getLocationForOffset', [c_void_p, c_void_p, c_uint], _CXSourceLocation)
+	def _location_by_offset(self, cxfile, offset):
+		return _libclang.clang_getLocationForOffset(self._tu, cxfile._f, offset)
+
 	@requires(2.7, 'clang_getLocation', [c_void_p, c_void_p, c_uint, c_uint], _CXSourceLocation)
-	@optional(2.9, 'clang_getLocationForOffset', [c_void_p, c_void_p, c_uint], _CXSourceLocation)
 	def location(self, cxfile, line=-1, column=0, offset=-1):
 		ret = None
 		if isinstance(cxfile, str):
 			cxfile = self.file(cxfile)
 		if line != -1:
 			ret = _libclang.clang_getLocation(self._tu, cxfile._f, line, column)
-		elif offset != -1 and _libclang.clang_getLocationForOffset:
-			ret = _libclang.clang_getLocationForOffset(self._tu, cxfile._f, offset)
+		elif offset != -1:
+			ret = self._location_by_offset(cxfile, offset)
 		if not ret:
 			raise Exception('Unable to determine the file location in this translation unit.')
 		return SourceLocation(ret)
