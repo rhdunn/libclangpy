@@ -1146,9 +1146,9 @@ RefQualifierKind.RVALUE = RefQualifierKind(2) # 3.4
 
 class Type:
 	@requires(2.8)
-	def __init__(self, t, tu):
+	def __init__(self, t, kind, tu):
 		self._t = t
-		self.kind = TypeKind(t.kind)
+		self.kind = kind
 		self._tu = tu
 
 	@requires(2.8, 'clang_equalTypes', [_CXType, _CXType], c_uint)
@@ -1167,19 +1167,19 @@ class Type:
 	@requires(2.8, 'clang_getCanonicalType', [_CXType], _CXType)
 	def canonical_type(self):
 		t = _libclang.clang_getCanonicalType(self._t)
-		return Type(t, self._tu)
+		return _type(t, self._tu)
 
 	@property
 	@requires(2.8, 'clang_getPointeeType', [_CXType], _CXType)
 	def pointee_type(self):
 		t = _libclang.clang_getPointeeType(self._t)
-		return Type(t, self._tu)
+		return _type(t, self._tu)
 
 	@property
 	@requires(2.8, 'clang_getResultType', [_CXType], _CXType)
 	def result_type(self):
 		t = _libclang.clang_getResultType(self._t)
-		return Type(t, self._tu)
+		return _type(t, self._tu)
 
 	@property
 	@requires(2.8, 'clang_getTypeDeclaration', [_CXType], '_CXCursor')
@@ -1211,7 +1211,7 @@ class Type:
 	@requires(3.0, 'clang_getArrayElementType', [_CXType], _CXType)
 	def array_element_type(self):
 		t = _libclang.clang_getArrayElementType(self._t)
-		return Type(t, self._tu)
+		return _type(t, self._tu)
 
 	@property
 	@requires(3.0, 'clang_getArraySize', [_CXType], c_longlong)
@@ -1230,7 +1230,7 @@ class Type:
 	@requires(3.1, 'clang_getElementType', [_CXType], _CXType)
 	def element_type(self):
 		t = _libclang.clang_getElementType(self._t)
-		return Type(t, self._tu)
+		return _type(t, self._tu)
 
 	@property
 	@requires(3.1, 'clang_getNumElements', [_CXType], c_longlong)
@@ -1278,7 +1278,32 @@ class Type:
 	@requires(3.4, 'clang_Type_getClassType', [_CXType], _CXType)
 	def class_type(self):
 		t = _libclang.clang_Type_getClassType(self._t)
-		return Type(t, self._tu)
+		return _type(t, self._tu)
+
+class BuiltinType(Type):
+	@requires(2.8)
+	def __init__(self, t, kind, tu, signed_integer=False, unsigned_integer=False, floating_point=False):
+		Type.__init__(self, t, kind, tu)
+		self.is_signed_integer = signed_integer
+		self.is_unsigned_integer = unsigned_integer
+		self.is_floating_point = floating_point
+
+def _type(t, tu):
+	kind = TypeKind(t.kind)
+	if kind.value > 1 and kind.value < 100: # builtin type
+		if kind in [TypeKind.BOOL,   TypeKind.CHAR_U, TypeKind.UCHAR,
+		            TypeKind.CHAR16, TypeKind.CHAR32, TypeKind.USHORT,
+		            TypeKind.UINT,   TypeKind.ULONG,  TypeKind.ULONGLONG,
+		            TypeKind.UINT128]:
+			return BuiltinType(t, kind, tu, unsigned_integer=True)
+		if kind in [TypeKind.CHAR_S,   TypeKind.SCHAR, TypeKind.WCHAR,
+		            TypeKind.SHORT,    TypeKind.INT,   TypeKind.LONG,
+		            TypeKind.LONGLONG, TypeKind.INT128]:
+			return BuiltinType(t, kind, tu, signed_integer=True)
+		if kind in [TypeKind.FLOAT, TypeKind.DOUBLE, TypeKind.LONG_DOUBLE]:
+			return BuiltinType(t, kind, tu, floating_point=True)
+		return BuiltinType(t, kind, tu)
+	return Type(t, kind, tu)
 
 class AvailabilityKind:
 	@requires(2.8)
@@ -1521,19 +1546,19 @@ class Cursor:
 	@requires(2.8, 'clang_getCursorType', ['_CXCursor'], _CXType)
 	def type(self):
 		t = _libclang.clang_getCursorType(self._c)
-		return Type(t, self._tu)
+		return _type(t, self._tu)
 
 	@property
 	@requires(2.8, 'clang_getCursorResultType', ['_CXCursor'], _CXType)
 	def result_type(self):
 		t = _libclang.clang_getCursorResultType(self._c)
-		return Type(t, self._tu)
+		return _type(t, self._tu)
 
 	@property
 	@requires(2.8, 'clang_getIBOutletCollectionType', ['_CXCursor'], _CXType)
 	def ib_outlet_collection_type(self):
 		t = _libclang.clang_getIBOutletCollectionType(self._c)
-		return Type(t, self._tu)
+		return _type(t, self._tu)
 
 	@property
 	@requires(2.8, 'clang_getCursorAvailability', ['_CXCursor'], c_uint)
@@ -1642,13 +1667,13 @@ class Cursor:
 	@requires(3.1, 'clang_getTypedefDeclUnderlyingType', ['_CXCursor'], _CXType)
 	def underlying_typedef_type(self):
 		t = _libclang.clang_getTypedefDeclUnderlyingType(self._c)
-		return Type(t, self._tu)
+		return _type(t, self._tu)
 
 	@property
 	@requires(3.1, 'clang_getEnumDeclIntegerType', ['_CXCursor'], _CXType)
 	def enum_type(self):
 		t = _libclang.clang_getEnumDeclIntegerType(self._c)
-		return Type(t, self._tu)
+		return _type(t, self._tu)
 
 	@property
 	@requires(3.1, 'clang_getEnumConstantDeclValue', ['_CXCursor'], c_longlong)
@@ -1690,7 +1715,7 @@ class Cursor:
 	@requires(3.2, 'clang_Cursor_getReceiverType', ['_CXCursor'], _CXType)
 	def receiver_type(self):
 		t = _libclang.clang_Cursor_getReceiverType(self._c)
-		return Type(t, self._tu)
+		return _type(t, self._tu)
 
 	@property
 	@requires(3.2, 'clang_Cursor_getCommentRange', ['_CXCursor'], _CXSourceRange)

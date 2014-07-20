@@ -62,8 +62,8 @@ def summary():
 	print('   {0} passed, {1} skipped, {2} failed'.format(_passed, _skipped, _failed))
 	print('')
 
-def parse_str(index, contents, filename='parse_str.cpp'):
-	tu = index.from_source(filename, unsaved_files=[(filename, contents)])
+def parse_str(index, contents, filename='parse_str.cpp', args=None):
+	tu = index.from_source(filename, unsaved_files=[(filename, contents)], args=args)
 	return [child for child in tu.cursor().children if child.location.file]
 
 def match_location(loc, filename, line, column, offset):
@@ -625,6 +625,66 @@ def test_Type28():
 	equals(t.declaration.kind, libclang.CursorKind.NO_DECL_FOUND)
 	equals(t.is_pod, True)
 
+def test_builtin_type(program, kind, args=None, signed=False, unsigned=False, floating_point=False):
+	index = libclang.Index()
+	c = parse_str(index, program, args=args)[0]
+	t = c.type
+	equals(isinstance(t, libclang.Type), True)
+	equals(isinstance(t, libclang.BuiltinType), True)
+	equals(t.kind, kind)
+	equals(t.is_signed_integer, signed)
+	equals(t.is_unsigned_integer, unsigned)
+	equals(t.is_floating_point, floating_point)
+
+def test_BuiltinType28():
+	Kind = libclang.TypeKind
+	test_builtin_type('void a;', Kind.VOID,
+	                  signed=False, unsigned=False, floating_point=False)
+	test_builtin_type('bool a;', Kind.BOOL,
+	                  signed=False, unsigned=True,  floating_point=False)
+	test_builtin_type('char a;', Kind.CHAR_U, args=['-funsigned-char'],
+	                  signed=False, unsigned=True,  floating_point=False)
+	test_builtin_type('unsigned char a;', Kind.UCHAR,
+	                  signed=False, unsigned=True,  floating_point=False)
+	test_builtin_type('wchar_t a;', Kind.WCHAR, args=['-funsigned-char'],
+	                  signed=True,  unsigned=False, floating_point=False)
+	test_builtin_type('char16_t a;', Kind.CHAR16, args=['-std=c++11'],
+	                  signed=False, unsigned=True,  floating_point=False)
+	test_builtin_type('char32_t a;', Kind.CHAR32, args=['-std=c++11'],
+	                  signed=False, unsigned=True,  floating_point=False)
+	test_builtin_type('unsigned short a;', Kind.USHORT,
+	                  signed=False, unsigned=True,  floating_point=False)
+	test_builtin_type('unsigned int a;', Kind.UINT,
+	                  signed=False, unsigned=True,  floating_point=False)
+	test_builtin_type('unsigned long a;', Kind.ULONG,
+	                  signed=False, unsigned=True,  floating_point=False)
+	test_builtin_type('unsigned long long a;', Kind.ULONGLONG,
+	                  signed=False, unsigned=True,  floating_point=False)
+	test_builtin_type('unsigned __int128 a;', Kind.UINT128,
+	                  signed=False, unsigned=True,  floating_point=False)
+	test_builtin_type('char a;', Kind.CHAR_S,
+	                  signed=True,  unsigned=False, floating_point=False)
+	test_builtin_type('signed char a;', Kind.SCHAR,
+	                  signed=True,  unsigned=False, floating_point=False)
+	test_builtin_type('wchar_t a;', Kind.WCHAR,
+	                  signed=True,  unsigned=False, floating_point=False)
+	test_builtin_type('short a;', Kind.SHORT,
+	                  signed=True,  unsigned=False, floating_point=False)
+	test_builtin_type('int a;', Kind.INT,
+	                  signed=True,  unsigned=False, floating_point=False)
+	test_builtin_type('long a;', Kind.LONG,
+	                  signed=True,  unsigned=False, floating_point=False)
+	test_builtin_type('long long a;', Kind.LONGLONG,
+	                  signed=True,  unsigned=False, floating_point=False)
+	test_builtin_type('__int128 a;', Kind.INT128,
+	                  signed=True,  unsigned=False, floating_point=False)
+	test_builtin_type('float a;', Kind.FLOAT,
+	                  signed=False, unsigned=False, floating_point=True)
+	test_builtin_type('double a;', Kind.DOUBLE,
+	                  signed=False, unsigned=False, floating_point=True)
+	test_builtin_type('long double a;', Kind.LONG_DOUBLE,
+	                  signed=False, unsigned=False, floating_point=True)
+
 def test_Type29():
 	index = libclang.Index()
 	c = parse_str(index, 'int a;')[0]
@@ -715,6 +775,7 @@ run(3.3, test_Cursor33)
 run(3.4, test_Cursor34)
 run(2.7, test_Token)
 run(2.8, test_Type28)
+run(2.8, test_BuiltinType28)
 run(2.9, test_Type29)
 run(3.0, test_Type30)
 run(3.1, test_Type31)
