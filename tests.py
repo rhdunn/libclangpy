@@ -89,7 +89,8 @@ def summary():
 	print('   {0} passed, {1} skipped, {2} failed'.format(_passed, _skipped, _failed))
 	print('')
 
-def parse_str(index, contents, filename='parse_str.cpp', args=None, ignore_errors=False):
+def parse_str(contents, filename='parse_str.cpp', args=None, ignore_errors=False):
+	index = libclang.Index()
 	tu = index.from_source(filename, unsaved_files=[(filename, contents)], args=args)
 	if not ignore_errors:
 		diagnostics = list(tu.diagnostics)
@@ -582,8 +583,7 @@ def test_Cursor():
 		equals(len(tokens), 0)
 
 def test_Cursor28():
-	index = libclang.Index()
-	c = parse_str(index, 'enum test {};')[0]
+	c = parse_str('enum test {};')[0]
 	equals(c.type.kind, libclang.TypeKind.ENUM)
 	equals(c.result_type.kind, libclang.TypeKind.INVALID)
 	equals(c.ib_outlet_collection_type.kind, libclang.TypeKind.INVALID)
@@ -596,8 +596,7 @@ def test_Cursor28():
 	equals(c.is_static_method, False)
 
 def test_Cursor29():
-	index = libclang.Index()
-	c = parse_str(index, 'enum test { a };')[0]
+	c = parse_str('enum test { a };')[0]
 	a = c.children[0]
 	equals(a.semantic_parent, c)
 	equals(a.lexical_parent, c)
@@ -609,16 +608,14 @@ def test_Cursor29():
 	equals(len(c.overridden), 0)
 
 def test_Cursor30():
-	index = libclang.Index()
-	c = parse_str(index, 'enum test {};', filename='cursor30.hpp')[0]
+	c = parse_str('enum test {};', filename='cursor30.hpp')[0]
 	equals(c.is_virtual, False)
 	rng = c.reference_name_range(libclang.NameRefFlags.WANT_TEMPLATE_ARGS, 0)
 	match_location(rng.start, 'cursor30.hpp', 1, 1, 0)
 	match_location(rng.end, 'cursor30.hpp', 1, 1, 0)
 
 def test_Cursor31():
-	index = libclang.Index()
-	c = parse_str(index, 'enum test { a = 7 };', filename='cursor31.hpp')[0]
+	c = parse_str('enum test { a = 7 };', filename='cursor31.hpp')[0]
 	equals(c.underlying_typedef_type.kind, libclang.TypeKind.INVALID)
 	equals(c.enum_type.kind, libclang.TypeKind.UINT)
 	equals(c.enum_value, 18446744073709551615) # ULLONG_MAX
@@ -630,8 +627,7 @@ def test_Cursor31():
 	match_location(rng.end, 'cursor31.hpp', 1, 6, 5)
 
 def test_Cursor32():
-	index = libclang.Index()
-	c = parse_str(index, 'enum test {};', filename='cursor32.hpp')[0]
+	c = parse_str('enum test {};', filename='cursor32.hpp')[0]
 	equals(c.is_dynamic_call, False)
 	equals(c.receiver_type.kind, libclang.TypeKind.INVALID)
 	match_location(c.comment_range.start, None, 0, 0, 0)
@@ -640,8 +636,7 @@ def test_Cursor32():
 	equals(c.brief_comment, None)
 
 def test_Cursor33():
-	index = libclang.Index()
-	c = parse_str(index, 'enum test {};', filename='cursor33.hpp')[0]
+	c = parse_str('enum test {};', filename='cursor33.hpp')[0]
 	equals(c.is_bit_field, False)
 	equals(c.bit_field_width, -1)
 	equals(c.is_variadic, False)
@@ -649,8 +644,7 @@ def test_Cursor33():
 	equals(c.objc_decl_qualifiers, libclang.ObjCDeclQualifierKind.NONE)
 
 def test_Cursor34():
-	index = libclang.Index()
-	c = parse_str(index, 'enum test {};', filename='cursor34.hpp')[0]
+	c = parse_str('enum test {};', filename='cursor34.hpp')[0]
 	equals(c.is_objc_optional, False)
 	equals(c.is_pure_virtual, False)
 
@@ -681,8 +675,7 @@ def test_Token():
 	equals(token.cursor, children[0])
 
 def test_Type28():
-	index = libclang.Index()
-	c = parse_str(index, 'int a;')[0]
+	c = parse_str('int a;')[0]
 	t = c.type
 	equals(t == t, True)
 	equals(t == t.pointee_type, False)
@@ -697,8 +690,7 @@ def test_Type28():
 	equals(t.is_pod, True)
 
 def test_builtin_type(program, kind, args=None, ignore_errors=False, signed=False, unsigned=False, floating_point=False):
-	index = libclang.Index()
-	c = parse_str(index, program, args=args, ignore_errors=ignore_errors)[0]
+	c = parse_str(program, args=args, ignore_errors=ignore_errors)[0]
 	t = c.type
 	equals(isinstance(t, libclang.Type), True)
 	equals(isinstance(t, libclang.BuiltinType), True)
@@ -760,23 +752,20 @@ def test_BuiltinType31():
 	                  signed=False, unsigned=True,  floating_point=False)
 
 def test_Type29():
-	index = libclang.Index()
-	c = parse_str(index, 'int a;')[0]
+	c = parse_str('int a;')[0]
 	t = c.type
 	equals(t.is_const_qualified, False)
 	equals(t.is_volatile_qualified, False)
 	equals(t.is_restrict_qualified, False)
 
 def test_Type30():
-	index = libclang.Index()
-	c = parse_str(index, 'long a[4];')[0]
+	c = parse_str('long a[4];')[0]
 	t = c.type
 	equals(t.array_element_type.kind, libclang.TypeKind.LONG)
 	equals(t.array_size, 4)
 
 def test_Type31():
-	index = libclang.Index()
-	c = parse_str(index, 'long a[4];')[0]
+	c = parse_str('long a[4];')[0]
 	t = c.type
 	equals(len(list(t.argument_types)), 0)
 	equals(t.element_type.kind, libclang.TypeKind.LONG)
@@ -785,8 +774,7 @@ def test_Type31():
 	equals(t.calling_convention, libclang.CallingConvention.INVALID)
 
 def test_Type33():
-	index = libclang.Index()
-	c = parse_str(index, 'short a[4];')[0]
+	c = parse_str('short a[4];')[0]
 	t = c.type
 	equals(t.spelling, 'short [4]')
 	equals(str(t), 'short [4]')
@@ -795,8 +783,7 @@ def test_Type33():
 	equals(t.offset('a'), -1)
 
 def test_FunctionProtoType34():
-	index = libclang.Index()
-	s = parse_str(index, """
+	s = parse_str("""
 		struct test {
 			int f(float x);
 			int g(float x) const &;
@@ -823,8 +810,7 @@ def test_FunctionProtoType34():
 	equals(ht.cxx_ref_qualifier, libclang.RefQualifierKind.RVALUE)
 
 def test_MemberPointerType34():
-	index = libclang.Index()
-	s, mp = parse_str(index, 'struct A{}; int *A::* b;')
+	s, mp = parse_str('struct A{}; int *A::* b;')
 	t = mp.type
 	equals(isinstance(t, libclang.Type), True)
 	if t.kind == libclang.TypeKind.UNEXPOSED:
