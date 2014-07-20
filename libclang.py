@@ -21,7 +21,7 @@ from ctypes import *
 import platform
 import sys
 
-_lib_extension = { 'Darwin': 'dylib', 'Linux': 'so', 'Windows': 'dll' }
+_lib_extension = { 'Darwin': '.dylib', 'Linux': '.so', 'Windows': '.dll' }
 _system = platform.system()
 _libclang = None
 _dynamic_types = {}
@@ -153,7 +153,10 @@ def load(name=None, version=None):
 		name = 'libclang'
 	if version:
 		name = '{0}-{1}'.format(name, version)
-	_libclang = cdll.LoadLibrary('{0}.{1}'.format(name, _lib_extension[_system]))
+	ext = _lib_extension[_system]
+	if not name.endswith(ext):
+		name = '{0}{1}'.format(name, ext)
+	_libclang = cdll.LoadLibrary(name)
 	lib_version = _detect_version(name)
 	if lib_version >= 3.0:
 		_dynamic_types['_CXCursor'] = _CXCursor30
