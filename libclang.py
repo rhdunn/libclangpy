@@ -1274,12 +1274,6 @@ class Type:
 		q = _libclang.clang_Type_getCXXRefQualifier(self._t)
 		return RefQualifierKind(q)
 
-	@property
-	@requires(3.4, 'clang_Type_getClassType', [_CXType], _CXType)
-	def class_type(self):
-		t = _libclang.clang_Type_getClassType(self._t)
-		return _type(t, self._tu)
-
 class BuiltinType(Type):
 	@requires(2.8)
 	def __init__(self, t, kind, tu, signed_integer=False, unsigned_integer=False, floating_point=False):
@@ -1287,6 +1281,17 @@ class BuiltinType(Type):
 		self.is_signed_integer = signed_integer
 		self.is_unsigned_integer = unsigned_integer
 		self.is_floating_point = floating_point
+
+class MemberPointerType(Type):
+	@requires(3.4)
+	def __init__(self, t, kind, tu):
+		Type.__init__(self, t, kind, tu)
+
+	@property
+	@requires(3.4, 'clang_Type_getClassType', [_CXType], _CXType)
+	def class_type(self):
+		t = _libclang.clang_Type_getClassType(self._t)
+		return _type(t, self._tu)
 
 def _type(t, tu):
 	kind = TypeKind(t.kind)
@@ -1303,6 +1308,8 @@ def _type(t, tu):
 		if kind in [TypeKind.FLOAT, TypeKind.DOUBLE, TypeKind.LONG_DOUBLE]:
 			return BuiltinType(t, kind, tu, floating_point=True)
 		return BuiltinType(t, kind, tu)
+	if kind == TypeKind.MEMBER_POINTER:
+		return MemberPointerType(t, kind, tu)
 	return Type(t, kind, tu)
 
 class AvailabilityKind:

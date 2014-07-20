@@ -725,7 +725,14 @@ def test_Type34():
 	c = parse_str(index, 'long a[4];')[0]
 	t = c.type
 	equals(t.cxx_ref_qualifier, libclang.RefQualifierKind.NONE)
-	equals(t.class_type.kind, libclang.TypeKind.INVALID)
+
+def test_MemberPointerType34():
+	index = libclang.Index()
+	s, mp = parse_str(index, 'struct A{}; int *A::* b;')
+	t = mp.type
+	equals(isinstance(t, libclang.Type), True)
+	equals(isinstance(t, libclang.MemberPointerType), True)
+	equals(t.class_type.kind, libclang.TypeKind.RECORD)
 
 libclang.load()
 
@@ -781,5 +788,6 @@ run(3.0, test_Type30)
 run(3.1, test_Type31)
 run(3.3, test_Type33)
 run(3.4, test_Type34)
+run(3.4, test_MemberPointerType34)
 
 summary()
