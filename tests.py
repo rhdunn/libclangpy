@@ -616,7 +616,6 @@ def test_Cursor30():
 
 def test_Cursor31():
 	c = parse_str('enum test { a = 7 };', filename='cursor31.hpp')[0]
-	equals(c.children[0].enum_value, long(7))
 	equals(len(list(c.arguments)), 0)
 	equals(c.objc_selector_index, -1)
 	rng = c.spelling_name_range(libclang.NameRefFlags.WANT_TEMPLATE_ARGS, 0)
