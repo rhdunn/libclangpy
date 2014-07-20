@@ -1860,12 +1860,7 @@ class EnumConstantDecl(Cursor):
 	@requires(3.1, 'clang_getEnumConstantDeclValue', ['_CXCursor'], c_longlong)
 	@requires(3.1, 'clang_getEnumConstantDeclUnsignedValue', ['_CXCursor'], c_ulonglong)
 	def enum_value(self):
-		underlying_type = self.type
-		if underlying_type.kind == TypeKind.ENUM:
-			underlying_type = underlying_type.declaration.enum_type
-		if underlying_type.kind in [TypeKind.CHAR_U, TypeKind.UCHAR, TypeKind.CHAR16,
-		                            TypeKind.CHAR32, TypeKind.USHORT, TypeKind.UINT,
-		                            TypeKind.ULONG, TypeKind.ULONGLONG, TypeKind.UINT128]:
+		if self.type.declaration.enum_type.is_unsigned_integer:
 			return _libclang.clang_getEnumConstantDeclUnsignedValue(self._c)
 		return _libclang.clang_getEnumConstantDeclValue(self._c)
 

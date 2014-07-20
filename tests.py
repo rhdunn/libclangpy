@@ -656,14 +656,17 @@ def test_EnumConstantDecl31():
 	# a
 	equals(isinstance(a, libclang.Cursor), True)
 	equals(isinstance(a, libclang.EnumConstantDecl), True)
+	equals(a.type.kind, libclang.TypeKind.ENUM)
 	equals(a.enum_value, long(7))
 	# b
 	equals(isinstance(b, libclang.Cursor), True)
 	equals(isinstance(b, libclang.EnumConstantDecl), True)
+	equals(b.type.kind, libclang.TypeKind.ENUM)
 	equals(b.enum_value, 2)
 	# c
 	equals(isinstance(c, libclang.Cursor), True)
 	equals(isinstance(c, libclang.EnumConstantDecl), True)
+	equals(c.type.kind, libclang.TypeKind.ENUM)
 	equals(c.enum_value, long(158))
 
 def test_Cursor32():
