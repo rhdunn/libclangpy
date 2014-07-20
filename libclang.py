@@ -1745,12 +1745,6 @@ class Cursor:
 		return bool(_libclang.clang_CXXMethod_isVirtual(self._c))
 
 	@property
-	@requires(3.1, 'clang_getTypedefDeclUnderlyingType', ['_CXCursor'], _CXType)
-	def underlying_typedef_type(self):
-		t = _libclang.clang_getTypedefDeclUnderlyingType(self._c)
-		return _type(t, self._tu)
-
-	@property
 	@requires(3.1, 'clang_Cursor_getNumArguments', ['_CXCursor'], c_int)
 	@requires(3.1, 'clang_Cursor_getArgument', ['_CXCursor', c_uint], '_CXCursor')
 	def arguments(self):
@@ -1864,12 +1858,25 @@ class EnumConstantDecl(Cursor):
 			return _libclang.clang_getEnumConstantDeclUnsignedValue(self._c)
 		return _libclang.clang_getEnumConstantDeclValue(self._c)
 
+class TypedefDecl(Cursor):
+	@requires(3.1)
+	def __init__(self, c, kind, parent, tu):
+		Cursor.__init__(self, c, kind, parent, tu)
+
+	@property
+	@requires(3.1, 'clang_getTypedefDeclUnderlyingType', ['_CXCursor'], _CXType)
+	def underlying_type(self):
+		t = _libclang.clang_getTypedefDeclUnderlyingType(self._c)
+		return _type(t, self._tu)
+
 def _cursor(c, parent, tu):
 	kind = CursorKind(c.kind)
 	if kind == CursorKind.ENUM_DECL:
 		return EnumDecl(c, kind, parent, tu)
 	if kind == CursorKind.ENUM_CONSTANT_DECL:
 		return EnumConstantDecl(c, kind, parent, tu)
+	if kind == CursorKind.TYPEDEF_DECL:
+		return TypedefDecl(c, kind, parent, tu)
 	return Cursor(c, kind, parent, tu)
 
 class TranslationUnitFlags:

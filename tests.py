@@ -616,7 +616,6 @@ def test_Cursor30():
 
 def test_Cursor31():
 	c = parse_str('enum test { a = 7 };', filename='cursor31.hpp')[0]
-	equals(c.underlying_typedef_type.kind, libclang.TypeKind.INVALID)
 	equals(c.children[0].enum_value, long(7))
 	equals(len(list(c.arguments)), 0)
 	equals(c.objc_selector_index, -1)
@@ -668,6 +667,12 @@ def test_EnumConstantDecl31():
 	equals(isinstance(c, libclang.EnumConstantDecl), True)
 	equals(c.type.kind, libclang.TypeKind.ENUM)
 	equals(c.enum_value, long(158))
+
+def test_TypedefDecl31():
+	x = parse_str('typedef float x;')[0]
+	equals(isinstance(x, libclang.Cursor), True)
+	equals(isinstance(x, libclang.TypedefDecl), True)
+	equals(x.underlying_type.kind, libclang.TypeKind.FLOAT)
 
 def test_Cursor32():
 	c = parse_str('enum test {};', filename='cursor32.hpp')[0]
@@ -910,6 +915,7 @@ run(3.0, test_Cursor30)
 run(3.1, test_Cursor31)
 run(3.1, test_EnumDecl31)
 run(3.1, test_EnumConstantDecl31)
+run(3.1, test_TypedefDecl31)
 run(3.2, test_Cursor32)
 run(3.3, test_Cursor33)
 run(3.4, test_Cursor34)
