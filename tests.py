@@ -22,6 +22,9 @@ import traceback
 
 import libclang
 
+class ParseError(Exception):
+	pass
+
 class UnsupportedException(Exception):
 	pass
 
@@ -84,7 +87,7 @@ def parse_str(index, contents, filename='parse_str.cpp', args=None, ignore_error
 	if not ignore_errors:
 		diagnostics = list(tu.diagnostics)
 		if len(diagnostics) > 0:
-			raise Exception(diagnostics[0].format())
+			raise ParseError(diagnostics[0].spelling)
 	return [child for child in tu.cursor().children if child.location.file]
 
 def match_location(loc, filename, line, column, offset):
@@ -715,8 +718,6 @@ def test_BuiltinType28():
 	                  signed=False, unsigned=True,  floating_point=False)
 	test_builtin_type('unsigned long long a;', Kind.ULONGLONG,
 	                  signed=False, unsigned=True,  floating_point=False)
-	test_builtin_type('unsigned __int128 a;', Kind.UINT128,
-	                  signed=False, unsigned=True,  floating_point=False)
 	test_builtin_type('char a;', Kind.CHAR_S,
 	                  signed=True,  unsigned=False, floating_point=False)
 	test_builtin_type('signed char a;', Kind.SCHAR,
@@ -731,14 +732,22 @@ def test_BuiltinType28():
 	                  signed=True,  unsigned=False, floating_point=False)
 	test_builtin_type('long long a;', Kind.LONGLONG,
 	                  signed=True,  unsigned=False, floating_point=False)
-	test_builtin_type('__int128 a;', Kind.INT128,
-	                  signed=True,  unsigned=False, floating_point=False)
 	test_builtin_type('float a;', Kind.FLOAT,
 	                  signed=False, unsigned=False, floating_point=True)
 	test_builtin_type('double a;', Kind.DOUBLE,
 	                  signed=False, unsigned=False, floating_point=True)
 	test_builtin_type('long double a;', Kind.LONG_DOUBLE,
 	                  signed=False, unsigned=False, floating_point=True)
+
+def test_BuiltinType31():
+	Kind = libclang.TypeKind
+	try:
+		test_builtin_type('__int128 a;', Kind.INT128,
+		                  signed=True,  unsigned=False, floating_point=False)
+		test_builtin_type('unsigned __int128 a;', Kind.UINT128,
+		                  signed=False, unsigned=True,  floating_point=False)
+	except ParseError as e:
+		raise UnsupportedException(e)
 
 def test_Type29():
 	index = libclang.Index()
@@ -865,6 +874,7 @@ run(3.4, test_Cursor34)
 run(2.7, test_Token)
 run(2.8, test_Type28)
 run(2.8, test_BuiltinType28)
+run(3.1, test_BuiltinType31)
 run(2.9, test_Type29)
 run(3.0, test_Type30)
 run(3.1, test_Type31)
