@@ -822,7 +822,7 @@ class Token:
 	def cursor(self):
 		# NOTE: This is doing what clang_annotateTokens does, but on one token only.
 		c = _libclang.clang_getCursor(self._tu._tu, self.location._sl)
-		return Cursor(c, None, self._tu)
+		return _cursor(c, None, self._tu)
 
 class TokenList:
 	@requires(2.7)
@@ -1235,7 +1235,7 @@ class Type:
 	@requires(2.8, 'clang_getTypeDeclaration', [_CXType], '_CXCursor')
 	def declaration(self):
 		c = _libclang.clang_getTypeDeclaration(self._t)
-		return Cursor(c, None, self._tu)
+		return _cursor(c, None, self._tu)
 
 	@property
 	@requires(2.8, 'clang_isPODType', [_CXType], c_uint)
@@ -1474,7 +1474,7 @@ class OverriddenCursors:
 
 	@requires(2.9)
 	def __getitem__(self, key):
-		return Cursor(self._cursors[key], None, self._tu)
+		return _cursor(self._cursors[key], None, self._tu)
 
 	@requires(2.9)
 	def __iter__(self):
@@ -1512,11 +1512,11 @@ NameRefFlags.WANT_SINGLE_PIECE = NameRefFlags(4) # 3.0
 
 class Cursor:
 	@requires(2.7)
-	def __init__(self, c, parent, tu):
+	def __init__(self, c, kind, parent, tu):
 		self._c = c
 		self._tu = tu
 		self.parent = parent
-		self.kind = CursorKind(c.kind)
+		self.kind = kind
 
 	@requires(2.7, 'clang_equalCursors', ['_CXCursor', '_CXCursor'], c_uint)
 	def __eq__(self, other):
@@ -1541,7 +1541,7 @@ class Cursor:
 	@requires(2.7, 'clang_getNullCursor', [], '_CXCursor')
 	def null():
 		c = _libclang.clang_getNullCursor()
-		return Cursor(c, None, None)
+		return _cursor(c, None, None)
 
 	@property
 	@requires(2.7)
@@ -1581,7 +1581,7 @@ class Cursor:
 	def children(self):
 		def visitor(child, parent_cursor, args):
 			(children, parent) = args
-			c = Cursor(child, parent, self._tu)
+			c = _cursor(child, parent, self._tu)
 			if c != Cursor.null():
 				children.append(c)
 			return 1 # continue
@@ -1605,13 +1605,13 @@ class Cursor:
 	@requires(2.7, 'clang_getCursorReferenced', ['_CXCursor'], '_CXCursor')
 	def referenced(self):
 		c = _libclang.clang_getCursorReferenced(self._c)
-		return Cursor(c, None, self._tu)
+		return _cursor(c, None, self._tu)
 
 	@property
 	@requires(2.7, 'clang_getCursorDefinition', ['_CXCursor'], '_CXCursor')
 	def definition(self):
 		c = _libclang.clang_getCursorDefinition(self._c)
-		return Cursor(c, None, self._tu)
+		return _cursor(c, None, self._tu)
 
 	@property
 	@requires(2.7, 'clang_isCursorDefinition', ['_CXCursor'], c_uint)
@@ -1669,7 +1669,7 @@ class Cursor:
 	@requires(2.8, 'clang_getSpecializedCursorTemplate', ['_CXCursor'], '_CXCursor')
 	def specialized_template(self):
 		c = _libclang.clang_getSpecializedCursorTemplate(self._c)
-		return Cursor(c, None, self._tu)
+		return _cursor(c, None, self._tu)
 
 	@property
 	@requires(2.8, 'clang_isVirtualBase', ['_CXCursor'], c_uint)
@@ -1685,13 +1685,13 @@ class Cursor:
 	@requires(2.9, 'clang_getCursorSemanticParent', ['_CXCursor'], '_CXCursor')
 	def semantic_parent(self):
 		c = _libclang.clang_getCursorSemanticParent(self._c)
-		return Cursor(c, None, self._tu)
+		return _cursor(c, None, self._tu)
 
 	@property
 	@requires(2.9, 'clang_getCursorLexicalParent', ['_CXCursor'], '_CXCursor')
 	def lexical_parent(self):
 		c = _libclang.clang_getCursorLexicalParent(self._c)
-		return Cursor(c, None, self._tu)
+		return _cursor(c, None, self._tu)
 
 	@property
 	@requires(2.9, 'clang_getIncludedFile', ['_CXCursor'], c_void_p)
@@ -1723,7 +1723,7 @@ class Cursor:
 	@requires(2.9, 'clang_getCanonicalCursor', ['_CXCursor'], '_CXCursor')
 	def canonical(self):
 		c = _libclang.clang_getCanonicalCursor(self._c)
-		return Cursor(c, None, self._tu)
+		return _cursor(c, None, self._tu)
 
 	@property
 	@requires(2.9, 'clang_getOverriddenCursors', ['_CXCursor', '_CXCursor**', POINTER(c_uint)])
@@ -1748,12 +1748,6 @@ class Cursor:
 	@requires(3.1, 'clang_getTypedefDeclUnderlyingType', ['_CXCursor'], _CXType)
 	def underlying_typedef_type(self):
 		t = _libclang.clang_getTypedefDeclUnderlyingType(self._c)
-		return _type(t, self._tu)
-
-	@property
-	@requires(3.1, 'clang_getEnumDeclIntegerType', ['_CXCursor'], _CXType)
-	def enum_type(self):
-		t = _libclang.clang_getEnumDeclIntegerType(self._c)
 		return _type(t, self._tu)
 
 	@property
@@ -1852,6 +1846,23 @@ class Cursor:
 	@requires(3.4, 'clang_CXXMethod_isPureVirtual', ['_CXCursor'], c_uint)
 	def is_pure_virtual(self):
 		return bool(_libclang.clang_CXXMethod_isPureVirtual(self._c))
+
+class EnumDecl(Cursor):
+	@requires(3.1)
+	def __init__(self, c, kind, parent, tu):
+		Cursor.__init__(self, c, kind, parent, tu)
+
+	@property
+	@requires(3.1, 'clang_getEnumDeclIntegerType', ['_CXCursor'], _CXType)
+	def enum_type(self):
+		t = _libclang.clang_getEnumDeclIntegerType(self._c)
+		return _type(t, self._tu)
+
+def _cursor(c, parent, tu):
+	kind = CursorKind(c.kind)
+	if kind == CursorKind.ENUM_DECL:
+		return EnumDecl(c, kind, parent, tu)
+	return Cursor(c, kind, parent, tu)
 
 class TranslationUnitFlags:
 	@requires(2.8)
@@ -2010,7 +2021,7 @@ class TranslationUnit:
 			c = _libclang.clang_getTranslationUnitCursor(self._tu)
 		else:
 			c = _libclang.clang_getCursor(self._tu, source_location._sl)
-		return Cursor(c, None, self)
+		return _cursor(c, None, self)
 
 	@requires(2.7, 'clang_tokenize', [c_void_p, _CXSourceRange, POINTER(POINTER(_CXToken)), POINTER(c_uint)])
 	def tokenize(self, srcrange):
