@@ -622,6 +622,28 @@ def test_Cursor31():
 	match_location(rng.start, 'cursor31.hpp', 1, 6, 5)
 	match_location(rng.end, 'cursor31.hpp', 1, 6, 5)
 
+def test_Cursor32():
+	c = parse_str('enum test {};', filename='cursor32.hpp')[0]
+	equals(c.is_dynamic_call, False)
+	equals(c.receiver_type.kind, libclang.TypeKind.INVALID)
+	match_location(c.comment_range.start, None, 0, 0, 0)
+	match_location(c.comment_range.end, None, 0, 0, 0)
+	equals(c.raw_comment, None)
+	equals(c.brief_comment, None)
+
+def test_Cursor33():
+	c = parse_str('enum test {};', filename='cursor33.hpp')[0]
+	equals(c.is_bit_field, False)
+	equals(c.bit_field_width, -1)
+	equals(c.is_variadic, False)
+	equals(c.objc_property_attributes, libclang.ObjCPropertyAttributes.NO_ATTR)
+	equals(c.objc_decl_qualifiers, libclang.ObjCDeclQualifierKind.NONE)
+
+def test_Cursor34():
+	c = parse_str('enum test {};', filename='cursor34.hpp')[0]
+	equals(c.is_objc_optional, False)
+	equals(c.is_pure_virtual, False)
+
 def test_EnumDecl31():
 	x, y, z = parse_str("""
 		enum x { a = 7 };
@@ -673,28 +695,6 @@ def test_TypedefDecl31():
 	equals(isinstance(x, libclang.TypedefDecl), True)
 	equals(x.underlying_type.kind, libclang.TypeKind.FLOAT)
 
-def test_Cursor32():
-	c = parse_str('enum test {};', filename='cursor32.hpp')[0]
-	equals(c.is_dynamic_call, False)
-	equals(c.receiver_type.kind, libclang.TypeKind.INVALID)
-	match_location(c.comment_range.start, None, 0, 0, 0)
-	match_location(c.comment_range.end, None, 0, 0, 0)
-	equals(c.raw_comment, None)
-	equals(c.brief_comment, None)
-
-def test_Cursor33():
-	c = parse_str('enum test {};', filename='cursor33.hpp')[0]
-	equals(c.is_bit_field, False)
-	equals(c.bit_field_width, -1)
-	equals(c.is_variadic, False)
-	equals(c.objc_property_attributes, libclang.ObjCPropertyAttributes.NO_ATTR)
-	equals(c.objc_decl_qualifiers, libclang.ObjCDeclQualifierKind.NONE)
-
-def test_Cursor34():
-	c = parse_str('enum test {};', filename='cursor34.hpp')[0]
-	equals(c.is_objc_optional, False)
-	equals(c.is_pure_virtual, False)
-
 def test_Token():
 	index = libclang.Index()
 	tu = index.from_source('tests/enumeration.hpp')
@@ -735,6 +735,37 @@ def test_Type28():
 	equals(t.result_type.kind, libclang.TypeKind.INVALID)
 	equals(t.declaration.kind, libclang.CursorKind.NO_DECL_FOUND)
 	equals(t.is_pod, True)
+
+def test_Type29():
+	c = parse_str('int a;')[0]
+	t = c.type
+	equals(t.is_const_qualified, False)
+	equals(t.is_volatile_qualified, False)
+	equals(t.is_restrict_qualified, False)
+
+def test_Type30():
+	c = parse_str('long a[4];')[0]
+	t = c.type
+	equals(t.array_element_type.kind, libclang.TypeKind.LONG)
+	equals(t.array_size, 4)
+
+def test_Type31():
+	c = parse_str('long a[4];')[0]
+	t = c.type
+	equals(len(list(t.argument_types)), 0)
+	equals(t.element_type.kind, libclang.TypeKind.LONG)
+	equals(t.element_count, 4)
+	equals(t.is_variadic, False)
+	equals(t.calling_convention, libclang.CallingConvention.INVALID)
+
+def test_Type33():
+	c = parse_str('short a[4];')[0]
+	t = c.type
+	equals(t.spelling, 'short [4]')
+	equals(str(t), 'short [4]')
+	equals(t.alignment, 2)
+	equals(t.size, 8)
+	equals(t.offset('a'), -1)
 
 def test_builtin_type(program, kind, args=None, ignore_errors=False, signed=False, unsigned=False, floating_point=False):
 	c = parse_str(program, args=args, ignore_errors=ignore_errors)[0]
@@ -797,37 +828,6 @@ def test_BuiltinType31():
 	                  signed=True,  unsigned=False, floating_point=False)
 	test_builtin_type('unsigned __int128 a;', Kind.UINT128,
 	                  signed=False, unsigned=True,  floating_point=False)
-
-def test_Type29():
-	c = parse_str('int a;')[0]
-	t = c.type
-	equals(t.is_const_qualified, False)
-	equals(t.is_volatile_qualified, False)
-	equals(t.is_restrict_qualified, False)
-
-def test_Type30():
-	c = parse_str('long a[4];')[0]
-	t = c.type
-	equals(t.array_element_type.kind, libclang.TypeKind.LONG)
-	equals(t.array_size, 4)
-
-def test_Type31():
-	c = parse_str('long a[4];')[0]
-	t = c.type
-	equals(len(list(t.argument_types)), 0)
-	equals(t.element_type.kind, libclang.TypeKind.LONG)
-	equals(t.element_count, 4)
-	equals(t.is_variadic, False)
-	equals(t.calling_convention, libclang.CallingConvention.INVALID)
-
-def test_Type33():
-	c = parse_str('short a[4];')[0]
-	t = c.type
-	equals(t.spelling, 'short [4]')
-	equals(str(t), 'short [4]')
-	equals(t.alignment, 2)
-	equals(t.size, 8)
-	equals(t.offset('a'), -1)
 
 def test_FunctionProtoType34():
 	s = parse_str("""
@@ -912,20 +912,20 @@ run(2.8, test_Cursor28)
 run(2.9, test_Cursor29)
 run(3.0, test_Cursor30)
 run(3.1, test_Cursor31)
-run(3.1, test_EnumDecl31)
-run(3.1, test_EnumConstantDecl31)
-run(3.1, test_TypedefDecl31)
 run(3.2, test_Cursor32)
 run(3.3, test_Cursor33)
 run(3.4, test_Cursor34)
+run(3.1, test_EnumDecl31)
+run(3.1, test_EnumConstantDecl31)
+run(3.1, test_TypedefDecl31)
 run(2.7, test_Token)
 run(2.8, test_Type28)
-run(2.8, test_BuiltinType28)
-run(3.1, test_BuiltinType31)
 run(2.9, test_Type29)
 run(3.0, test_Type30)
 run(3.1, test_Type31)
 run(3.3, test_Type33)
+run(2.8, test_BuiltinType28)
+run(3.1, test_BuiltinType31)
 run(3.4, test_FunctionProtoType34)
 run(3.4, test_MemberPointerType34)
 
