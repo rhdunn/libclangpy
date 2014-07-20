@@ -2093,6 +2093,8 @@ class Index:
 		argc, argv = _marshall_args(args)
 		unsavedc, unsavedv = _marshall_unsaved_files(unsaved_files)
 		tu = _libclang.clang_createTranslationUnitFromSourceFile(self._index, filename, argc, argv, unsavedc, unsavedv)
+		if not tu:
+			return None
 		return TranslationUnit(tu, self)
 
 	@requires(2.8, 'clang_parseTranslationUnit', [c_void_p, c_utf8_p, POINTER(c_utf8_p), c_uint, POINTER(_CXUnsavedFile), c_uint, c_uint], c_void_p)

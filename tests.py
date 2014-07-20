@@ -412,7 +412,14 @@ def test_Index():
 	equals(len(list(tu.diagnostics)), 0)
 	# unsaved files
 	tu = index.from_source('unsaved.hxx', unsaved_files=[('unsaved.hxx', 'struct test {};')])
-	equals(tu.spelling, '')
+	equals(tu, None)
+	# unsaved files
+	tu = index.from_source('unsaved.hpp', unsaved_files=[('unsaved.hpp', 'struct test {};')])
+	equals(tu.spelling, 'unsaved.hpp')
+	equals(len(list(tu.diagnostics)), 0)
+	# unsaved files
+	tu = index.from_source('unsaved.cpp', unsaved_files=[('unsaved.cpp', 'struct test {};')])
+	equals(tu.spelling, 'unsaved.cpp')
 	equals(len(list(tu.diagnostics)), 0)
 
 def test_Index28():
