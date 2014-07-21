@@ -107,6 +107,10 @@ def match_location(loc, filename, line, column, offset):
 	equals(loc.column, column)
 	equals(loc.offset, offset)
 
+def match_tokens(a, b):
+	tokens = [str(t) for t in a]
+	equals(tokens, b)
+
 def test_version():
 	oneof(libclang.version, [2.7, 2.8, 2.9, 3.0, 3.1, 3.2, 3.3, 3.4, 3.5])
 
@@ -569,9 +573,20 @@ def test_Cursor():
 	equals(children[0].kind, libclang.CursorKind.ENUM_CONSTANT_DECL)
 	equals(children[0].parent, c)
 	# tokens
-	c = parse_str('enum test { x, y };')[0]
-	tokens = [str(t) for t in c.tokens]
-	equals(tokens, ['enum', 'test', '{', 'x', ',', 'y', '}', ';'])
+	c = parse_str('enum test { x, y = 3, z };')[0]
+	x, y, z = c.children
+	match_tokens(c.tokens, ['enum', 'test', '{', 'x', ',', 'y', '=', '3', ',', 'z', '}', ';'])
+	match_tokens(x.tokens, ['x', ','])
+	match_tokens(y.tokens, ['y', '=', '3', ','])
+	match_tokens(z.tokens, ['z', '}'])
+	# tokens
+	c = parse_str('extern "C" void f(int x, int y);')[0]
+	f = c.children[0]
+	x, y = f.children
+	match_tokens(c.tokens, ['extern', '"C"', 'void', 'f', '(', 'int', 'x', ',', 'int', 'y', ')', ';'])
+	match_tokens(f.tokens, ['void', 'f', '(', 'int', 'x', ',', 'int', 'y', ')', ';'])
+	match_tokens(x.tokens, ['int', 'x', ','])
+	match_tokens(y.tokens, ['int', 'y', ')'])
 
 def test_Cursor28():
 	c = parse_str('enum test {};')[0]
