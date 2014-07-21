@@ -1624,6 +1624,15 @@ class Cursor:
 		return self._tu.tokenize(self.extent)
 
 	@property
+	@requires(2.7)
+	def tokens_left_of_children(self):
+		children = self.children
+		if len(children) == 0:
+			return self._tu.tokenize(self.extent)
+		end = children[0].extent.start
+		return self._tu.tokenize(SourceRange(self.extent.start, end))
+
+	@property
 	@requires(2.8, 'clang_getCursorType', ['_CXCursor'], _CXType)
 	def type(self):
 		t = _libclang.clang_getCursorType(self._c)
