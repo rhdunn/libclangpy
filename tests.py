@@ -569,9 +569,9 @@ def test_Cursor():
 	equals(children[0].kind, libclang.CursorKind.ENUM_CONSTANT_DECL)
 	equals(children[0].parent, c)
 	# tokens
-	tokens = list(c.tokens)
-	equals(len(tokens), 8)
-	equals(tokens[0].kind, libclang.TokenKind.KEYWORD)
+	c = parse_str('enum test { x, y };')[0]
+	tokens = [str(t) for t in c.tokens]
+	equals(tokens, ['enum', 'test', '{', 'x', ',', 'y', '}', ';'])
 
 def test_Cursor28():
 	c = parse_str('enum test {};')[0]
