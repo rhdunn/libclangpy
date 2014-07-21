@@ -1828,6 +1828,29 @@ class Cursor:
 	def is_pure_virtual(self):
 		return bool(_libclang.clang_CXXMethod_isPureVirtual(self._c))
 
+class RecordDecl(Cursor):
+	@requires(2.7)
+	def __init__(self, c, kind, parent, tu):
+		Cursor.__init__(self, c, kind, parent, tu)
+
+class StructDecl(RecordDecl):
+	@requires(2.7)
+	def __init__(self, c, kind, parent, tu):
+		RecordDecl.__init__(self, c, kind, parent, tu)
+
+class UnionDecl(RecordDecl):
+	@requires(2.7)
+	def __init__(self, c, kind, parent, tu):
+		RecordDecl.__init__(self, c, kind, parent, tu)
+
+class ClassDecl(RecordDecl):
+	@requires(2.7)
+	def __init__(self, c, kind, parent, tu):
+		RecordDecl.__init__(self, c, kind, parent, tu)
+
+# NOTE: The clang C++ API groups an EnumDecl as a record type, but an enumeration
+# does not support fields, methods, etc. like the other record types -- it only
+# supports enumeration constants. Thus, EnumDecl does not inherit from RecordDecl.
 class EnumDecl(Cursor):
 	@requires(2.7)
 	def __init__(self, c, kind, parent, tu):
@@ -1858,6 +1881,71 @@ class EnumConstantDecl(Cursor):
 			return _libclang.clang_getEnumConstantDeclUnsignedValue(self._c)
 		return _libclang.clang_getEnumConstantDeclValue(self._c)
 
+class FunctionDecl(Cursor):
+	@requires(2.7)
+	def __init__(self, c, kind, parent, tu):
+		Cursor.__init__(self, c, kind, parent, tu)
+
+class VarDecl(Cursor):
+	@requires(2.7)
+	def __init__(self, c, kind, parent, tu):
+		Cursor.__init__(self, c, kind, parent, tu)
+
+class FieldDecl(VarDecl):
+	@requires(2.7)
+	def __init__(self, c, kind, parent, tu):
+		VarDecl.__init__(self, c, kind, parent, tu)
+
+class ParmDecl(VarDecl):
+	@requires(2.7)
+	def __init__(self, c, kind, parent, tu):
+		VarDecl.__init__(self, c, kind, parent, tu)
+
+class ObjCInterfaceDecl(Cursor):
+	@requires(2.7)
+	def __init__(self, c, kind, parent, tu):
+		Cursor.__init__(self, c, kind, parent, tu)
+
+class ObjCCategoryDecl(Cursor):
+	@requires(2.7)
+	def __init__(self, c, kind, parent, tu):
+		Cursor.__init__(self, c, kind, parent, tu)
+
+class ObjCProtocolDecl(Cursor):
+	@requires(2.7)
+	def __init__(self, c, kind, parent, tu):
+		Cursor.__init__(self, c, kind, parent, tu)
+
+class ObjCPropertyDecl(Cursor):
+	@requires(2.7)
+	def __init__(self, c, kind, parent, tu):
+		Cursor.__init__(self, c, kind, parent, tu)
+
+class ObjCIvarDecl(FieldDecl):
+	@requires(2.7)
+	def __init__(self, c, kind, parent, tu):
+		FieldDecl.__init__(self, c, kind, parent, tu)
+
+class ObjCInstanceMethodDecl(FunctionDecl):
+	@requires(2.7)
+	def __init__(self, c, kind, parent, tu):
+		FunctionDecl.__init__(self, c, kind, parent, tu)
+
+class ObjCClassMethodDecl(FunctionDecl):
+	@requires(2.7)
+	def __init__(self, c, kind, parent, tu):
+		FunctionDecl.__init__(self, c, kind, parent, tu)
+
+class ObjCImplementationDecl(Cursor):
+	@requires(2.7)
+	def __init__(self, c, kind, parent, tu):
+		Cursor.__init__(self, c, kind, parent, tu)
+
+class ObjCCategoryImplDecl(Cursor):
+	@requires(2.7)
+	def __init__(self, c, kind, parent, tu):
+		Cursor.__init__(self, c, kind, parent, tu)
+
 class TypedefDecl(Cursor):
 	@requires(2.7)
 	def __init__(self, c, kind, parent, tu):
@@ -1870,8 +1958,24 @@ class TypedefDecl(Cursor):
 		return _type(t, self._tu)
 
 _cursor_kinds = {
+	CursorKind.STRUCT_DECL: StructDecl,
+	CursorKind.UNION_DECL: UnionDecl,
+	CursorKind.CLASS_DECL: ClassDecl,
 	CursorKind.ENUM_DECL: EnumDecl,
+	CursorKind.FIELD_DECL: FieldDecl,
 	CursorKind.ENUM_CONSTANT_DECL: EnumConstantDecl,
+	CursorKind.FUNCTION_DECL: FunctionDecl,
+	CursorKind.VAR_DECL: VarDecl,
+	CursorKind.PARM_DECL: ParmDecl,
+	CursorKind.OBJC_INTERFACE_DECL: ObjCInterfaceDecl,
+	CursorKind.OBJC_CATEGORY_DECL: ObjCCategoryDecl,
+	CursorKind.OBJC_PROTOCOL_DECL: ObjCProtocolDecl,
+	CursorKind.OBJC_PROPERTY_DECL: ObjCPropertyDecl,
+	CursorKind.OBJC_IVAR_DECL: ObjCIvarDecl,
+	CursorKind.OBJC_INSTANCE_METHOD_DECL: ObjCInstanceMethodDecl,
+	CursorKind.OBJC_CLASS_METHOD_DECL: ObjCClassMethodDecl,
+	CursorKind.OBJC_IMPLEMENTATION_DECL: ObjCImplementationDecl,
+	CursorKind.OBJC_CATEGORY_IMPL_DECL: ObjCCategoryImplDecl,
 	CursorKind.TYPEDEF_DECL: TypedefDecl,
 }
 
