@@ -115,6 +115,7 @@ def match_type(a, b):
 	equals(a.kind, b)
 
 def match_cursor(a, b):
+	equals(isinstance(a, libclang.Cursor), True)
 	if a.kind in [libclang.CursorKind.UNEXPOSED_DECL,
 	              libclang.CursorKind.UNEXPOSED_EXPR,
 	              libclang.CursorKind.UNEXPOSED_STMT,
@@ -684,7 +685,6 @@ def test_StructDecl27():
 	x = parse_str('struct x { int a; };')[0]
 	# x
 	match_cursor(x, libclang.CursorKind.STRUCT_DECL)
-	equals(isinstance(x, libclang.Cursor), True)
 	equals(isinstance(x, libclang.RecordDecl), True)
 	equals(isinstance(x, libclang.StructDecl), True)
 
@@ -692,7 +692,6 @@ def test_UnionDecl27():
 	x = parse_str('union x { int a; };')[0]
 	# x
 	match_cursor(x, libclang.CursorKind.UNION_DECL)
-	equals(isinstance(x, libclang.Cursor), True)
 	equals(isinstance(x, libclang.RecordDecl), True)
 	equals(isinstance(x, libclang.UnionDecl), True)
 
@@ -700,7 +699,6 @@ def test_ClassDecl27():
 	x = parse_str('class x { int a; };')[0]
 	# x
 	match_cursor(x, libclang.CursorKind.CLASS_DECL)
-	equals(isinstance(x, libclang.Cursor), True)
 	equals(isinstance(x, libclang.RecordDecl), True)
 	equals(isinstance(x, libclang.ClassDecl), True)
 
@@ -708,7 +706,6 @@ def test_EnumDecl27():
 	x = parse_str('enum x { a = 7 };')[0]
 	# x
 	match_cursor(x, libclang.CursorKind.ENUM_DECL)
-	equals(isinstance(x, libclang.Cursor), True)
 	equals(isinstance(x, libclang.RecordDecl), False) # Does not support fields, methods, etc.
 	equals(isinstance(x, libclang.EnumDecl), True)
 	equals(x.is_enum_class, False)
@@ -719,12 +716,10 @@ def test_EnumDecl29():
 		enum class y : unsigned char { c };""", args=['-std=c++11'])
 	# x
 	match_cursor(x, libclang.CursorKind.ENUM_DECL)
-	equals(isinstance(x, libclang.Cursor), True)
 	equals(isinstance(x, libclang.EnumDecl), True)
 	equals(x.is_enum_class, True)
 	# y
 	match_cursor(y, libclang.CursorKind.ENUM_DECL)
-	equals(isinstance(y, libclang.Cursor), True)
 	equals(isinstance(y, libclang.EnumDecl), True)
 	equals(y.is_enum_class, True)
 
@@ -742,7 +737,6 @@ def test_FieldDecl27():
 	a = x.children[0]
 	# a
 	match_cursor(a, libclang.CursorKind.FIELD_DECL)
-	equals(isinstance(a, libclang.Cursor), True)
 	equals(isinstance(a, libclang.VarDecl), True)
 	equals(isinstance(a, libclang.FieldDecl), True)
 
@@ -751,7 +745,6 @@ def test_EnumConstantDecl27():
 	a = x.children[0]
 	# a
 	match_cursor(a, libclang.CursorKind.ENUM_CONSTANT_DECL)
-	equals(isinstance(a, libclang.Cursor), True)
 	equals(isinstance(a, libclang.EnumConstantDecl), True)
 	equals(a.type.kind, libclang.TypeKind.ENUM)
 
@@ -763,12 +756,10 @@ def test_EnumConstantDecl29():
 	b = y.children[0]
 	# a
 	match_cursor(a, libclang.CursorKind.ENUM_CONSTANT_DECL)
-	equals(isinstance(a, libclang.Cursor), True)
 	equals(isinstance(a, libclang.EnumConstantDecl), True)
 	equals(a.type.kind, libclang.TypeKind.ENUM)
 	# b
 	match_cursor(b, libclang.CursorKind.ENUM_CONSTANT_DECL)
-	equals(isinstance(b, libclang.Cursor), True)
 	equals(isinstance(b, libclang.EnumConstantDecl), True)
 	equals(b.type.kind, libclang.TypeKind.ENUM)
 
@@ -785,14 +776,12 @@ def test_FunctionDecl27():
 	f = parse_str('void f(int x);')[0]
 	# f
 	match_cursor(f, libclang.CursorKind.FUNCTION_DECL)
-	equals(isinstance(f, libclang.Cursor), True)
 	equals(isinstance(f, libclang.FunctionDecl), True)
 
 def test_VarDecl27():
 	x = parse_str('int x;')[0]
 	# x
 	match_cursor(x, libclang.CursorKind.VAR_DECL)
-	equals(isinstance(x, libclang.Cursor), True)
 	equals(isinstance(x, libclang.VarDecl), True)
 
 def test_ParmDecl27():
@@ -800,7 +789,6 @@ def test_ParmDecl27():
 	x = f.children[0]
 	# x
 	match_cursor(x, libclang.CursorKind.PARM_DECL)
-	equals(isinstance(x, libclang.Cursor), True)
 	equals(isinstance(x, libclang.VarDecl), True)
 	equals(isinstance(x, libclang.ParmDecl), True)
 
@@ -808,7 +796,6 @@ def test_ObjCInterfaceDecl27():
 	x = parse_str('@interface x @end', args=['-ObjC'])[0]
 	# x
 	match_cursor(x, libclang.CursorKind.OBJC_INTERFACE_DECL)
-	equals(isinstance(x, libclang.Cursor), True)
 	equals(isinstance(x, libclang.ObjCInterfaceDecl), True)
 
 def test_ObjCCategoryDecl27():
@@ -817,14 +804,12 @@ def test_ObjCCategoryDecl27():
 		@interface x (c) @end""", args=['-ObjC'])
 	# c
 	match_cursor(c, libclang.CursorKind.OBJC_CATEGORY_DECL)
-	equals(isinstance(c, libclang.Cursor), True)
 	equals(isinstance(c, libclang.ObjCCategoryDecl), True)
 
 def test_ObjCProtocolDecl27():
 	x = parse_str('@protocol x @end', args=['-ObjC'])[0]
 	# x
 	match_cursor(x, libclang.CursorKind.OBJC_PROTOCOL_DECL)
-	equals(isinstance(x, libclang.Cursor), True)
 	equals(isinstance(x, libclang.ObjCProtocolDecl), True)
 
 def test_ObjCPropertyDecl27():
@@ -832,7 +817,6 @@ def test_ObjCPropertyDecl27():
 	a = x.children[0]
 	# x
 	match_cursor(a, libclang.CursorKind.OBJC_PROPERTY_DECL)
-	equals(isinstance(a, libclang.Cursor), True)
 	equals(isinstance(a, libclang.ObjCPropertyDecl), True)
 
 def test_ObjCIvarDecl27():
@@ -840,7 +824,6 @@ def test_ObjCIvarDecl27():
 	a = x.children[0]
 	# x
 	match_cursor(a, libclang.CursorKind.OBJC_IVAR_DECL)
-	equals(isinstance(a, libclang.Cursor), True)
 	equals(isinstance(a, libclang.VarDecl), True)
 	equals(isinstance(a, libclang.FieldDecl), True)
 	equals(isinstance(a, libclang.ObjCIvarDecl), True)
@@ -850,7 +833,6 @@ def test_ObjCInstanceMethodDecl27():
 	a = x.children[0]
 	# x
 	match_cursor(a, libclang.CursorKind.OBJC_INSTANCE_METHOD_DECL)
-	equals(isinstance(a, libclang.Cursor), True)
 	equals(isinstance(a, libclang.FunctionDecl), True)
 	equals(isinstance(a, libclang.ObjCInstanceMethodDecl), True)
 
@@ -859,7 +841,6 @@ def test_ObjCClassMethodDecl27():
 	a = x.children[0]
 	# x
 	match_cursor(a, libclang.CursorKind.OBJC_CLASS_METHOD_DECL)
-	equals(isinstance(a, libclang.Cursor), True)
 	equals(isinstance(a, libclang.FunctionDecl), True)
 	equals(isinstance(a, libclang.ObjCClassMethodDecl), True)
 
@@ -869,7 +850,6 @@ def test_ObjCImplementationDecl27():
 		@implementation x @end""", args=['-ObjC', '-Wno-objc-root-class'])
 	# x
 	match_cursor(x, libclang.CursorKind.OBJC_IMPLEMENTATION_DECL)
-	equals(isinstance(x, libclang.Cursor), True)
 	equals(isinstance(x, libclang.ObjCImplementationDecl), True)
 
 def test_ObjCCategoryImplDecl27():
@@ -878,13 +858,11 @@ def test_ObjCCategoryImplDecl27():
 		@implementation x (c) @end""", args=['-ObjC', '-Wno-objc-root-class'])
 	# x
 	match_cursor(x, libclang.CursorKind.OBJC_CATEGORY_IMPL_DECL)
-	equals(isinstance(x, libclang.Cursor), True)
 	equals(isinstance(x, libclang.ObjCCategoryImplDecl), True)
 
 def test_TypedefDecl27():
 	x = parse_str('typedef float x;')[0]
 	match_cursor(x, libclang.CursorKind.TYPEDEF_DECL)
-	equals(isinstance(x, libclang.Cursor), True)
 	equals(isinstance(x, libclang.TypedefDecl), True)
 
 def test_TypedefDecl31():
@@ -896,7 +874,6 @@ def test_MethodDecl28():
 	f = x.children[0]
 	# f
 	match_cursor(f, libclang.CursorKind.CXX_METHOD_DECL)
-	equals(isinstance(f, libclang.Cursor), True)
 	equals(isinstance(f, libclang.FunctionDecl), True)
 	equals(isinstance(f, libclang.MethodDecl), True)
 
@@ -904,7 +881,6 @@ def test_Namespace28():
 	x = parse_str('namespace x {}')[0]
 	# x
 	match_cursor(x, libclang.CursorKind.NAMESPACE)
-	equals(isinstance(x, libclang.Cursor), True)
 	equals(isinstance(x, libclang.Namespace), True)
 
 def test_LinkageSpec28():
