@@ -1274,7 +1274,7 @@ class Type:
 	def argument_types(self):
 		for i in range(0, _libclang.clang_getNumArgTypes(self._t)):
 			t = _libclang.clang_getArgTypel(self._t, i)
-			yield Type(t, self._tu)
+			yield _type(t, self._tu)
 
 	@property
 	@requires(3.1, 'clang_getElementType', [_CXType], _CXType)
