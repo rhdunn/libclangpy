@@ -1,7 +1,7 @@
 # libclangpy 3.4
 
-The libclangpy project is a Python binding to the libclang 3.4 API. It differs
-from the cindex bindings from LLVM/clang in that it:
+The libclangpy project is a Python binding to the libclang 2.7 to 3.4 API. It
+differs from the cindex bindings from LLVM/clang in that it:
 
 1.  is a more complete libclang binding (see Implementation Status below);
 
@@ -12,6 +12,10 @@ from the cindex bindings from LLVM/clang in that it:
 4.  provides backward compatibility for several APIs;
 
 5.  supports Python 2 and Python 3.
+
+**NOTE:** The bindings have been tested with libclang 2.8 through to libclang
+3.5 to ensure compatibility. The bindings have not been tested with libclang
+2.7 due to issues getting LLVM/clang to build on modern systems.
 
 ## Using In Your Own Projects
 
