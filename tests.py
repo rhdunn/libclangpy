@@ -583,8 +583,15 @@ def test_Cursor():
 	c = parse_str('extern "C" void f(int x, int y);')[0]
 	f = c.children[0]
 	x, y = f.children
-	match_tokens(c.tokens, ['extern', '"C"', 'void', 'f', '(', 'int', 'x', ',', 'int', 'y', ')', ';'])
-	match_tokens(f.tokens, ['void', 'f', '(', 'int', 'x', ',', 'int', 'y', ')', ';'])
+	if libclang.version <= 2.8:
+		match_tokens(c.tokens, ['"C"', 'void'])
+		match_tokens(f.tokens, ['f', '(', 'int', 'x', ',', 'int', 'y', ')', ';'])
+	elif libclang.version == 2.9:
+		match_tokens(c.tokens, ['"C"', 'void', 'f', '(', 'int', 'x', ',', 'int', 'y', ')', ';'])
+		match_tokens(f.tokens, ['f', '(', 'int', 'x', ',', 'int', 'y', ')', ';'])
+	else:
+		match_tokens(c.tokens, ['extern', '"C"', 'void', 'f', '(', 'int', 'x', ',', 'int', 'y', ')', ';'])
+		match_tokens(f.tokens, ['void', 'f', '(', 'int', 'x', ',', 'int', 'y', ')', ';'])
 	match_tokens(x.tokens, ['int', 'x', ','])
 	match_tokens(y.tokens, ['int', 'y', ')'])
 
