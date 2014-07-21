@@ -543,44 +543,35 @@ def test_Diagnostic29():
 	equals(d.category_text, 'Parse Issue')
 
 def test_Cursor():
-	index = libclang.Index()
-	tu = index.from_source('tests/enumeration.hpp')
-	c = tu.cursor()
+	c = parse_str('enum test { a, b };', filename='tests/enumeration.hpp')[0]
 	equals(c == c, True)
 	equals(c == libclang.Cursor.null(), False)
 	equals(c != c, False)
 	equals(c != libclang.Cursor.null(), True)
 	equals(c.is_null, False)
 	equals(hash(c), hash(c))
-	equals(c.spelling, 'tests/enumeration.hpp')
-	equals(str(c), 'tests/enumeration.hpp')
-	equals(c.kind, libclang.CursorKind.TRANSLATION_UNIT)
-	equals(c.parent, None)
-	equals(c.linkage, libclang.Linkage.INVALID)
-	equals(c.location, libclang.SourceLocation.null())
-	if libclang.version >= 3.1:
-		match_location(c.extent.start, 'tests/enumeration.hpp', 1, 1, 0)
-		match_location(c.extent.end, 'tests/enumeration.hpp', 1, 1, 0)
-	else:
-		match_location(c.extent.start, None, 0, 0, 0)
-		match_location(c.extent.end, None, 0, 0, 0)
-	equals(c.usr, '')
-	equals(c.referenced, libclang.Cursor.null())
-	equals(c.definition, libclang.Cursor.null())
-	equals(c.is_definition, False)
-	equals(c.translation_unit.spelling, tu.spelling)
+	equals(c.spelling, 'test')
+	equals(str(c), 'test')
+	equals(c.kind, libclang.CursorKind.ENUM_DECL)
+	equals(c.parent.kind, libclang.CursorKind.TRANSLATION_UNIT)
+	equals(c.linkage, libclang.Linkage.EXTERNAL)
+	match_location(c.location, 'tests/enumeration.hpp', 1, 6, 5)
+	match_location(c.extent.start, 'tests/enumeration.hpp', 1, 1, 0)
+	match_location(c.extent.end, 'tests/enumeration.hpp', 1, 1, 0)
+	equals(c.usr, 'c:@E@test')
+	equals(c.referenced, c)
+	equals(c.definition, c)
+	equals(c.is_definition, True)
+	equals(c.translation_unit.spelling, 'tests/enumeration.hpp')
 	# children
 	children = [child for child in c.children if child.location.file]
-	equals(len(children), 1)
-	equals(children[0].kind, libclang.CursorKind.ENUM_DECL)
+	equals(len(children), 2)
+	equals(children[0].kind, libclang.CursorKind.ENUM_CONSTANT_DECL)
 	equals(children[0].parent, c)
 	# tokens
 	tokens = list(c.tokens)
-	if libclang.version >= 3.1:
-		equals(len(tokens), 11)
-		equals(tokens[0].kind, libclang.TokenKind.KEYWORD)
-	else:
-		equals(len(tokens), 0)
+	equals(len(tokens), 8)
+	equals(tokens[0].kind, libclang.TokenKind.KEYWORD)
 
 def test_Cursor28():
 	c = parse_str('enum test {};')[0]
