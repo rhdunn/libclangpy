@@ -644,55 +644,74 @@ def test_Cursor34():
 	equals(c.is_objc_optional, False)
 	equals(c.is_pure_virtual, False)
 
+def test_EnumDecl27():
+	x = parse_str('enum x { a = 7 };')[0]
+	# x
+	equals(isinstance(x, libclang.Cursor), True)
+	equals(isinstance(x, libclang.EnumDecl), True)
+	equals(x.is_enum_class, False)
+
+def test_EnumDecl29():
+	x, y = parse_str("""
+		enum class x { b };
+		enum class y : unsigned char { c };""", args=['-std=c++11'])
+	# x
+	equals(isinstance(x, libclang.Cursor), True)
+	equals(isinstance(x, libclang.EnumDecl), True)
+	equals(x.is_enum_class, True)
+	# y
+	equals(isinstance(y, libclang.Cursor), True)
+	equals(isinstance(y, libclang.EnumDecl), True)
+	equals(y.is_enum_class, True)
+
 def test_EnumDecl31():
 	x, y, z = parse_str("""
 		enum x { a = 7 };
 		enum class y { b };
 		enum class z : unsigned char { c };""", args=['-std=c++11'])
-	# x
-	equals(isinstance(x, libclang.Cursor), True)
-	equals(isinstance(x, libclang.EnumDecl), True)
 	equals(x.enum_type.kind, libclang.TypeKind.UINT)
-	equals(x.is_enum_class, False)
-	# y
-	equals(isinstance(y, libclang.Cursor), True)
-	equals(isinstance(y, libclang.EnumDecl), True)
 	equals(y.enum_type.kind, libclang.TypeKind.INT)
-	equals(y.is_enum_class, True)
-	# z
-	equals(isinstance(z, libclang.Cursor), True)
-	equals(isinstance(z, libclang.EnumDecl), True)
 	equals(z.enum_type.kind, libclang.TypeKind.UCHAR)
-	equals(z.is_enum_class, True)
+
+def test_EnumConstantDecl27():
+	x = parse_str('enum x { a = 7 };')[0]
+	a = x.children[0]
+	# a
+	equals(isinstance(a, libclang.Cursor), True)
+	equals(isinstance(a, libclang.EnumConstantDecl), True)
+	equals(a.type.kind, libclang.TypeKind.ENUM)
+
+def test_EnumConstantDecl29():
+	x, y = parse_str("""
+		enum class x : short { b = 2 };
+		enum class y : unsigned char { c = 158 };""", args=['-std=c++11'])
+	a = x.children[0]
+	b = y.children[0]
+	# a
+	equals(isinstance(a, libclang.Cursor), True)
+	equals(isinstance(a, libclang.EnumConstantDecl), True)
+	equals(a.type.kind, libclang.TypeKind.ENUM)
+	# b
+	equals(isinstance(b, libclang.Cursor), True)
+	equals(isinstance(b, libclang.EnumConstantDecl), True)
+	equals(b.type.kind, libclang.TypeKind.ENUM)
 
 def test_EnumConstantDecl31():
 	x, y, z = parse_str("""
 		enum x { a = 7 };
 		enum class y : short { b = 2 };
 		enum class z : unsigned char { c = 158 };""", args=['-std=c++11'])
-	a = x.children[0]
-	b = y.children[0]
-	c = z.children[0]
-	# a
-	equals(isinstance(a, libclang.Cursor), True)
-	equals(isinstance(a, libclang.EnumConstantDecl), True)
-	equals(a.type.kind, libclang.TypeKind.ENUM)
-	equals(a.enum_value, long(7))
-	# b
-	equals(isinstance(b, libclang.Cursor), True)
-	equals(isinstance(b, libclang.EnumConstantDecl), True)
-	equals(b.type.kind, libclang.TypeKind.ENUM)
-	equals(b.enum_value, 2)
-	# c
-	equals(isinstance(c, libclang.Cursor), True)
-	equals(isinstance(c, libclang.EnumConstantDecl), True)
-	equals(c.type.kind, libclang.TypeKind.ENUM)
-	equals(c.enum_value, long(158))
+	equals(x.children[0].enum_value, long(7))
+	equals(y.children[0].enum_value, 2)
+	equals(z.children[0].enum_value, long(158))
 
-def test_TypedefDecl31():
+def test_TypedefDecl27():
 	x = parse_str('typedef float x;')[0]
 	equals(isinstance(x, libclang.Cursor), True)
 	equals(isinstance(x, libclang.TypedefDecl), True)
+
+def test_TypedefDecl31():
+	x = parse_str('typedef float x;')[0]
 	equals(x.underlying_type.kind, libclang.TypeKind.FLOAT)
 
 def test_Token():
@@ -915,8 +934,13 @@ run(3.1, test_Cursor31)
 run(3.2, test_Cursor32)
 run(3.3, test_Cursor33)
 run(3.4, test_Cursor34)
+run(2.7, test_EnumDecl27)
+run(2.9, test_EnumDecl29) # C++11 enum class
 run(3.1, test_EnumDecl31)
+run(2.7, test_EnumConstantDecl27)
+run(2.9, test_EnumConstantDecl29) # C++11 enum class
 run(3.1, test_EnumConstantDecl31)
+run(2.7, test_TypedefDecl27)
 run(3.1, test_TypedefDecl31)
 run(2.7, test_Token)
 run(2.8, test_Type28)

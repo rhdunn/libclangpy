@@ -1829,7 +1829,7 @@ class Cursor:
 		return bool(_libclang.clang_CXXMethod_isPureVirtual(self._c))
 
 class EnumDecl(Cursor):
-	@requires(3.1)
+	@requires(2.7)
 	def __init__(self, c, kind, parent, tu):
 		Cursor.__init__(self, c, kind, parent, tu)
 
@@ -1840,13 +1840,13 @@ class EnumDecl(Cursor):
 		return _type(t, self._tu)
 
 	@property
-	@requires(3.1)
+	@requires(2.7)
 	def is_enum_class(self):
 		t = self.tokens[1]
 		return t.kind == TokenKind.KEYWORD and t.spelling == 'class'
 
 class EnumConstantDecl(Cursor):
-	@requires(3.1)
+	@requires(2.7)
 	def __init__(self, c, kind, parent, tu):
 		Cursor.__init__(self, c, kind, parent, tu)
 
@@ -1859,7 +1859,7 @@ class EnumConstantDecl(Cursor):
 		return _libclang.clang_getEnumConstantDeclValue(self._c)
 
 class TypedefDecl(Cursor):
-	@requires(3.1)
+	@requires(2.7)
 	def __init__(self, c, kind, parent, tu):
 		Cursor.__init__(self, c, kind, parent, tu)
 
