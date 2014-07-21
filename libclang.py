@@ -1869,15 +1869,18 @@ class TypedefDecl(Cursor):
 		t = _libclang.clang_getTypedefDeclUnderlyingType(self._c)
 		return _type(t, self._tu)
 
+_cursor_kinds = {
+	CursorKind.ENUM_DECL: EnumDecl,
+	CursorKind.ENUM_CONSTANT_DECL: EnumConstantDecl,
+	CursorKind.TYPEDEF_DECL: TypedefDecl,
+}
+
 def _cursor(c, parent, tu):
 	kind = CursorKind(c.kind)
-	if kind == CursorKind.ENUM_DECL:
-		return EnumDecl(c, kind, parent, tu)
-	if kind == CursorKind.ENUM_CONSTANT_DECL:
-		return EnumConstantDecl(c, kind, parent, tu)
-	if kind == CursorKind.TYPEDEF_DECL:
-		return TypedefDecl(c, kind, parent, tu)
-	return Cursor(c, kind, parent, tu)
+	try:
+		return _cursor_kinds[kind](c, kind, parent, tu)
+	except KeyError:
+		return Cursor(c, kind, parent, tu)
 
 class TranslationUnitFlags:
 	@requires(2.8)
