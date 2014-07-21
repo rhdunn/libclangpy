@@ -1874,7 +1874,7 @@ class EnumDecl(Cursor):
 	@property
 	@requires(2.7)
 	def is_enum_class(self):
-		t = self.tokens[1]
+		t = self.tokens_left_of_children[1]
 		return t.kind == TokenKind.KEYWORD and t.spelling == 'class'
 
 class EnumConstantDecl(Cursor):
