@@ -1886,6 +1886,11 @@ class FunctionDecl(Cursor):
 	def __init__(self, c, kind, parent, tu):
 		Cursor.__init__(self, c, kind, parent, tu)
 
+class MethodDecl(FunctionDecl):
+	@requires(2.8)
+	def __init__(self, c, kind, parent, tu):
+		FunctionDecl.__init__(self, c, kind, parent, tu)
+
 class VarDecl(Cursor):
 	@requires(2.7)
 	def __init__(self, c, kind, parent, tu):
@@ -1977,6 +1982,7 @@ _cursor_kinds = {
 	CursorKind.OBJC_IMPLEMENTATION_DECL: ObjCImplementationDecl,
 	CursorKind.OBJC_CATEGORY_IMPL_DECL: ObjCCategoryImplDecl,
 	CursorKind.TYPEDEF_DECL: TypedefDecl,
+	CursorKind.CXX_METHOD_DECL: MethodDecl,
 }
 
 def _cursor(c, parent, tu):
