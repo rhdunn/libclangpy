@@ -883,11 +883,11 @@ def test_Namespace28():
 	match_cursor(x, libclang.CursorKind.NAMESPACE)
 	equals(isinstance(x, libclang.Namespace), True)
 
-def test_LinkageSpec28():
+def test_LinkageSpec30():
 	s = parse_str('extern "C" void f(int x);')[0]
 	# s
-	equals(s.kind, libclang.CursorKind.UNEXPOSED_DECL)
-	equals(isinstance(s, libclang.Cursor), True)
+	match_cursor(s, libclang.CursorKind.LINKAGE_SPEC)
+	equals(isinstance(s, libclang.LinkageSpec), True)
 
 def test_Token():
 	index = libclang.Index()
@@ -1131,7 +1131,7 @@ run(2.7, test_TypedefDecl27)
 run(3.1, test_TypedefDecl31)
 run(2.8, test_MethodDecl28)
 run(2.8, test_Namespace28)
-run(2.8, test_LinkageSpec28)
+run(3.0, test_LinkageSpec30)
 run(2.7, test_Token)
 run(2.8, test_Type28)
 run(2.9, test_Type29)

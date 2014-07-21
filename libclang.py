@@ -1976,8 +1976,12 @@ class Namespace(Cursor):
 	def __init__(self, c, kind, parent, tu):
 		Cursor.__init__(self, c, kind, parent, tu)
 
+# Although CursorKind.LINKAGE_SPEC is defined in libclang 2.8, the implementation
+# does not expose it. The token API used to work around the bug has a bug of its
+# own in libclang 2.9 and earlier that cause the incorrect set of tokens to be
+# returned. Thus, this is only supported in libclang 3.0+.
 class LinkageSpec(Cursor):
-	@requires(2.8)
+	@requires(3.0)
 	def __init__(self, c, kind, parent, tu):
 		Cursor.__init__(self, c, kind, parent, tu)
 
@@ -2006,8 +2010,21 @@ _cursor_kinds = {
 	CursorKind.LINKAGE_SPEC: LinkageSpec,
 }
 
+def _is_linkage_spec(cursor):
+	tokens = cursor.tokens_left_of_children
+	if len(tokens) < 2:
+		return False
+	if tokens[0].kind != TokenKind.KEYWORD or tokens[0].spelling != 'extern':
+		return False
+	return tokens[1].kind == TokenKind.LITERAL
+
 def _cursor(c, parent, tu):
 	kind = CursorKind(c.kind)
+	if kind == CursorKind.UNEXPOSED_DECL:
+		# Try and detect unexposed declarations ...
+		cursor = Cursor(c, kind, parent, tu)
+		if _is_linkage_spec(cursor):
+			kind = CursorKind.LINKAGE_SPEC
 	try:
 		return _cursor_kinds[kind](c, kind, parent, tu)
 	except KeyError:
