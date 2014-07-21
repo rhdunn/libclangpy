@@ -1967,6 +1967,11 @@ class Namespace(Cursor):
 	def __init__(self, c, kind, parent, tu):
 		Cursor.__init__(self, c, kind, parent, tu)
 
+class LinkageSpec(Cursor):
+	@requires(2.8)
+	def __init__(self, c, kind, parent, tu):
+		Cursor.__init__(self, c, kind, parent, tu)
+
 _cursor_kinds = {
 	CursorKind.STRUCT_DECL: StructDecl,
 	CursorKind.UNION_DECL: UnionDecl,
@@ -1989,6 +1994,7 @@ _cursor_kinds = {
 	CursorKind.TYPEDEF_DECL: TypedefDecl,
 	CursorKind.CXX_METHOD_DECL: MethodDecl,
 	CursorKind.NAMESPACE: Namespace,
+	CursorKind.LINKAGE_SPEC: LinkageSpec,
 }
 
 def _cursor(c, parent, tu):
