@@ -859,6 +859,13 @@ def test_MethodDecl28():
 	equals(isinstance(f, libclang.MethodDecl), True)
 	equals(f.kind, libclang.CursorKind.CXX_METHOD_DECL)
 
+def test_Namespace28():
+	x = parse_str('namespace x {}')[0]
+	# x
+	equals(isinstance(x, libclang.Cursor), True)
+	equals(isinstance(x, libclang.Namespace), True)
+	equals(x.kind, libclang.CursorKind.NAMESPACE)
+
 def test_Token():
 	index = libclang.Index()
 	tu = index.from_source('tests/enumeration.hpp')
@@ -1103,6 +1110,7 @@ run(2.7, test_ObjCCategoryImplDecl27)
 run(2.7, test_TypedefDecl27)
 run(3.1, test_TypedefDecl31)
 run(2.8, test_MethodDecl28)
+run(2.8, test_Namespace28)
 run(2.7, test_Token)
 run(2.8, test_Type28)
 run(2.9, test_Type29)
