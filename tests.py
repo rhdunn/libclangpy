@@ -109,6 +109,7 @@ def match_tokens(a, b):
 	equals(tokens, b)
 
 def match_type(a, b):
+	equals(isinstance(a, libclang.Type), True)
 	if a.kind == libclang.TypeKind.UNEXPOSED:
 		raise UnsupportedException('type is not supported')
 	equals(a.kind, b)
@@ -988,7 +989,6 @@ def test_builtin_type(program, kind, args=None, ignore_errors=False, signed=Fals
 	c = parse_str(program, args=args, ignore_errors=ignore_errors)[0]
 	t = c.type
 	match_type(t, kind)
-	equals(isinstance(t, libclang.Type), True)
 	equals(isinstance(t, libclang.BuiltinType), True)
 	equals(t.is_signed_integer, signed)
 	equals(t.is_unsigned_integer, unsigned)
@@ -1058,21 +1058,18 @@ def test_FunctionProtoType34():
 	equals(f.spelling, 'f')
 	ft = f.type
 	match_type(ft, libclang.TypeKind.FUNCTION_PROTO)
-	equals(isinstance(ft, libclang.Type), True)
 	equals(isinstance(ft, libclang.FunctionProtoType), True)
 	equals(ft.cxx_ref_qualifier, libclang.RefQualifierKind.NONE)
 	# g -- const lvalue
 	equals(g.spelling, 'g')
 	gt = g.type
 	match_type(gt, libclang.TypeKind.FUNCTION_PROTO)
-	equals(isinstance(gt, libclang.Type), True)
 	equals(isinstance(gt, libclang.FunctionProtoType), True)
 	equals(gt.cxx_ref_qualifier, libclang.RefQualifierKind.LVALUE)
 	# g -- const rvalue
 	equals(h.spelling, 'h')
 	ht = h.type
 	match_type(ht, libclang.TypeKind.FUNCTION_PROTO)
-	equals(isinstance(ht, libclang.Type), True)
 	equals(isinstance(ht, libclang.FunctionProtoType), True)
 	equals(ht.cxx_ref_qualifier, libclang.RefQualifierKind.RVALUE)
 
@@ -1080,7 +1077,6 @@ def test_MemberPointerType34():
 	s, mp = parse_str('struct A{}; int *A::* b;')
 	t = mp.type
 	match_type(t, libclang.TypeKind.MEMBER_POINTER)
-	equals(isinstance(t, libclang.Type), True)
 	equals(isinstance(t, libclang.MemberPointerType), True)
 	equals(t.class_type.kind, libclang.TypeKind.RECORD)
 
