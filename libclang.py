@@ -1618,12 +1618,12 @@ class Cursor:
 	def is_definition(self):
 		return bool(_libclang.clang_isCursorDefinition(self._c))
 
-	@property
+	@cached_property
 	@requires(2.7)
 	def tokens(self):
 		return self._tu.tokenize(self.extent)
 
-	@property
+	@cached_property
 	@requires(2.7)
 	def tokens_left_of_children(self):
 		children = self.children
