@@ -817,7 +817,7 @@ class Token:
 		sr = _libclang.clang_getTokenExtent(self._tu._tu, self._t)
 		return SourceRange(sr, None)
 
-	@property
+	@cached_property
 	@requires(2.7, 'clang_getCursor', [c_void_p, _CXSourceLocation], '_CXCursor')
 	def cursor(self):
 		# NOTE: This is doing what clang_annotateTokens does, but on one token only.
@@ -1231,7 +1231,7 @@ class Type:
 		t = _libclang.clang_getResultType(self._t)
 		return _type(t, self._tu)
 
-	@property
+	@cached_property
 	@requires(2.8, 'clang_getTypeDeclaration', [_CXType], '_CXCursor')
 	def declaration(self):
 		c = _libclang.clang_getTypeDeclaration(self._t)
@@ -1576,7 +1576,7 @@ class Cursor:
 		sr = _libclang.clang_getCursorExtent(self._c)
 		return SourceRange(sr, None)
 
-	@property
+	@cached_property
 	@requires(2.7, 'clang_visitChildren', ['_CXCursor', 'cb_cursor_visitor', py_object], c_uint)
 	def children(self):
 		def visitor(child, parent_cursor, args):
@@ -1601,13 +1601,13 @@ class Cursor:
 		s = _libclang.clang_getCursorSpelling(self._c)
 		return _to_str(s)
 
-	@property
+	@cached_property
 	@requires(2.7, 'clang_getCursorReferenced', ['_CXCursor'], '_CXCursor')
 	def referenced(self):
 		c = _libclang.clang_getCursorReferenced(self._c)
 		return _cursor(c, None, self._tu)
 
-	@property
+	@cached_property
 	@requires(2.7, 'clang_getCursorDefinition', ['_CXCursor'], '_CXCursor')
 	def definition(self):
 		c = _libclang.clang_getCursorDefinition(self._c)
@@ -1674,7 +1674,7 @@ class Cursor:
 		kind = _libclang.clang_getTemplateCursorKind(self._c)
 		return CursorKind(kind)
 
-	@property
+	@cached_property
 	@requires(2.8, 'clang_getSpecializedCursorTemplate', ['_CXCursor'], '_CXCursor')
 	def specialized_template(self):
 		c = _libclang.clang_getSpecializedCursorTemplate(self._c)
@@ -1690,13 +1690,13 @@ class Cursor:
 	def is_static_method(self):
 		return bool(_libclang.clang_CXXMethod_isStatic(self._c))
 
-	@property
+	@cached_property
 	@requires(2.9, 'clang_getCursorSemanticParent', ['_CXCursor'], '_CXCursor')
 	def semantic_parent(self):
 		c = _libclang.clang_getCursorSemanticParent(self._c)
 		return _cursor(c, None, self._tu)
 
-	@property
+	@cached_property
 	@requires(2.9, 'clang_getCursorLexicalParent', ['_CXCursor'], '_CXCursor')
 	def lexical_parent(self):
 		c = _libclang.clang_getCursorLexicalParent(self._c)
@@ -1728,7 +1728,7 @@ class Cursor:
 		s = _libclang.clang_getCursorDisplayName(self._c)
 		return _to_str(s)
 
-	@property
+	@cached_property
 	@requires(2.9, 'clang_getCanonicalCursor', ['_CXCursor'], '_CXCursor')
 	def canonical(self):
 		c = _libclang.clang_getCanonicalCursor(self._c)
