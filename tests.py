@@ -22,10 +22,10 @@ import traceback
 
 import libclang
 
-class ParseError(Exception):
+class UnsupportedException(Exception):
 	pass
 
-class UnsupportedException(Exception):
+class ParseError(UnsupportedException):
 	pass
 
 if sys.version_info.major >= 3:
@@ -70,9 +70,6 @@ def run(version, test):
 			print('failed ... incorrect API binding')
 			_failed = _failed + 1
 	except UnsupportedException as e:
-		print('skipping ... {0}'.format(e))
-		_skipped = _skipped + 1
-	except ParseError as e:
 		if libclang.version < version:
 			print('skipping ... {0}'.format(e))
 			_skipped = _skipped + 1
@@ -110,6 +107,11 @@ def match_location(loc, filename, line, column, offset):
 def match_tokens(a, b):
 	tokens = [str(t) for t in a]
 	equals(tokens, b)
+
+def match_type(a, b):
+	if a.kind == libclang.TypeKind.UNEXPOSED:
+		raise UnsupportedException('type is not supported')
+	equals(a.kind, b)
 
 def test_version():
 	oneof(libclang.version, [2.7, 2.8, 2.9, 3.0, 3.1, 3.2, 3.3, 3.4, 3.5])
@@ -972,9 +974,9 @@ def test_Type33():
 def test_builtin_type(program, kind, args=None, ignore_errors=False, signed=False, unsigned=False, floating_point=False):
 	c = parse_str(program, args=args, ignore_errors=ignore_errors)[0]
 	t = c.type
+	match_type(t, kind)
 	equals(isinstance(t, libclang.Type), True)
 	equals(isinstance(t, libclang.BuiltinType), True)
-	equals(t.kind, kind)
 	equals(t.is_signed_integer, signed)
 	equals(t.is_unsigned_integer, unsigned)
 	equals(t.is_floating_point, floating_point)
@@ -1042,18 +1044,21 @@ def test_FunctionProtoType34():
 	# f -- no ref-qualifier
 	equals(f.spelling, 'f')
 	ft = f.type
+	match_type(ft, libclang.TypeKind.FUNCTION_PROTO)
 	equals(isinstance(ft, libclang.Type), True)
 	equals(isinstance(ft, libclang.FunctionProtoType), True)
 	equals(ft.cxx_ref_qualifier, libclang.RefQualifierKind.NONE)
 	# g -- const lvalue
 	equals(g.spelling, 'g')
 	gt = g.type
+	match_type(gt, libclang.TypeKind.FUNCTION_PROTO)
 	equals(isinstance(gt, libclang.Type), True)
 	equals(isinstance(gt, libclang.FunctionProtoType), True)
 	equals(gt.cxx_ref_qualifier, libclang.RefQualifierKind.LVALUE)
 	# g -- const rvalue
 	equals(h.spelling, 'h')
 	ht = h.type
+	match_type(ht, libclang.TypeKind.FUNCTION_PROTO)
 	equals(isinstance(ht, libclang.Type), True)
 	equals(isinstance(ht, libclang.FunctionProtoType), True)
 	equals(ht.cxx_ref_qualifier, libclang.RefQualifierKind.RVALUE)
@@ -1061,9 +1066,8 @@ def test_FunctionProtoType34():
 def test_MemberPointerType34():
 	s, mp = parse_str('struct A{}; int *A::* b;')
 	t = mp.type
+	match_type(t, libclang.TypeKind.MEMBER_POINTER)
 	equals(isinstance(t, libclang.Type), True)
-	if t.kind == libclang.TypeKind.UNEXPOSED:
-		raise UnsupportedException('MemberPointer type is not supported')
 	equals(isinstance(t, libclang.MemberPointerType), True)
 	equals(t.class_type.kind, libclang.TypeKind.RECORD)
 
