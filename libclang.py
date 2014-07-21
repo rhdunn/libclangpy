@@ -1213,19 +1213,19 @@ class Type:
 	def __str__(self):
 		return self.spelling
 
-	@property
+	@cached_property
 	@requires(2.8, 'clang_getCanonicalType', [_CXType], _CXType)
 	def canonical_type(self):
 		t = _libclang.clang_getCanonicalType(self._t)
 		return _type(t, self._tu)
 
-	@property
+	@cached_property
 	@requires(2.8, 'clang_getPointeeType', [_CXType], _CXType)
 	def pointee_type(self):
 		t = _libclang.clang_getPointeeType(self._t)
 		return _type(t, self._tu)
 
-	@property
+	@cached_property
 	@requires(2.8, 'clang_getResultType', [_CXType], _CXType)
 	def result_type(self):
 		t = _libclang.clang_getResultType(self._t)
@@ -1257,7 +1257,7 @@ class Type:
 	def is_restrict_qualified(self):
 		return bool(_libclang.clang_isRestrictQualifiedType(self._t))
 
-	@property
+	@cached_property
 	@requires(3.0, 'clang_getArrayElementType', [_CXType], _CXType)
 	def array_element_type(self):
 		t = _libclang.clang_getArrayElementType(self._t)
@@ -1276,7 +1276,7 @@ class Type:
 			t = _libclang.clang_getArgTypel(self._t, i)
 			yield _type(t, self._tu)
 
-	@property
+	@cached_property
 	@requires(3.1, 'clang_getElementType', [_CXType], _CXType)
 	def element_type(self):
 		t = _libclang.clang_getElementType(self._t)
@@ -1348,7 +1348,7 @@ class MemberPointerType(Type):
 	def __init__(self, t, kind, tu):
 		Type.__init__(self, t, kind, tu)
 
-	@property
+	@cached_property
 	@requires(3.4, 'clang_Type_getClassType', [_CXType], _CXType)
 	def class_type(self):
 		t = _libclang.clang_Type_getClassType(self._t)
@@ -1632,19 +1632,19 @@ class Cursor:
 		end = children[0].extent.start
 		return self._tu.tokenize(SourceRange(self.extent.start, end))
 
-	@property
+	@cached_property
 	@requires(2.8, 'clang_getCursorType', ['_CXCursor'], _CXType)
 	def type(self):
 		t = _libclang.clang_getCursorType(self._c)
 		return _type(t, self._tu)
 
-	@property
+	@cached_property
 	@requires(2.8, 'clang_getCursorResultType', ['_CXCursor'], _CXType)
 	def result_type(self):
 		t = _libclang.clang_getCursorResultType(self._c)
 		return _type(t, self._tu)
 
-	@property
+	@cached_property
 	@requires(2.8, 'clang_getIBOutletCollectionType', ['_CXCursor'], _CXType)
 	def ib_outlet_collection_type(self):
 		t = _libclang.clang_getIBOutletCollectionType(self._c)
@@ -1776,7 +1776,7 @@ class Cursor:
 	def is_dynamic_call(self):
 		return bool(_libclang.clang_Cursor_isDynamicCall(self._c))
 
-	@property
+	@cached_property
 	@requires(3.2, 'clang_Cursor_getReceiverType', ['_CXCursor'], _CXType)
 	def receiver_type(self):
 		t = _libclang.clang_Cursor_getReceiverType(self._c)
@@ -1865,7 +1865,7 @@ class EnumDecl(Cursor):
 	def __init__(self, c, kind, parent, tu):
 		Cursor.__init__(self, c, kind, parent, tu)
 
-	@property
+	@cached_property
 	@requires(3.1, 'clang_getEnumDeclIntegerType', ['_CXCursor'], _CXType)
 	def enum_type(self):
 		t = _libclang.clang_getEnumDeclIntegerType(self._c)
@@ -1965,7 +1965,7 @@ class TypedefDecl(Cursor):
 	def __init__(self, c, kind, parent, tu):
 		Cursor.__init__(self, c, kind, parent, tu)
 
-	@property
+	@cached_property
 	@requires(3.1, 'clang_getTypedefDeclUnderlyingType', ['_CXCursor'], _CXType)
 	def underlying_type(self):
 		t = _libclang.clang_getTypedefDeclUnderlyingType(self._c)
