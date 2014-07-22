@@ -1985,6 +1985,86 @@ class LinkageSpec(Cursor):
 	def __init__(self, c, kind, parent, tu):
 		Cursor.__init__(self, c, kind, parent, tu)
 
+class Constructor(MethodDecl):
+	@requires(2.8)
+	def __init__(self, c, kind, parent, tu):
+		MethodDecl.__init__(self, c, kind, parent, tu)
+
+class Destructor(MethodDecl):
+	@requires(2.8)
+	def __init__(self, c, kind, parent, tu):
+		MethodDecl.__init__(self, c, kind, parent, tu)
+
+class ConversionFunction(MethodDecl):
+	@requires(2.8)
+	def __init__(self, c, kind, parent, tu):
+		MethodDecl.__init__(self, c, kind, parent, tu)
+
+class ClassTemplate(RecordDecl):
+	@requires(2.8)
+	def __init__(self, c, kind, parent, tu):
+		RecordDecl.__init__(self, c, kind, parent, tu)
+
+class ClassTemplatePartialSpecialization(ClassTemplate):
+	@requires(2.8)
+	def __init__(self, c, kind, parent, tu):
+		ClassTemplate.__init__(self, c, kind, parent, tu)
+
+class FunctionTemplate(FunctionDecl):
+	@requires(2.8)
+	def __init__(self, c, kind, parent, tu):
+		FunctionDecl.__init__(self, c, kind, parent, tu)
+
+class TemplateTypeParameter(Cursor):
+	@requires(2.8)
+	def __init__(self, c, kind, parent, tu):
+		Cursor.__init__(self, c, kind, parent, tu)
+
+class NonTypeTemplateParameter(Cursor):
+	@requires(2.8)
+	def __init__(self, c, kind, parent, tu):
+		Cursor.__init__(self, c, kind, parent, tu)
+
+class TemplateTemplateParameter(Cursor):
+	@requires(2.8)
+	def __init__(self, c, kind, parent, tu):
+		Cursor.__init__(self, c, kind, parent, tu)
+
+class NamespaceAlias(Cursor):
+	@requires(2.8)
+	def __init__(self, c, kind, parent, tu):
+		Cursor.__init__(self, c, kind, parent, tu)
+
+class UsingDirective(Cursor):
+	@requires(2.8)
+	def __init__(self, c, kind, parent, tu):
+		Cursor.__init__(self, c, kind, parent, tu)
+
+class UsingDeclaration(Cursor):
+	@requires(2.8)
+	def __init__(self, c, kind, parent, tu):
+		Cursor.__init__(self, c, kind, parent, tu)
+
+class TypeAliasDecl(Cursor):
+	@requires(3.0)
+	def __init__(self, c, kind, parent, tu):
+		Cursor.__init__(self, c, kind, parent, tu)
+
+class ObjCSynthesizeDecl(Cursor):
+	@requires(3.0)
+	def __init__(self, c, kind, parent, tu):
+		Cursor.__init__(self, c, kind, parent, tu)
+
+class ObjCDynamicDecl(Cursor):
+	@requires(3.0)
+	def __init__(self, c, kind, parent, tu):
+		Cursor.__init__(self, c, kind, parent, tu)
+
+class CxxAccessSpecifier(Cursor):
+	@requires(3.0)
+	def __init__(self, c, kind, parent, tu):
+		Cursor.__init__(self, c, kind, parent, tu)
+
 _cursor_kinds = {
 	CursorKind.STRUCT_DECL: StructDecl,
 	CursorKind.UNION_DECL: UnionDecl,
@@ -2008,6 +2088,22 @@ _cursor_kinds = {
 	CursorKind.CXX_METHOD_DECL: MethodDecl,
 	CursorKind.NAMESPACE: Namespace,
 	CursorKind.LINKAGE_SPEC: LinkageSpec,
+	CursorKind.CONSTRUCTOR: Constructor,
+	CursorKind.DESTRUCTOR: Destructor,
+	CursorKind.CONVERSION_FUNCTION: ConversionFunction,
+	CursorKind.CLASS_TEMPLATE: ClassTemplate,
+	CursorKind.CLASS_TEMPLATE_PARTIAL_SPECIALIZATION: ClassTemplatePartialSpecialization,
+	CursorKind.FUNCTION_TEMPLATE: FunctionTemplate,
+	CursorKind.TEMPLATE_TYPE_PARAMETER: TemplateTypeParameter,
+	CursorKind.NON_TYPE_TEMPLATE_PARAMETER: NonTypeTemplateParameter,
+	CursorKind.TEMPLATE_TEMPLATE_PARAMETER: TemplateTemplateParameter,
+	CursorKind.NAMESPACE_ALIAS: NamespaceAlias,
+	CursorKind.USING_DIRECTIVE: UsingDirective,
+	CursorKind.USING_DECLARATION: UsingDeclaration,
+	CursorKind.TYPE_ALIAS_DECL: TypeAliasDecl,
+	CursorKind.OBJC_SYNTHESIZE_DECL: ObjCSynthesizeDecl,
+	CursorKind.OBJC_DYNAMIC_DECL: ObjCDynamicDecl,
+	CursorKind.CXX_ACCESS_SPECIFIER: CxxAccessSpecifier,
 }
 
 def _is_linkage_spec(cursor):

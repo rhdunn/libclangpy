@@ -883,11 +883,154 @@ def test_Namespace28():
 	match_cursor(x, libclang.CursorKind.NAMESPACE)
 	equals(isinstance(x, libclang.Namespace), True)
 
+def test_Constructor28():
+	x = parse_str('struct x { x(); };')[0]
+	f = x.children[0]
+	# f
+	match_cursor(f, libclang.CursorKind.CONSTRUCTOR)
+	equals(isinstance(f, libclang.FunctionDecl), True)
+	equals(isinstance(f, libclang.MethodDecl), True)
+	equals(isinstance(f, libclang.Constructor), True)
+
+def test_Destructor28():
+	x = parse_str('struct x { ~x(); };')[0]
+	f = x.children[0]
+	# f
+	match_cursor(f, libclang.CursorKind.DESTRUCTOR)
+	equals(isinstance(f, libclang.FunctionDecl), True)
+	equals(isinstance(f, libclang.MethodDecl), True)
+	equals(isinstance(f, libclang.Destructor), True)
+
+def test_ConversionFunction28():
+	x = parse_str('struct x { operator float(); };')[0]
+	f = x.children[0]
+	# f
+	match_cursor(f, libclang.CursorKind.CONVERSION_FUNCTION)
+	equals(isinstance(f, libclang.FunctionDecl), True)
+	equals(isinstance(f, libclang.MethodDecl), True)
+	equals(isinstance(f, libclang.ConversionFunction), True)
+
+def test_ClassTemplate28():
+	x = parse_str('template<typename T> struct x {};')[0]
+	# x
+	match_cursor(x, libclang.CursorKind.CLASS_TEMPLATE)
+	equals(isinstance(x, libclang.RecordDecl), True)
+	equals(isinstance(x, libclang.ClassTemplate), True)
+
+def test_ClassTemplatePartialSpecialization28():
+	xt, x = parse_str('template<typename T> struct x {}; template<typename T> struct x<T *> {};')
+	# x
+	match_cursor(x, libclang.CursorKind.CLASS_TEMPLATE_PARTIAL_SPECIALIZATION)
+	equals(isinstance(x, libclang.RecordDecl), True)
+	equals(isinstance(x, libclang.ClassTemplate), True)
+	equals(isinstance(x, libclang.ClassTemplatePartialSpecialization), True)
+
+def test_FunctionTemplate28():
+	f, x = parse_str('template<typename T> void f(); struct x { template <typename T> void g(); };')
+	g = x.children[0]
+	# f
+	match_cursor(f, libclang.CursorKind.FUNCTION_TEMPLATE)
+	equals(isinstance(f, libclang.FunctionDecl), True)
+	equals(isinstance(f, libclang.FunctionTemplate), True)
+	# g -- libclang does not have a CursorKind.METHOD_TEMPLATE ...
+	match_cursor(g, libclang.CursorKind.FUNCTION_TEMPLATE)
+	equals(isinstance(g, libclang.FunctionDecl), True)
+	equals(isinstance(g, libclang.FunctionTemplate), True)
+
+def test_TemplateTypeParameter28():
+	x = parse_str('template<typename T> struct x {};')[0]
+	t = x.children[0]
+	# t
+	match_cursor(t, libclang.CursorKind.TEMPLATE_TYPE_PARAMETER)
+	equals(isinstance(t, libclang.TemplateTypeParameter), True)
+
+def test_NonTypeTemplateParameter28():
+	x = parse_str('template<int T> struct x {};')[0]
+	t = x.children[0]
+	# t
+	match_cursor(t, libclang.CursorKind.NON_TYPE_TEMPLATE_PARAMETER)
+	equals(isinstance(t, libclang.NonTypeTemplateParameter), True)
+
+def test_TemplateTemplateParameter28():
+	x = parse_str('template<template<typename T> class U> struct x {};')[0]
+	u = x.children[0]
+	# u
+	match_cursor(u, libclang.CursorKind.TEMPLATE_TEMPLATE_PARAMETER)
+	equals(isinstance(u, libclang.TemplateTemplateParameter), True)
+
+def test_NamespaceAlias28():
+	x, y = parse_str('namespace x {} namespace y = x;')
+	# y
+	match_cursor(y, libclang.CursorKind.NAMESPACE_ALIAS)
+	equals(isinstance(y, libclang.NamespaceAlias), True)
+
+def test_UsingDirective28():
+	x, y = parse_str('namespace x { int a; } using namespace x;')
+	# y
+	match_cursor(y, libclang.CursorKind.USING_DIRECTIVE)
+	equals(isinstance(y, libclang.UsingDirective), True)
+
+def test_UsingDeclaration28():
+	x, y = parse_str('namespace x { int a; } using x::a;')
+	# y
+	match_cursor(y, libclang.CursorKind.USING_DECLARATION)
+	equals(isinstance(y, libclang.UsingDeclaration), True)
+
 def test_LinkageSpec30():
 	s = parse_str('extern "C" void f(int x);')[0]
 	# s
 	match_cursor(s, libclang.CursorKind.LINKAGE_SPEC)
 	equals(isinstance(s, libclang.LinkageSpec), True)
+
+def test_TypeAliasDecl30():
+	x, y = parse_str('struct x {}; using y = x;', args=['-std=c++11'])
+	# y
+	match_cursor(y, libclang.CursorKind.TYPE_ALIAS_DECL)
+	equals(isinstance(y, libclang.TypeAliasDecl), True)
+
+def test_ObjCSynthesizeDecl30():
+	i, x = parse_str("""
+		@interface x { int _a; } @property int a; @end
+		@implementation x @synthesize a=_a; @end""", args=['-ObjC', '-Wno-objc-root-class'])
+	a = x.children[0]
+	# a
+	match_cursor(a, libclang.CursorKind.OBJC_SYNTHESIZE_DECL)
+	equals(isinstance(a, libclang.ObjCSynthesizeDecl), True)
+
+def test_ObjCDynamicDecl30():
+	i, x = parse_str("""
+		@interface x { int _a; } @property int a; @end
+		@implementation x @dynamic a; @end""", args=['-ObjC', '-Wno-objc-root-class'])
+	a = x.children[0]
+	# a
+	match_cursor(a, libclang.CursorKind.OBJC_DYNAMIC_DECL)
+	equals(isinstance(a, libclang.ObjCDynamicDecl), True)
+
+def test_CxxAccessSpecifier30():
+	x = parse_str("""
+		struct x {
+			public:    int a;
+			protected: int b;
+			private:   int c;
+		};""")[0]
+	if libclang.version == 3.0:
+		# libclang 3.0 has a bug where the access specifier nodes are
+		# duplicated.
+		a, a2, a_, b, b2, b_, c, c2, c_ = x.children
+		match_cursor(a2, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
+		match_cursor(b2, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
+		match_cursor(c2, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
+	else:
+		a, a_, b, b_, c, c_ = x.children
+	# a
+	match_cursor(a, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
+	equals(isinstance(a, libclang.CxxAccessSpecifier), True)
+	# b
+	match_cursor(b, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
+	equals(isinstance(b, libclang.CxxAccessSpecifier), True)
+	# c
+	match_cursor(c, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
+	equals(isinstance(c, libclang.CxxAccessSpecifier), True)
 
 def test_Token():
 	index = libclang.Index()
@@ -1131,7 +1274,21 @@ run(2.7, test_TypedefDecl27)
 run(3.1, test_TypedefDecl31)
 run(2.8, test_MethodDecl28)
 run(2.8, test_Namespace28)
+run(2.8, test_Constructor28)
+run(2.8, test_Destructor28)
+run(2.8, test_ConversionFunction28)
+run(2.8, test_ClassTemplate28)
+run(2.8, test_ClassTemplatePartialSpecialization28)
+run(2.8, test_FunctionTemplate28)
+run(2.8, test_TemplateTypeParameter28)
+run(2.8, test_NonTypeTemplateParameter28)
+run(2.8, test_TemplateTemplateParameter28)
+run(2.8, test_NamespaceAlias28)
+run(2.8, test_UsingDirective28)
 run(3.0, test_LinkageSpec30)
+run(3.0, test_TypeAliasDecl30)
+run(3.0, test_ObjCSynthesizeDecl30)
+run(3.0, test_CxxAccessSpecifier30)
 run(2.7, test_Token)
 run(2.8, test_Type28)
 run(2.9, test_Type29)
