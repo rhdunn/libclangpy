@@ -678,7 +678,6 @@ def test_Cursor33():
 def test_Cursor34():
 	c = parse_str('enum test {};', filename='cursor34.hpp')[0]
 	equals(c.is_objc_optional, False)
-	equals(c.is_pure_virtual, False)
 
 def test_StructDecl27():
 	x = parse_str('struct x { int a; };')[0]
@@ -869,8 +868,14 @@ def test_TypedefDecl31():
 	equals(x.underlying_type.kind, libclang.TypeKind.FLOAT)
 
 def test_CxxMethodDecl28():
-	x = parse_str('struct x { void f(int x); static int g(); };')[0]
-	f, g = x.children
+	x = parse_str("""
+		struct x {
+			void f(int x);
+			static int g();
+			virtual void h() {};
+			virtual void i() = 0;
+		};""")[0]
+	f, g, h, i = x.children
 	# f
 	match_cursor(f, libclang.CursorKind.CXX_METHOD_DECL)
 	equals(isinstance(f, libclang.FunctionDecl), True)
@@ -878,11 +883,37 @@ def test_CxxMethodDecl28():
 	equals(isinstance(f, libclang.CxxMethodDecl), True)
 	equals(f.is_static, False)
 	# g
-	match_cursor(f, libclang.CursorKind.CXX_METHOD_DECL)
-	equals(isinstance(f, libclang.FunctionDecl), True)
-	equals(isinstance(f, libclang.MethodDecl), True)
-	equals(isinstance(f, libclang.CxxMethodDecl), True)
+	match_cursor(g, libclang.CursorKind.CXX_METHOD_DECL)
+	equals(isinstance(g, libclang.FunctionDecl), True)
+	equals(isinstance(g, libclang.MethodDecl), True)
+	equals(isinstance(g, libclang.CxxMethodDecl), True)
 	equals(g.is_static, True)
+	# h
+	match_cursor(h, libclang.CursorKind.CXX_METHOD_DECL)
+	equals(isinstance(h, libclang.FunctionDecl), True)
+	equals(isinstance(h, libclang.MethodDecl), True)
+	equals(isinstance(h, libclang.CxxMethodDecl), True)
+	equals(h.is_static, False)
+	# i
+	match_cursor(i, libclang.CursorKind.CXX_METHOD_DECL)
+	equals(isinstance(i, libclang.FunctionDecl), True)
+	equals(isinstance(i, libclang.MethodDecl), True)
+	equals(isinstance(i, libclang.CxxMethodDecl), True)
+	equals(i.is_static, False)
+
+def test_CxxMethodDecl34():
+	x = parse_str("""
+		struct x {
+			void f(int x);
+			static int g();
+			virtual void h() {};
+			virtual void i() = 0;
+		};""")[0]
+	f, g, h, i = x.children
+	equals(f.is_pure_virtual, False)
+	equals(g.is_pure_virtual, False)
+	equals(h.is_pure_virtual, False)
+	equals(i.is_pure_virtual, True)
 
 def test_Namespace28():
 	x = parse_str('namespace x {}')[0]
@@ -1280,6 +1311,7 @@ run(2.7, test_ObjCCategoryImplDecl27)
 run(2.7, test_TypedefDecl27)
 run(3.1, test_TypedefDecl31)
 run(2.8, test_CxxMethodDecl28)
+run(3.4, test_CxxMethodDecl34)
 run(2.8, test_Namespace28)
 run(2.8, test_Constructor28)
 run(2.8, test_Destructor28)

@@ -1827,11 +1827,6 @@ class Cursor:
 	def is_objc_optional(self):
 		return bool(_libclang.clang_Cursor_isObjCOptional(self._c))
 
-	@property
-	@requires(3.4, 'clang_CXXMethod_isPureVirtual', ['_CXCursor'], c_uint)
-	def is_pure_virtual(self):
-		return bool(_libclang.clang_CXXMethod_isPureVirtual(self._c))
-
 class RecordDecl(Cursor):
 	@requires(2.7)
 	def __init__(self, c, kind, parent, tu):
@@ -1904,6 +1899,11 @@ class CxxMethodDecl(MethodDecl):
 	@requires(2.8, 'clang_CXXMethod_isStatic', ['_CXCursor'], c_uint)
 	def is_static(self):
 		return bool(_libclang.clang_CXXMethod_isStatic(self._c))
+
+	@property
+	@requires(3.4, 'clang_CXXMethod_isPureVirtual', ['_CXCursor'], c_uint)
+	def is_pure_virtual(self):
+		return bool(_libclang.clang_CXXMethod_isPureVirtual(self._c))
 
 class VarDecl(Cursor):
 	@requires(2.7)
