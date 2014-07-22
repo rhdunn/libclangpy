@@ -1901,6 +1901,15 @@ class CxxMethodDecl(MethodDecl):
 		return bool(_libclang.clang_CXXMethod_isStatic(self._c))
 
 	@property
+	@requires(3.0)
+	def is_virtual(self):
+		if version <= 2.9:
+			# libclang 2.9 and earlier have a buggy tokenize implementation
+			raise MissingFunction('CxxMethodDecl.is_virtual is not supported in this version of libclang.')
+		tokens = self._tokens_left_of_children
+		return tokens[0].kind == TokenKind.KEYWORD and tokens[0].spelling == 'virtual'
+
+	@property
 	@requires(3.4, 'clang_CXXMethod_isPureVirtual', ['_CXCursor'], c_uint)
 	def is_pure_virtual(self):
 		return bool(_libclang.clang_CXXMethod_isPureVirtual(self._c))

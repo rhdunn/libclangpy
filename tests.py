@@ -889,6 +889,21 @@ def test_CxxMethodDecl28():
 	equals(isinstance(i, libclang.CxxMethodDecl), True)
 	equals(i.is_static, False)
 
+def test_CxxMethodDecl30():
+	x = parse_str("""
+		struct x {
+			void f(int x);
+			static int g();
+			virtual void h() {};
+			virtual void i() = 0;
+		};""")[0]
+	f, g, h, i = x.children
+	# is_virtual
+	equals(f.is_virtual, False)
+	equals(g.is_virtual, False)
+	equals(h.is_virtual, True)
+	equals(i.is_virtual, True)
+
 def test_CxxMethodDecl34():
 	x = parse_str("""
 		struct x {
@@ -898,6 +913,7 @@ def test_CxxMethodDecl34():
 			virtual void i() = 0;
 		};""")[0]
 	f, g, h, i = x.children
+	# is_pure_virtual
 	equals(f.is_pure_virtual, False)
 	equals(g.is_pure_virtual, False)
 	equals(h.is_pure_virtual, False)
@@ -1300,6 +1316,7 @@ run(2.7, test_ObjCCategoryImplDecl27)
 run(2.7, test_TypedefDecl27)
 run(3.1, test_TypedefDecl31)
 run(2.8, test_CxxMethodDecl28)
+run(3.0, test_CxxMethodDecl30)
 run(3.4, test_CxxMethodDecl34)
 run(2.8, test_Namespace28)
 run(2.8, test_Constructor28)
