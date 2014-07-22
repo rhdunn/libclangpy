@@ -1685,11 +1685,6 @@ class Cursor:
 	def is_virtual_base(self):
 		return bool(_libclang.clang_isVirtualBase(self._c))
 
-	@property
-	@requires(2.8, 'clang_CXXMethod_isStatic', ['_CXCursor'], c_uint)
-	def is_static_method(self):
-		return bool(_libclang.clang_CXXMethod_isStatic(self._c))
-
 	@cached_property
 	@requires(2.9, 'clang_getCursorSemanticParent', ['_CXCursor'], '_CXCursor')
 	def semantic_parent(self):
@@ -1904,6 +1899,11 @@ class CxxMethodDecl(MethodDecl):
 	@requires(2.8)
 	def __init__(self, c, kind, parent, tu):
 		MethodDecl.__init__(self, c, kind, parent, tu)
+
+	@property
+	@requires(2.8, 'clang_CXXMethod_isStatic', ['_CXCursor'], c_uint)
+	def is_static(self):
+		return bool(_libclang.clang_CXXMethod_isStatic(self._c))
 
 class VarDecl(Cursor):
 	@requires(2.7)

@@ -630,7 +630,6 @@ def test_Cursor28():
 	equals(c.template_kind, libclang.CursorKind.NO_DECL_FOUND)
 	equals(c.specialized_template.kind, libclang.CursorKind.INVALID_FILE)
 	equals(c.is_virtual_base, False)
-	equals(c.is_static_method, False)
 
 def test_Cursor29():
 	c = parse_str('enum test { a };')[0]
@@ -870,13 +869,20 @@ def test_TypedefDecl31():
 	equals(x.underlying_type.kind, libclang.TypeKind.FLOAT)
 
 def test_CxxMethodDecl28():
-	x = parse_str('struct x { void f(int x); };')[0]
-	f = x.children[0]
+	x = parse_str('struct x { void f(int x); static int g(); };')[0]
+	f, g = x.children
 	# f
 	match_cursor(f, libclang.CursorKind.CXX_METHOD_DECL)
 	equals(isinstance(f, libclang.FunctionDecl), True)
 	equals(isinstance(f, libclang.MethodDecl), True)
 	equals(isinstance(f, libclang.CxxMethodDecl), True)
+	equals(f.is_static, False)
+	# g
+	match_cursor(f, libclang.CursorKind.CXX_METHOD_DECL)
+	equals(isinstance(f, libclang.FunctionDecl), True)
+	equals(isinstance(f, libclang.MethodDecl), True)
+	equals(isinstance(f, libclang.CxxMethodDecl), True)
+	equals(g.is_static, True)
 
 def test_Namespace28():
 	x = parse_str('namespace x {}')[0]
