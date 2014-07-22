@@ -72,9 +72,17 @@ except:
 
 args = []
 filenames = []
+libclangpath = None
+is_libclang_arg = False
 for arg in argv:
-	if arg.startswith('--'):
-		args.append(arg)
+	if is_libclang_arg:
+		libclangpath = arg
+		is_libclang_arg = False
+	elif arg.startswith('--'):
+		if arg == '--libclang':
+			is_libclang_arg = True
+		else:
+			args.append(arg)
 	elif arg == '-':
 		pass
 	else:
@@ -89,7 +97,10 @@ else:
 restrict_to_input_file = '--only-input-file' in args
 print_types = '--print-types' in args
 
-libclang.load()
+if libclangpath:
+	libclang.load(name=libclangpath)
+else:
+	libclang.load()
 
 index = libclang.Index()
 
