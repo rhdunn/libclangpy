@@ -869,13 +869,14 @@ def test_TypedefDecl31():
 	x = parse_str('typedef float x;')[0]
 	equals(x.underlying_type.kind, libclang.TypeKind.FLOAT)
 
-def test_MethodDecl28():
+def test_CxxMethodDecl28():
 	x = parse_str('struct x { void f(int x); };')[0]
 	f = x.children[0]
 	# f
 	match_cursor(f, libclang.CursorKind.CXX_METHOD_DECL)
 	equals(isinstance(f, libclang.FunctionDecl), True)
 	equals(isinstance(f, libclang.MethodDecl), True)
+	equals(isinstance(f, libclang.CxxMethodDecl), True)
 
 def test_Namespace28():
 	x = parse_str('namespace x {}')[0]
@@ -1272,7 +1273,7 @@ run(2.7, test_ObjCImplementationDecl27)
 run(2.7, test_ObjCCategoryImplDecl27)
 run(2.7, test_TypedefDecl27)
 run(3.1, test_TypedefDecl31)
-run(2.8, test_MethodDecl28)
+run(2.8, test_CxxMethodDecl28)
 run(2.8, test_Namespace28)
 run(2.8, test_Constructor28)
 run(2.8, test_Destructor28)
