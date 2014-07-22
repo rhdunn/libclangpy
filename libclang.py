@@ -1625,7 +1625,7 @@ class Cursor:
 
 	@cached_property
 	@requires(2.7)
-	def tokens_left_of_children(self):
+	def _tokens_left_of_children(self):
 		children = self.children
 		if len(children) == 0:
 			return self._tu.tokenize(self.extent)
@@ -1864,7 +1864,7 @@ class EnumDecl(Cursor):
 	@property
 	@requires(2.7)
 	def is_enum_class(self):
-		t = self.tokens_left_of_children[1]
+		t = self._tokens_left_of_children[1]
 		return t.kind == TokenKind.KEYWORD and t.spelling == 'class'
 
 class EnumConstantDecl(Cursor):
@@ -2112,7 +2112,7 @@ _cursor_kinds = {
 }
 
 def _is_linkage_spec(cursor):
-	tokens = cursor.tokens_left_of_children
+	tokens = cursor._tokens_left_of_children
 	if len(tokens) < 2:
 		return False
 	if tokens[0].kind != TokenKind.KEYWORD or tokens[0].spelling != 'extern':
