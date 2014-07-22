@@ -26,6 +26,7 @@ def print_type(t, level=0, indentation='... ', cursors=set(), ctx=''):
 		return
 	sys.stdout.write('{0}{1}'.format(level * indentation, ctx))
 	sys.stdout.write('[{0}|{1}]'.format(t.kind.value, t.kind))
+	sys.stdout.write(' "{0}"'.format(t.spelling))
 	if t.canonical_type != t:
 		kind = t.canonical_type.kind
 		sys.stdout.write(' canonical=[{0}|{1}]'.format(kind.value, kind))
