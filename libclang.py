@@ -1067,6 +1067,21 @@ CursorKind.MS_ASM_STMT = CursorKind(229) # 3.2
 CursorKind.NULL_STMT = CursorKind(230) # 3.0
 CursorKind.DECL_STMT = CursorKind(231) # 3.0
 CursorKind.OMP_PARALLEL_DIRECTIVE = CursorKind(232) # 3.4
+CursorKind.OMP_SIMD_DIRECTIVE = CursorKind(233) # 3.5
+CursorKind.OMP_FOR_DIRECTIVE = CursorKind(234) # 3.5
+CursorKind.OMP_SECTIONS_DIRECTIVE = CursorKind(235) # 3.5
+CursorKind.OMP_SECTION_DIRECTIVE = CursorKind(236) # 3.5
+CursorKind.OMP_SINGLE_DIRECTIVE = CursorKind(237) # 3.5
+CursorKind.OMP_PARALLEL_FOR_DIRECTIVE = CursorKind(238) # 3.5
+CursorKind.OMP_PARALLEL_SECTIONS_DIRECTIVE = CursorKind(239) # 3.5
+CursorKind.OMP_TASK_DIRECTIVE = CursorKind(240) # 3.5
+CursorKind.OMP_MASTER_DIRECTIVE = CursorKind(241) # 3.5
+CursorKind.OMP_CRITICAL_DIRECTIVE = CursorKind(242) # 3.5
+CursorKind.OMP_TASKYIELD_DIRECTIVE = CursorKind(243) # 3.5
+CursorKind.OMP_BARRIER_DIRECTIVE = CursorKind(244) # 3.5
+CursorKind.OMP_TASKWAIT_DIRECTIVE = CursorKind(245) # 3.5
+CursorKind.OMP_FLUSH_DIRECTIVE = CursorKind(246) # 3.5
+CursorKind.SEH_LEAVE_STMT = CursorKind(247) # 3.5
 
 CursorKind.TRANSLATION_UNIT = CursorKind(300) # 2.7
 
@@ -1079,6 +1094,13 @@ CursorKind.CXX_OVERRIDE_ATTR = CursorKind(405) # 3.0
 CursorKind.ANNOTATE_ATTR = CursorKind(406) # 3.0
 CursorKind.ASM_LABEL_ATTR = CursorKind(407) # 3.1
 CursorKind.PACKED_ATTR = CursorKind(408) # 3.4
+CursorKind.PURE_ATTR = CursorKind(409) # 3.5
+CursorKind.CONST_ATTR = CursorKind(410) # 3.5
+CursorKind.NO_DUPLICATE_ATTR = CursorKind(411) # 3.5
+CursorKind.CUDA_CONSTANT_ATTR = CursorKind(412) # 3.5
+CursorKind.CUDA_DEVICE_ATTR = CursorKind(413) # 3.5
+CursorKind.CUDA_GLOBAL_ATTR = CursorKind(414) # 3.5
+CursorKind.CUDA_HOST_ATTR = CursorKind(415) # 3.5
 
 CursorKind.PREPROCESSING_DIRECTIVE = CursorKind(500) # 2.8
 CursorKind.MACRO_DEFINITION = CursorKind(501) # 2.8
