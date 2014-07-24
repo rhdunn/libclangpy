@@ -1849,29 +1849,6 @@ class Cursor:
 	def is_objc_optional(self):
 		return bool(_libclang.clang_Cursor_isObjCOptional(self._c))
 
-class RecordDecl(Cursor):
-	@requires(2.7)
-	def __init__(self, c, kind, parent, tu):
-		Cursor.__init__(self, c, kind, parent, tu)
-
-class StructDecl(RecordDecl):
-	@requires(2.7)
-	def __init__(self, c, kind, parent, tu):
-		RecordDecl.__init__(self, c, kind, parent, tu)
-
-class UnionDecl(RecordDecl):
-	@requires(2.7)
-	def __init__(self, c, kind, parent, tu):
-		RecordDecl.__init__(self, c, kind, parent, tu)
-
-class ClassDecl(RecordDecl):
-	@requires(2.7)
-	def __init__(self, c, kind, parent, tu):
-		RecordDecl.__init__(self, c, kind, parent, tu)
-
-# NOTE: The clang C++ API groups an EnumDecl as a record type, but an enumeration
-# does not support fields, methods, etc. like the other record types -- it only
-# supports enumeration constants. Thus, EnumDecl does not inherit from RecordDecl.
 class EnumDecl(Cursor):
 	@requires(2.7)
 	def __init__(self, c, kind, parent, tu):
@@ -1902,20 +1879,10 @@ class EnumConstantDecl(Cursor):
 			return _libclang.clang_getEnumConstantDeclUnsignedValue(self._c)
 		return _libclang.clang_getEnumConstantDeclValue(self._c)
 
-class FunctionDecl(Cursor):
-	@requires(2.7)
+class CxxMethodDecl(Cursor):
+	@requires(2.8)
 	def __init__(self, c, kind, parent, tu):
 		Cursor.__init__(self, c, kind, parent, tu)
-
-class MethodDecl(FunctionDecl):
-	@requires(2.8)
-	def __init__(self, c, kind, parent, tu):
-		FunctionDecl.__init__(self, c, kind, parent, tu)
-
-class CxxMethodDecl(MethodDecl):
-	@requires(2.8)
-	def __init__(self, c, kind, parent, tu):
-		MethodDecl.__init__(self, c, kind, parent, tu)
 
 	@property
 	@requires(2.8, 'clang_CXXMethod_isStatic', ['_CXCursor'], c_uint)
@@ -1941,66 +1908,6 @@ class CxxMethodDecl(MethodDecl):
 	def is_const(self):
 		return bool(_libclang.clang_CXXMethod_isConst(self._c))
 
-class VarDecl(Cursor):
-	@requires(2.7)
-	def __init__(self, c, kind, parent, tu):
-		Cursor.__init__(self, c, kind, parent, tu)
-
-class FieldDecl(VarDecl):
-	@requires(2.7)
-	def __init__(self, c, kind, parent, tu):
-		VarDecl.__init__(self, c, kind, parent, tu)
-
-class ParmDecl(VarDecl):
-	@requires(2.7)
-	def __init__(self, c, kind, parent, tu):
-		VarDecl.__init__(self, c, kind, parent, tu)
-
-class ObjCInterfaceDecl(Cursor):
-	@requires(2.7)
-	def __init__(self, c, kind, parent, tu):
-		Cursor.__init__(self, c, kind, parent, tu)
-
-class ObjCCategoryDecl(Cursor):
-	@requires(2.7)
-	def __init__(self, c, kind, parent, tu):
-		Cursor.__init__(self, c, kind, parent, tu)
-
-class ObjCProtocolDecl(Cursor):
-	@requires(2.7)
-	def __init__(self, c, kind, parent, tu):
-		Cursor.__init__(self, c, kind, parent, tu)
-
-class ObjCPropertyDecl(Cursor):
-	@requires(2.7)
-	def __init__(self, c, kind, parent, tu):
-		Cursor.__init__(self, c, kind, parent, tu)
-
-class ObjCIvarDecl(FieldDecl):
-	@requires(2.7)
-	def __init__(self, c, kind, parent, tu):
-		FieldDecl.__init__(self, c, kind, parent, tu)
-
-class ObjCInstanceMethodDecl(FunctionDecl):
-	@requires(2.7)
-	def __init__(self, c, kind, parent, tu):
-		FunctionDecl.__init__(self, c, kind, parent, tu)
-
-class ObjCClassMethodDecl(FunctionDecl):
-	@requires(2.7)
-	def __init__(self, c, kind, parent, tu):
-		FunctionDecl.__init__(self, c, kind, parent, tu)
-
-class ObjCImplementationDecl(Cursor):
-	@requires(2.7)
-	def __init__(self, c, kind, parent, tu):
-		Cursor.__init__(self, c, kind, parent, tu)
-
-class ObjCCategoryImplDecl(Cursor):
-	@requires(2.7)
-	def __init__(self, c, kind, parent, tu):
-		Cursor.__init__(self, c, kind, parent, tu)
-
 class TypedefDecl(Cursor):
 	@requires(2.7)
 	def __init__(self, c, kind, parent, tu):
@@ -2012,139 +1919,11 @@ class TypedefDecl(Cursor):
 		t = _libclang.clang_getTypedefDeclUnderlyingType(self._c)
 		return _type(t, self._tu)
 
-class Namespace(Cursor):
-	@requires(2.8)
-	def __init__(self, c, kind, parent, tu):
-		Cursor.__init__(self, c, kind, parent, tu)
-
-# Although CursorKind.LINKAGE_SPEC is defined in libclang 2.8, the implementation
-# does not expose it. The token API used to work around the bug has a bug of its
-# own in libclang 2.9 and earlier that cause the incorrect set of tokens to be
-# returned. Thus, this is only supported in libclang 3.0+.
-class LinkageSpec(Cursor):
-	@requires(3.0)
-	def __init__(self, c, kind, parent, tu):
-		Cursor.__init__(self, c, kind, parent, tu)
-
-class Constructor(MethodDecl):
-	@requires(2.8)
-	def __init__(self, c, kind, parent, tu):
-		MethodDecl.__init__(self, c, kind, parent, tu)
-
-class Destructor(MethodDecl):
-	@requires(2.8)
-	def __init__(self, c, kind, parent, tu):
-		MethodDecl.__init__(self, c, kind, parent, tu)
-
-class ConversionFunction(MethodDecl):
-	@requires(2.8)
-	def __init__(self, c, kind, parent, tu):
-		MethodDecl.__init__(self, c, kind, parent, tu)
-
-class ClassTemplate(RecordDecl):
-	@requires(2.8)
-	def __init__(self, c, kind, parent, tu):
-		RecordDecl.__init__(self, c, kind, parent, tu)
-
-class ClassTemplatePartialSpecialization(ClassTemplate):
-	@requires(2.8)
-	def __init__(self, c, kind, parent, tu):
-		ClassTemplate.__init__(self, c, kind, parent, tu)
-
-class FunctionTemplate(FunctionDecl):
-	@requires(2.8)
-	def __init__(self, c, kind, parent, tu):
-		FunctionDecl.__init__(self, c, kind, parent, tu)
-
-class TemplateTypeParameter(Cursor):
-	@requires(2.8)
-	def __init__(self, c, kind, parent, tu):
-		Cursor.__init__(self, c, kind, parent, tu)
-
-class NonTypeTemplateParameter(Cursor):
-	@requires(2.8)
-	def __init__(self, c, kind, parent, tu):
-		Cursor.__init__(self, c, kind, parent, tu)
-
-class TemplateTemplateParameter(Cursor):
-	@requires(2.8)
-	def __init__(self, c, kind, parent, tu):
-		Cursor.__init__(self, c, kind, parent, tu)
-
-class NamespaceAlias(Cursor):
-	@requires(2.8)
-	def __init__(self, c, kind, parent, tu):
-		Cursor.__init__(self, c, kind, parent, tu)
-
-class UsingDirective(Cursor):
-	@requires(2.8)
-	def __init__(self, c, kind, parent, tu):
-		Cursor.__init__(self, c, kind, parent, tu)
-
-class UsingDeclaration(Cursor):
-	@requires(2.8)
-	def __init__(self, c, kind, parent, tu):
-		Cursor.__init__(self, c, kind, parent, tu)
-
-class TypeAliasDecl(Cursor):
-	@requires(3.0)
-	def __init__(self, c, kind, parent, tu):
-		Cursor.__init__(self, c, kind, parent, tu)
-
-class ObjCSynthesizeDecl(Cursor):
-	@requires(3.0)
-	def __init__(self, c, kind, parent, tu):
-		Cursor.__init__(self, c, kind, parent, tu)
-
-class ObjCDynamicDecl(Cursor):
-	@requires(3.0)
-	def __init__(self, c, kind, parent, tu):
-		Cursor.__init__(self, c, kind, parent, tu)
-
-class CxxAccessSpecifier(Cursor):
-	@requires(3.0)
-	def __init__(self, c, kind, parent, tu):
-		Cursor.__init__(self, c, kind, parent, tu)
-
 _cursor_kinds = {
-	CursorKind.STRUCT_DECL: StructDecl,
-	CursorKind.UNION_DECL: UnionDecl,
-	CursorKind.CLASS_DECL: ClassDecl,
 	CursorKind.ENUM_DECL: EnumDecl,
-	CursorKind.FIELD_DECL: FieldDecl,
 	CursorKind.ENUM_CONSTANT_DECL: EnumConstantDecl,
-	CursorKind.FUNCTION_DECL: FunctionDecl,
-	CursorKind.VAR_DECL: VarDecl,
-	CursorKind.PARM_DECL: ParmDecl,
-	CursorKind.OBJC_INTERFACE_DECL: ObjCInterfaceDecl,
-	CursorKind.OBJC_CATEGORY_DECL: ObjCCategoryDecl,
-	CursorKind.OBJC_PROTOCOL_DECL: ObjCProtocolDecl,
-	CursorKind.OBJC_PROPERTY_DECL: ObjCPropertyDecl,
-	CursorKind.OBJC_IVAR_DECL: ObjCIvarDecl,
-	CursorKind.OBJC_INSTANCE_METHOD_DECL: ObjCInstanceMethodDecl,
-	CursorKind.OBJC_CLASS_METHOD_DECL: ObjCClassMethodDecl,
-	CursorKind.OBJC_IMPLEMENTATION_DECL: ObjCImplementationDecl,
-	CursorKind.OBJC_CATEGORY_IMPL_DECL: ObjCCategoryImplDecl,
 	CursorKind.TYPEDEF_DECL: TypedefDecl,
 	CursorKind.CXX_METHOD_DECL: CxxMethodDecl,
-	CursorKind.NAMESPACE: Namespace,
-	CursorKind.LINKAGE_SPEC: LinkageSpec,
-	CursorKind.CONSTRUCTOR: Constructor,
-	CursorKind.DESTRUCTOR: Destructor,
-	CursorKind.CONVERSION_FUNCTION: ConversionFunction,
-	CursorKind.CLASS_TEMPLATE: ClassTemplate,
-	CursorKind.CLASS_TEMPLATE_PARTIAL_SPECIALIZATION: ClassTemplatePartialSpecialization,
-	CursorKind.FUNCTION_TEMPLATE: FunctionTemplate,
-	CursorKind.TEMPLATE_TYPE_PARAMETER: TemplateTypeParameter,
-	CursorKind.NON_TYPE_TEMPLATE_PARAMETER: NonTypeTemplateParameter,
-	CursorKind.TEMPLATE_TEMPLATE_PARAMETER: TemplateTemplateParameter,
-	CursorKind.NAMESPACE_ALIAS: NamespaceAlias,
-	CursorKind.USING_DIRECTIVE: UsingDirective,
-	CursorKind.USING_DECLARATION: UsingDeclaration,
-	CursorKind.TYPE_ALIAS_DECL: TypeAliasDecl,
-	CursorKind.OBJC_SYNTHESIZE_DECL: ObjCSynthesizeDecl,
-	CursorKind.OBJC_DYNAMIC_DECL: ObjCDynamicDecl,
-	CursorKind.CXX_ACCESS_SPECIFIER: CxxAccessSpecifier,
 }
 
 def _is_linkage_spec(cursor):
