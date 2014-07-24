@@ -1346,6 +1346,14 @@ class Type:
 		q = _libclang.clang_Type_getCXXRefQualifier(self._t)
 		return RefQualifierKind(q)
 
+	@property
+	@requires(3.5, 'clang_Type_getNumTemplateArguments', [_CXType], c_int)
+	@requires(3.5, 'clang_Type_getTemplateArgumentAsType', [_CXType, c_uint], _CXType)
+	def template_arguments(self):
+		for i in range(0, _libclang.clang_Type_getNumTemplateArguments(self._t)):
+			t = _libclang.clang_Type_getArgumentAsType(self._t, i)
+			yield _type(t, self._tu)
+
 class BuiltinType(Type):
 	@requires(2.8)
 	def __init__(self, t, kind, tu, signed_integer=False, unsigned_integer=False, floating_point=False):

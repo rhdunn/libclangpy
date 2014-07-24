@@ -1090,6 +1090,11 @@ def test_Type33():
 	equals(t.size, 8)
 	equals(t.offset('a'), -1)
 
+def test_Type35():
+	c = parse_str('long a[4];')[0]
+	t = c.type
+	equals(len(list(t.template_arguments)), 0)
+
 def test_builtin_type(program, kind, args=None, ignore_errors=False, signed=False, unsigned=False, floating_point=False):
 	c = parse_str(program, args=args, ignore_errors=ignore_errors)[0]
 	t = c.type
@@ -1285,6 +1290,7 @@ run(2.9, test_Type29)
 run(3.0, test_Type30)
 run(3.1, test_Type31)
 run(3.3, test_Type33)
+run(3.5, test_Type35)
 run(2.8, test_BuiltinType28)
 run(3.1, test_BuiltinType31)
 run(3.4, test_FunctionProtoType34)
