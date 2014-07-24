@@ -1936,6 +1936,11 @@ class CxxMethodDecl(MethodDecl):
 	def is_pure_virtual(self):
 		return bool(_libclang.clang_CXXMethod_isPureVirtual(self._c))
 
+	@property
+	@requires(3.5, 'clang_CXXMethod_isConst', ['_CXCursor'], c_uint)
+	def is_const(self):
+		return bool(_libclang.clang_CXXMethod_isConst(self._c))
+
 class VarDecl(Cursor):
 	@requires(2.7)
 	def __init__(self, c, kind, parent, tu):

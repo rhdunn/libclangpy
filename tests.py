@@ -919,6 +919,17 @@ def test_CxxMethodDecl34():
 	equals(h.is_pure_virtual, False)
 	equals(i.is_pure_virtual, True)
 
+def test_CxxMethodDecl35():
+	x = parse_str("""
+		struct x {
+			void f(int x);
+			void g(int x) const;
+		};""")[0]
+	f, g = x.children
+	# is_const
+	equals(f.is_const, False)
+	equals(g.is_const, True)
+
 def test_Namespace28():
 	x = parse_str('namespace x {}')[0]
 	# x
@@ -1318,6 +1329,7 @@ run(3.1, test_TypedefDecl31)
 run(2.8, test_CxxMethodDecl28)
 run(3.0, test_CxxMethodDecl30)
 run(3.4, test_CxxMethodDecl34)
+run(3.5, test_CxxMethodDecl35)
 run(2.8, test_Namespace28)
 run(2.8, test_Constructor28)
 run(2.8, test_Destructor28)
