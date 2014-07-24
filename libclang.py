@@ -1295,7 +1295,7 @@ class Type:
 	@requires(3.1, 'clang_getArgType', [_CXType, c_uint], _CXType)
 	def argument_types(self):
 		for i in range(0, _libclang.clang_getNumArgTypes(self._t)):
-			t = _libclang.clang_getArgTypel(self._t, i)
+			t = _libclang.clang_getArgType(self._t, i)
 			yield _type(t, self._tu)
 
 	@cached_property
