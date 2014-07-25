@@ -1945,13 +1945,13 @@ def _is_linkage_spec(cursor):
 def _cursor(c, parent, tu):
 	kind = CursorKind(c.kind)
 	if kind == CursorKind.UNEXPOSED_DECL:
-		# Try and detect unexposed declarations ...
 		cursor = Cursor(c, kind, parent, tu)
+		# libclang (all known versions) does not expose LINKAGE_SPEC ...
 		if _is_linkage_spec(cursor):
 			kind = CursorKind.LINKAGE_SPEC
 	elif kind == CursorKind.UNEXPOSED_EXPR:
-		# Try and detect unexposed expressions ...
 		cursor = Cursor(c, kind, parent, tu)
+		# libclang <= 2.9 does not expose CXX_NULLPTR_LITERAL_EXPR ...
 		if cursor.type.kind == TypeKind.NULLPTR:
 			kind = CursorKind.CXX_NULLPTR_LITERAL_EXPR
 	try:
