@@ -1175,31 +1175,45 @@ def test_BuiltinType31():
 	                  signed=False, unsigned=True,  floating_point=False)
 
 def test_FunctionProtoType34():
-	s = parse_str("""
+	s, j = parse_str("""
 		struct test {
 			int f(float x);
-			int g(float x) const &;
-			int h(float x) const &&;
-		};""", args=['-std=c++11'])[0]
-	f, g, h = s.children
+			int g(float x) const;
+			int h(float x) const &;
+			int i(float x) const &&;
+		};
+		int j(float x);""", args=['-std=c++11'])
+	f, g, h, i = s.children
 	# f -- no ref-qualifier
 	equals(f.spelling, 'f')
 	ft = f.type
 	match_type(ft, libclang.TypeKind.FUNCTION_PROTO)
 	equals(isinstance(ft, libclang.FunctionProtoType), True)
 	equals(ft.cxx_ref_qualifier, libclang.RefQualifierKind.NONE)
-	# g -- const lvalue
+	# g -- const, no ref-qualifier
 	equals(g.spelling, 'g')
 	gt = g.type
 	match_type(gt, libclang.TypeKind.FUNCTION_PROTO)
 	equals(isinstance(gt, libclang.FunctionProtoType), True)
-	equals(gt.cxx_ref_qualifier, libclang.RefQualifierKind.LVALUE)
-	# g -- const rvalue
+	equals(gt.cxx_ref_qualifier, libclang.RefQualifierKind.NONE)
+	# h -- const lvalue
 	equals(h.spelling, 'h')
 	ht = h.type
 	match_type(ht, libclang.TypeKind.FUNCTION_PROTO)
 	equals(isinstance(ht, libclang.FunctionProtoType), True)
-	equals(ht.cxx_ref_qualifier, libclang.RefQualifierKind.RVALUE)
+	equals(ht.cxx_ref_qualifier, libclang.RefQualifierKind.LVALUE)
+	# i -- const rvalue
+	equals(i.spelling, 'i')
+	it = i.type
+	match_type(it, libclang.TypeKind.FUNCTION_PROTO)
+	equals(isinstance(it, libclang.FunctionProtoType), True)
+	equals(it.cxx_ref_qualifier, libclang.RefQualifierKind.RVALUE)
+	# j -- no ref-qualifier (non-member function)
+	equals(j.spelling, 'j')
+	jt = j.type
+	match_type(jt, libclang.TypeKind.FUNCTION_PROTO)
+	equals(isinstance(jt, libclang.FunctionProtoType), True)
+	equals(jt.cxx_ref_qualifier, libclang.RefQualifierKind.NONE)
 
 def test_MemberPointerType34():
 	s, mp = parse_str('struct A{}; int *A::* b;')
