@@ -969,6 +969,20 @@ def test_UsingDeclaration28():
 	# y
 	match_cursor(y, libclang.CursorKind.USING_DECLARATION)
 
+def test_CxxNullPtrLiteralExpr28():
+	x = parse_str('int *x = nullptr;', args=['-std=c++11'])[0]
+	e = x.children[0] # assignment
+	# cursor
+	a = e.children[0]
+	match_cursor(a, libclang.CursorKind.CXX_NULLPTR_LITERAL_EXPR)
+	# type
+	t = a.type
+	match_type(t, libclang.TypeKind.NULLPTR)
+	equals(isinstance(t, libclang.BuiltinType), True)
+	equals(t.is_signed_integer, False)
+	equals(t.is_unsigned_integer, False)
+	equals(t.is_floating_point, False)
+
 def test_LinkageSpec30():
 	s = parse_str('extern "C" void f(int x);')[0]
 	# s
@@ -1281,6 +1295,7 @@ run(2.8, test_TemplateTemplateParameter28)
 run(2.8, test_NamespaceAlias28)
 run(2.8, test_UsingDirective28)
 run(2.8, test_UsingDeclaration28)
+run(2.8, test_CxxNullPtrLiteralExpr28)
 run(3.0, test_LinkageSpec30)
 run(3.0, test_TypeAliasDecl30)
 run(3.0, test_ObjCSynthesizeDecl30)

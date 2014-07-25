@@ -1949,6 +1949,11 @@ def _cursor(c, parent, tu):
 		cursor = Cursor(c, kind, parent, tu)
 		if _is_linkage_spec(cursor):
 			kind = CursorKind.LINKAGE_SPEC
+	elif kind == CursorKind.UNEXPOSED_EXPR:
+		# Try and detect unexposed expressions ...
+		cursor = Cursor(c, kind, parent, tu)
+		if cursor.type.kind == TypeKind.NULLPTR:
+			kind = CursorKind.CXX_NULLPTR_LITERAL_EXPR
 	try:
 		return _cursor_kinds[kind](c, kind, parent, tu)
 	except KeyError:
