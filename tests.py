@@ -780,10 +780,7 @@ def test_ObjCInterfaceDecl27():
 	x = parse_str('@interface x @end', args=['-ObjC'])[0]
 	# x
 	match_cursor(x, libclang.CursorKind.OBJC_INTERFACE_DECL)
-	if libclang.version <= 2.8: # FIXME
-		match_type(x.type, libclang.TypeKind.INVALID, x)
-	else:
-		match_type(x.type, libclang.TypeKind.OBJC_INTERFACE, x)
+	match_type(x.type, libclang.TypeKind.OBJC_INTERFACE, x)
 
 def test_ObjCCategoryDecl27():
 	x, c = parse_str("""
