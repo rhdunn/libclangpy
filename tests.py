@@ -969,16 +969,10 @@ def test_FunctionTemplate28():
 	g = x.children[0]
 	# f
 	match_cursor(f, libclang.CursorKind.FUNCTION_TEMPLATE)
-	if libclang.version <= 3.2: # FIXME
-		match_type(f.type, libclang.TypeKind.INVALID, f)
-	else:
-		match_type(f.type, libclang.TypeKind.FUNCTION_PROTO, f)
+	match_type(f.type, libclang.TypeKind.FUNCTION_PROTO, f)
 	# g -- libclang does not have a CursorKind.METHOD_TEMPLATE ...
 	match_cursor(g, libclang.CursorKind.FUNCTION_TEMPLATE)
-	if libclang.version <= 3.2: # FIXME
-		match_type(g.type, libclang.TypeKind.INVALID, g)
-	else:
-		match_type(g.type, libclang.TypeKind.FUNCTION_PROTO, g)
+	match_type(g.type, libclang.TypeKind.FUNCTION_PROTO, g)
 
 def test_TemplateTypeParameter28():
 	x = parse_str('template<typename T> struct x {};')[0]
