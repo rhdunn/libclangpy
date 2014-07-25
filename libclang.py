@@ -1387,9 +1387,12 @@ class MemberPointerType(Type):
 def _type(t, cursor):
 	kind = TypeKind(t.kind)
 	if kind == TypeKind.INVALID:
-		# libclang <= 2.8 does not identify the OBJC_INTERFACE type
 		if cursor.kind == CursorKind.OBJC_INTERFACE_DECL:
+			# libclang <= 2.8 does not identify the OBJC_INTERFACE type
 			kind = TypeKind.OBJC_INTERFACE
+		elif cursor.kind == CursorKind.TYPEDEF_DECL:
+			# libclang <= 2.8 does not identify the TYPEDEF type
+			kind = TypeKind.TYPEDEF
 	if kind.value > 1 and kind.value < 100: # builtin type
 		if kind in [TypeKind.BOOL,   TypeKind.CHAR_U, TypeKind.UCHAR,
 		            TypeKind.CHAR16, TypeKind.CHAR32, TypeKind.USHORT,

@@ -843,17 +843,11 @@ def test_ObjCCategoryImplDecl27():
 def test_TypedefDecl27():
 	x = parse_str('typedef float x;')[0]
 	match_cursor(x, libclang.CursorKind.TYPEDEF_DECL)
-	if libclang.version <= 2.8: # FIXME
-		match_type(x.type, libclang.TypeKind.INVALID, x)
-	else:
-		match_type(x.type, libclang.TypeKind.TYPEDEF, x)
+	match_type(x.type, libclang.TypeKind.TYPEDEF, x)
 
 def test_TypedefDecl31():
 	x = parse_str('typedef float x;')[0]
-	if libclang.version <= 2.8: # FIXME
-		match_type(x.type, libclang.TypeKind.INVALID, x)
-	else:
-		match_type(x.type, libclang.TypeKind.TYPEDEF, x)
+	match_type(x.type, libclang.TypeKind.TYPEDEF, x)
 	match_type(x.underlying_type, libclang.TypeKind.FLOAT, x)
 
 def test_CxxMethodDecl28():
