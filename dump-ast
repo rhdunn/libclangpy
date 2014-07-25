@@ -26,7 +26,10 @@ def print_type(t, level=0, indentation='... ', cursors=set(), ctx=''):
 		return
 	sys.stdout.write('{0}{1}'.format(level * indentation, ctx))
 	sys.stdout.write('[{0}|{1}]'.format(t.kind.value, t.kind))
-	sys.stdout.write(' "{0}"'.format(t.spelling))
+	try:
+		sys.stdout.write(' "{0}"'.format(t.spelling))
+	except libclang.MissingFunction:
+		pass
 	if t.canonical_type != t:
 		kind = t.canonical_type.kind
 		sys.stdout.write(' canonical=[{0}|{1}]'.format(kind.value, kind))
@@ -50,10 +53,7 @@ def print_cursor(c, level=0, indentation='... ', cursors=set(), print_types=Fals
 		sys.stdout.write(' def="{0}"@{1}'.format(c.definition.spelling, hash(c.definition)))
 	sys.stdout.write('\n')
 	if print_types:
-		try:
-			print_type(c.type, level=level, indentation=indentation, cursors=cursors, ctx='|=> ')
-		except libclang.MethodException:
-			pass
+		print_type(c.type, level=level, indentation=indentation, cursors=cursors, ctx='|=> ')
 	if not c in cursors:
 		for child in c.children:
 			print_cursor(child, level=level+1, indentation=indentation, cursors=cursors, print_types=print_types)
