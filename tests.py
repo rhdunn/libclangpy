@@ -889,11 +889,15 @@ def test_CxxMethodDecl35():
 		struct x {
 			void f(int x);
 			void g(int x) const;
-		};""")[0]
-	f, g = x.children
+			void h(int x) const &;
+			void i(int x) const &&;
+		};""", args=['-std=c++11'])[0]
+	f, g, h, i = x.children
 	# is_const
 	equals(f.is_const, False)
 	equals(g.is_const, True)
+	equals(h.is_const, True)
+	equals(i.is_const, True)
 
 def test_Namespace28():
 	x = parse_str('namespace x {}')[0]
