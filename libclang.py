@@ -1954,20 +1954,13 @@ _cursor_kinds = {
 	CursorKind.CXX_METHOD_DECL: CxxMethodDecl,
 }
 
-def _is_linkage_spec(cursor):
-	tokens = cursor._tokens_left_of_children
-	if len(tokens) < 2:
-		return False
-	if tokens[0].kind != TokenKind.KEYWORD or tokens[0].spelling != 'extern':
-		return False
-	return tokens[1].kind == TokenKind.LITERAL
-
 def _cursor(c, parent, tu):
 	kind = CursorKind(c.kind)
 	if kind == CursorKind.UNEXPOSED_DECL:
 		cursor = Cursor(c, kind, parent, tu)
+		tokens = cursor._tokens_left_of_children
 		# libclang (all known versions) does not expose LINKAGE_SPEC ...
-		if _is_linkage_spec(cursor):
+		if tokens.match(0, TokenKind.KEYWORD, 'extern') and tokens.match(1, TokenKind.LITERAL):
 			kind = CursorKind.LINKAGE_SPEC
 	elif kind == CursorKind.UNEXPOSED_EXPR:
 		cursor = Cursor(c, kind, parent, tu)
