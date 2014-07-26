@@ -88,7 +88,7 @@ def summary():
 
 def parse_str(contents, filename='parse_str.cpp', args=None, ignore_errors=False):
 	index = libclang.Index()
-	tu = index.from_source(filename, unsaved_files=[(filename, contents)], args=args)
+	tu = index.parse(filename, unsaved_files=[(filename, contents)], args=args)
 	if not ignore_errors:
 		diagnostics = list(tu.diagnostics)
 		if len(diagnostics) > 0:
@@ -439,34 +439,6 @@ def test_Index():
 	index = libclang.Index()
 	filename = 'tests/enumeration.hpp'
 	# no args
-	tu = index.from_source(filename)
-	equals(tu.spelling, filename)
-	equals(len(list(tu.diagnostics)), 0)
-	# no args -- as keyword argument
-	tu = index.from_source(filename=filename)
-	equals(tu.spelling, filename)
-	equals(len(list(tu.diagnostics)), 0)
-	# file as arg
-	tu = index.from_source(args=[filename])
-	equals(tu.spelling, filename)
-	equals(len(list(tu.diagnostics)), 0)
-	# args
-	tu = index.from_source(filename, args=['-std=c++98'])
-	equals(tu.spelling, filename)
-	equals(len(list(tu.diagnostics)), 0)
-	# unsaved files
-	tu = index.from_source('unsaved.hpp', unsaved_files=[('unsaved.hpp', 'struct test {};')])
-	equals(tu.spelling, 'unsaved.hpp')
-	equals(len(list(tu.diagnostics)), 0)
-	# unsaved files
-	tu = index.from_source('unsaved.cpp', unsaved_files=[('unsaved.cpp', 'struct test {};')])
-	equals(tu.spelling, 'unsaved.cpp')
-	equals(len(list(tu.diagnostics)), 0)
-
-def test_Index28():
-	index = libclang.Index()
-	filename = 'tests/enumeration.hpp'
-	# no args
 	tu = index.parse(filename)
 	equals(tu.spelling, filename)
 	equals(len(list(tu.diagnostics)), 0)
@@ -500,7 +472,7 @@ def test_Index31():
 def test_TranslationUnit():
 	index = libclang.Index()
 	filename = 'tests/enumeration.hpp'
-	tu = index.from_source(filename)
+	tu = index.parse(filename)
 	equals(tu.spelling, filename)
 	equals(str(tu), filename)
 	test_File(tu.file(filename), filename)
@@ -515,18 +487,18 @@ def test_TranslationUnit():
 def test_TranslationUnit29():
 	index = libclang.Index()
 	filename = 'tests/enumeration.hpp'
-	tu = index.from_source(filename)
+	tu = index.parse(filename)
 	match_location(tu.location(tu.file(filename), offset=13), filename, 3, 2, 13)
 
 def test_TranslationUnit30():
 	index = libclang.Index()
 	filename = 'tests/enumeration.hpp'
-	tu = index.from_source(filename)
+	tu = index.parse(filename)
 	equals(tu.is_multiple_include_guarded(tu.file(filename)), False)
 
 def test_Diagnostic():
 	index = libclang.Index()
-	tu = index.from_source('tests/error.hpp')
+	tu = index.parse('tests/error.hpp')
 	diagnostics = list(tu.diagnostics)
 	equals(len(diagnostics), 1)
 	d = diagnostics[0]
@@ -550,7 +522,7 @@ def test_Diagnostic():
 
 def test_Diagnostic29():
 	index = libclang.Index()
-	tu = index.from_source('tests/error.hpp')
+	tu = index.parse('tests/error.hpp')
 	diagnostics = list(tu.diagnostics)
 	equals(len(diagnostics), 1)
 	d = diagnostics[0]
@@ -1085,7 +1057,7 @@ def test_CxxAccessSpecifier30():
 
 def test_Token():
 	index = libclang.Index()
-	tu = index.from_source('tests/enumeration.hpp')
+	tu = index.parse('tests/enumeration.hpp')
 	f = tu.file('tests/enumeration.hpp')
 	rng = libclang.SourceRange(tu.location(f, 1, 1), tu.location(f, 2, 1))
 	children = [child for child in tu.cursor().children if child.location.file]
@@ -1306,7 +1278,6 @@ run(3.3, test_ObjCPropertyAttributes33)
 run(3.3, test_ObjCDeclQualifierKind33)
 run(3.4, test_RefQualifierKind34)
 run(2.7, test_Index)
-run(2.8, test_Index28)
 run(3.1, test_Index31)
 run(2.7, test_TranslationUnit)
 run(2.9, test_TranslationUnit29)

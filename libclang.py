@@ -2206,19 +2206,14 @@ class Index:
 		return TranslationUnit(tu, self)
 
 	@requires(2.7, 'clang_createTranslationUnitFromSourceFile', [c_void_p, c_utf8_p, c_int, POINTER(c_utf8_p), c_uint, POINTER(_CXUnsavedFile)], c_void_p)
-	def from_source(self, filename=None, args=None, unsaved_files=None):
-		argc, argv = _marshall_args(args)
-		unsavedc, unsavedv = _marshall_unsaved_files(unsaved_files)
-		tu = _libclang.clang_createTranslationUnitFromSourceFile(self._index, filename, argc, argv, unsavedc, unsavedv)
-		if not tu:
-			return None
-		return TranslationUnit(tu, self)
-
-	@requires(2.8, 'clang_parseTranslationUnit', [c_void_p, c_utf8_p, POINTER(c_utf8_p), c_uint, POINTER(_CXUnsavedFile), c_uint, c_uint], c_void_p)
+	@optional(2.8, 'clang_parseTranslationUnit', [c_void_p, c_utf8_p, POINTER(c_utf8_p), c_uint, POINTER(_CXUnsavedFile), c_uint, c_uint], c_void_p)
 	def parse(self, filename=None, args=None, unsaved_files=None, options=TranslationUnitFlags.NONE):
 		argc, argv = _marshall_args(args)
 		unsavedc, unsavedv = _marshall_unsaved_files(unsaved_files)
-		tu = _libclang.clang_parseTranslationUnit(self._index, filename, argv, argc, unsavedv, unsavedc, options.value)
+		if _libclang.clang_parseTranslationUnit:
+			tu = _libclang.clang_parseTranslationUnit(self._index, filename, argv, argc, unsavedv, unsavedc, options.value)
+		else:
+			tu = _libclang.clang_createTranslationUnitFromSourceFile(self._index, filename, argc, argv, unsavedc, unsavedv)
 		if not tu:
 			return None
 		return TranslationUnit(tu, self)
