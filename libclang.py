@@ -852,6 +852,16 @@ class TokenList:
 		for i in range(0, len(self)):
 			yield self[i]
 
+	@requires(2.7)
+	def match(self, pos, kind, value=None):
+		try:
+			token = Token(self._tokens[pos], self, self._tu)
+		except IndexError:
+			return False
+		if token.kind != kind:
+			return False
+		return not value or token.spelling == value
+
 class CursorKind:
 	@requires(2.7)
 	def __init__(self, value):

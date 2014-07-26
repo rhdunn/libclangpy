@@ -1072,6 +1072,16 @@ def test_Token():
 	equals(tokens[1].kind, libclang.TokenKind.IDENTIFIER)
 	equals(tokens[2].spelling, '{')
 	equals(tokens[2].kind, libclang.TokenKind.PUNCTUATION)
+	# match
+	equals(tokens.match(0, libclang.TokenKind.KEYWORD), True)
+	equals(tokens.match(0, libclang.TokenKind.KEYWORD, 'enum'), True)
+	equals(tokens.match(1, libclang.TokenKind.IDENTIFIER), True)
+	equals(tokens.match(1, libclang.TokenKind.IDENTIFIER, 'test'), True)
+	equals(tokens.match(2, libclang.TokenKind.PUNCTUATION), True)
+	equals(tokens.match(2, libclang.TokenKind.PUNCTUATION, '{'), True)
+	equals(tokens.match(0, libclang.TokenKind.IDENTIFIER), False)
+	equals(tokens.match(0, libclang.TokenKind.KEYWORD, 'enun'), False)
+	equals(tokens.match(3, libclang.TokenKind.PUNCTUATION), False)
 	# token
 	token = tokens[0]
 	equals(str(token), 'enum')
