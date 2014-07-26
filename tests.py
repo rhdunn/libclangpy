@@ -1029,7 +1029,7 @@ def test_ObjCDynamicDecl30():
 	match_cursor(a, libclang.CursorKind.OBJC_DYNAMIC_DECL)
 	match_type(a.type, libclang.TypeKind.INVALID, a)
 
-def test_CxxAccessSpecifier30():
+def test_CxxAccessSpecifier27():
 	x = parse_str("""
 		struct x {
 			public:    int a;
@@ -1347,7 +1347,7 @@ run(2.8, test_CxxNullPtrLiteralExpr28)
 run(3.0, test_LinkageSpec30)
 run(3.0, test_TypeAliasDecl30)
 run(3.0, test_ObjCSynthesizeDecl30)
-run(3.0, test_CxxAccessSpecifier30)
+run(2.7, test_CxxAccessSpecifier27)
 run(2.7, test_Token)
 run(2.8, test_Type28)
 run(2.9, test_Type29)

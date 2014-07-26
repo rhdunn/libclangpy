@@ -1959,13 +1959,18 @@ def _cursor(c, parent, tu):
 	if kind == CursorKind.UNEXPOSED_DECL:
 		cursor = Cursor(c, kind, parent, tu)
 		tokens = cursor._tokens_left_of_children
-		# libclang (all known versions) does not expose LINKAGE_SPEC ...
 		if tokens.match(0, TokenKind.KEYWORD, 'extern') and tokens.match(1, TokenKind.LITERAL):
+			# libclang (all known versions) does not expose LINKAGE_SPEC ...
 			kind = CursorKind.LINKAGE_SPEC
+		elif tokens.match(0, TokenKind.KEYWORD) and tokens.match(1, TokenKind.PUNCTUATION, ':'):
+			keyword = tokens[0].spelling
+			if keyword in ['public', 'protected', 'private']:
+				# libclang <= 2.9 does not expose CXX_ACCESS_SPECIFIER ...
+				kind = CursorKind.CXX_ACCESS_SPECIFIER
 	elif kind == CursorKind.UNEXPOSED_EXPR:
 		cursor = Cursor(c, kind, parent, tu)
-		# libclang <= 2.9 does not expose CXX_NULLPTR_LITERAL_EXPR ...
 		if cursor.type.kind == TypeKind.NULLPTR:
+			# libclang <= 2.9 does not expose CXX_NULLPTR_LITERAL_EXPR ...
 			kind = CursorKind.CXX_NULLPTR_LITERAL_EXPR
 	try:
 		return _cursor_kinds[kind](c, kind, parent, tu)
