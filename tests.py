@@ -1048,12 +1048,15 @@ def test_CxxAccessSpecifier27():
 	# a
 	match_cursor(a, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
 	match_type(a.type, libclang.TypeKind.INVALID, a)
+	equals(a.access_specifier, libclang.AccessSpecifier.PUBLIC)
 	# b
 	match_cursor(b, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
 	match_type(b.type, libclang.TypeKind.INVALID, b)
+	equals(b.access_specifier, libclang.AccessSpecifier.PROTECTED)
 	# c
 	match_cursor(c, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
 	match_type(c.type, libclang.TypeKind.INVALID, c)
+	equals(c.access_specifier, libclang.AccessSpecifier.PRIVATE)
 
 def test_Token():
 	index = libclang.Index()

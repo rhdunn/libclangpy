@@ -1567,6 +1567,7 @@ class Cursor:
 		self._tu = tu
 		self.parent = parent
 		self.kind = kind
+		self._access_specifier = None
 
 	@requires(2.7, 'clang_equalCursors', ['_CXCursor', '_CXCursor'], c_uint)
 	def __eq__(self, other):
@@ -1715,6 +1716,9 @@ class Cursor:
 	@property
 	@requires(2.8, 'clang_getCXXAccessSpecifier', ['_CXCursor'], c_uint)
 	def access_specifier(self):
+		if self._access_specifier:
+			# overridden for compatibility/bug fixes ...
+			return self._access_specifier
 		access = _libclang.clang_getCXXAccessSpecifier(self._c)
 		return AccessSpecifier(access)
 
@@ -1955,6 +1959,7 @@ _cursor_kinds = {
 }
 
 def _cursor(c, parent, tu):
+	access_specifier = None
 	kind = CursorKind(c.kind)
 	if kind == CursorKind.UNEXPOSED_DECL:
 		cursor = Cursor(c, kind, parent, tu)
@@ -1964,18 +1969,28 @@ def _cursor(c, parent, tu):
 			kind = CursorKind.LINKAGE_SPEC
 		elif tokens.match(0, TokenKind.KEYWORD) and tokens.match(1, TokenKind.PUNCTUATION, ':'):
 			keyword = tokens[0].spelling
-			if keyword in ['public', 'protected', 'private']:
-				# libclang <= 2.9 does not expose CXX_ACCESS_SPECIFIER ...
+			# libclang <= 2.9 does not expose CXX_ACCESS_SPECIFIER ...
+			if keyword == 'public':
 				kind = CursorKind.CXX_ACCESS_SPECIFIER
+				access_specifier = AccessSpecifier.PUBLIC
+			elif keyword == 'protected':
+				kind = CursorKind.CXX_ACCESS_SPECIFIER
+				access_specifier = AccessSpecifier.PROTECTED
+			elif keyword == 'private':
+				kind = CursorKind.CXX_ACCESS_SPECIFIER
+				access_specifier = AccessSpecifier.PRIVATE
 	elif kind == CursorKind.UNEXPOSED_EXPR:
 		cursor = Cursor(c, kind, parent, tu)
 		if cursor.type.kind == TypeKind.NULLPTR:
 			# libclang <= 2.9 does not expose CXX_NULLPTR_LITERAL_EXPR ...
 			kind = CursorKind.CXX_NULLPTR_LITERAL_EXPR
 	try:
-		return _cursor_kinds[kind](c, kind, parent, tu)
+		ret = _cursor_kinds[kind](c, kind, parent, tu)
 	except KeyError:
-		return Cursor(c, kind, parent, tu)
+		ret = Cursor(c, kind, parent, tu)
+	if access_specifier:
+		ret._access_specifier = access_specifier
+	return ret
 
 class TranslationUnitFlags:
 	@requires(2.8)
