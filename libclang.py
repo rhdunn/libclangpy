@@ -1987,6 +1987,11 @@ def _cursor(c, parent, tu):
 		if cursor.type.kind == TypeKind.NULLPTR:
 			# libclang <= 2.9 does not expose CXX_NULLPTR_LITERAL_EXPR ...
 			kind = CursorKind.CXX_NULLPTR_LITERAL_EXPR
+	if kind in [CursorKind.TEMPLATE_TYPE_PARAMETER,
+	            CursorKind.NON_TYPE_TEMPLATE_PARAMETER,
+	            CursorKind.TEMPLATE_TEMPLATE_PARAMETER]:
+		# libclang >= 3.2 incorrectly assigns an access_specifier to these cursors ...
+		access_specifier = AccessSpecifier.INVALID
 	try:
 		ret = _cursor_kinds[kind](c, kind, parent, tu)
 	except KeyError:

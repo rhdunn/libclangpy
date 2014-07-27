@@ -1009,10 +1009,7 @@ def test_TemplateTypeParameter28():
 	# t
 	match_cursor(t, libclang.CursorKind.TEMPLATE_TYPE_PARAMETER)
 	match_type(t.type, libclang.TypeKind.UNEXPOSED, t) # FIXME
-	if libclang.version <= 3.2:
-		equals(t.access_specifier, libclang.AccessSpecifier.INVALID)
-	else:
-		equals(t.access_specifier, libclang.AccessSpecifier.PUBLIC) # FIXME: ???
+	equals(t.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_NonTypeTemplateParameter28():
 	x = parse_str('template<int T> struct x {};')[0]
@@ -1020,10 +1017,7 @@ def test_NonTypeTemplateParameter28():
 	# t
 	match_cursor(t, libclang.CursorKind.NON_TYPE_TEMPLATE_PARAMETER)
 	match_type(t.type, libclang.TypeKind.INT, t)
-	if libclang.version <= 3.2:
-		equals(t.access_specifier, libclang.AccessSpecifier.INVALID)
-	else:
-		equals(t.access_specifier, libclang.AccessSpecifier.PUBLIC) # FIXME: ???
+	equals(t.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_TemplateTemplateParameter28():
 	x = parse_str('template<template<typename T> class U> struct x {};')[0]
@@ -1031,10 +1025,7 @@ def test_TemplateTemplateParameter28():
 	# u
 	match_cursor(u, libclang.CursorKind.TEMPLATE_TEMPLATE_PARAMETER)
 	match_type(u.type, libclang.TypeKind.INVALID, u)
-	if libclang.version <= 3.2:
-		equals(u.access_specifier, libclang.AccessSpecifier.INVALID)
-	else:
-		equals(u.access_specifier, libclang.AccessSpecifier.PUBLIC) # FIXME: ???
+	equals(u.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_NamespaceAlias28():
 	x, y = parse_str('namespace x {} namespace y = x;')
