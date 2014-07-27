@@ -542,7 +542,6 @@ def test_Cursor():
 	equals(hash(c), hash(c))
 	equals(c.spelling, 'test')
 	equals(str(c), 'test')
-	equals(c.access_specifier, libclang.AccessSpecifier.INVALID)
 	equals(c.kind, libclang.CursorKind.ENUM_DECL)
 	equals(c.parent.kind, libclang.CursorKind.TRANSLATION_UNIT)
 	equals(c.linkage, libclang.Linkage.EXTERNAL)
@@ -646,18 +645,21 @@ def test_StructDecl27():
 	# x
 	match_cursor(x, libclang.CursorKind.STRUCT_DECL)
 	match_type(x.type, libclang.TypeKind.RECORD, x)
+	equals(x.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_UnionDecl27():
 	x = parse_str('union x { int a; };')[0]
 	# x
 	match_cursor(x, libclang.CursorKind.UNION_DECL)
 	match_type(x.type, libclang.TypeKind.RECORD, x)
+	equals(x.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_ClassDecl27():
 	x = parse_str('class x { int a; };')[0]
 	# x
 	match_cursor(x, libclang.CursorKind.CLASS_DECL)
 	match_type(x.type, libclang.TypeKind.RECORD, x)
+	equals(x.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_EnumDecl27():
 	x = parse_str('enum x { a = 7 };')[0]
@@ -666,6 +668,7 @@ def test_EnumDecl27():
 	equals(isinstance(x, libclang.EnumDecl), True)
 	equals(x.is_enum_class, False)
 	match_type(x.type, libclang.TypeKind.ENUM, x)
+	equals(x.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_EnumDecl29():
 	x, y = parse_str("""
@@ -676,11 +679,13 @@ def test_EnumDecl29():
 	equals(isinstance(x, libclang.EnumDecl), True)
 	equals(x.is_enum_class, True)
 	match_type(x.type, libclang.TypeKind.ENUM, x)
+	equals(x.access_specifier, libclang.AccessSpecifier.INVALID)
 	# y
 	match_cursor(y, libclang.CursorKind.ENUM_DECL)
 	equals(isinstance(y, libclang.EnumDecl), True)
 	equals(y.is_enum_class, True)
 	match_type(y.type, libclang.TypeKind.ENUM, y)
+	equals(y.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_EnumDecl31():
 	x, y, z = parse_str("""
@@ -697,6 +702,10 @@ def test_FieldDecl27():
 	# a
 	match_cursor(a, libclang.CursorKind.FIELD_DECL)
 	match_type(a.type, libclang.TypeKind.INT, a)
+	if libclang.version <= 3.2:
+		equals(a.access_specifier, libclang.AccessSpecifier.INVALID)
+	else:
+		equals(a.access_specifier, libclang.AccessSpecifier.PUBLIC)
 
 def test_EnumConstantDecl27():
 	x = parse_str('enum x { a = 7 };')[0]
@@ -705,6 +714,7 @@ def test_EnumConstantDecl27():
 	match_cursor(a, libclang.CursorKind.ENUM_CONSTANT_DECL)
 	equals(isinstance(a, libclang.EnumConstantDecl), True)
 	match_type(a.type, libclang.TypeKind.ENUM, a)
+	equals(a.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_EnumConstantDecl29():
 	x, y = parse_str("""
@@ -716,10 +726,12 @@ def test_EnumConstantDecl29():
 	match_cursor(a, libclang.CursorKind.ENUM_CONSTANT_DECL)
 	equals(isinstance(a, libclang.EnumConstantDecl), True)
 	match_type(a.type, libclang.TypeKind.ENUM, a)
+	equals(a.access_specifier, libclang.AccessSpecifier.INVALID)
 	# b
 	match_cursor(b, libclang.CursorKind.ENUM_CONSTANT_DECL)
 	equals(isinstance(b, libclang.EnumConstantDecl), True)
 	match_type(b.type, libclang.TypeKind.ENUM, b)
+	equals(b.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_EnumConstantDecl31():
 	x, y, z = parse_str("""
@@ -735,12 +747,14 @@ def test_FunctionDecl27():
 	# f
 	match_cursor(f, libclang.CursorKind.FUNCTION_DECL)
 	match_type(f.type, libclang.TypeKind.FUNCTION_PROTO, f)
+	equals(f.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_VarDecl27():
 	x = parse_str('int x;')[0]
 	# x
 	match_cursor(x, libclang.CursorKind.VAR_DECL)
 	match_type(x.type, libclang.TypeKind.INT, x)
+	equals(x.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_ParmDecl27():
 	f = parse_str('void f(int x);')[0]
@@ -748,12 +762,14 @@ def test_ParmDecl27():
 	# x
 	match_cursor(x, libclang.CursorKind.PARM_DECL)
 	match_type(x.type, libclang.TypeKind.INT, x)
+	equals(x.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_ObjCInterfaceDecl27():
 	x = parse_str('@interface x @end', args=['-ObjC'])[0]
 	# x
 	match_cursor(x, libclang.CursorKind.OBJC_INTERFACE_DECL)
 	match_type(x.type, libclang.TypeKind.OBJC_INTERFACE, x)
+	equals(x.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_ObjCCategoryDecl27():
 	x, c = parse_str("""
@@ -762,12 +778,14 @@ def test_ObjCCategoryDecl27():
 	# c
 	match_cursor(c, libclang.CursorKind.OBJC_CATEGORY_DECL)
 	match_type(c.type, libclang.TypeKind.INVALID, c)
+	equals(c.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_ObjCProtocolDecl27():
 	x = parse_str('@protocol x @end', args=['-ObjC'])[0]
 	# x
 	match_cursor(x, libclang.CursorKind.OBJC_PROTOCOL_DECL)
 	match_type(x.type, libclang.TypeKind.INVALID, x)
+	equals(x.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_ObjCPropertyDecl27():
 	x = parse_str('@interface x @property int a; @end', args=['-ObjC'])[0]
@@ -775,6 +793,7 @@ def test_ObjCPropertyDecl27():
 	# a
 	match_cursor(a, libclang.CursorKind.OBJC_PROPERTY_DECL)
 	match_type(a.type, libclang.TypeKind.INT, a)
+	equals(a.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_ObjCIvarDecl27():
 	x = parse_str('@interface x { int a; } @end', args=['-ObjC'])[0]
@@ -782,6 +801,7 @@ def test_ObjCIvarDecl27():
 	# a
 	match_cursor(a, libclang.CursorKind.OBJC_IVAR_DECL)
 	match_type(a.type, libclang.TypeKind.INT, a)
+	equals(a.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_ObjCInstanceMethodDecl27():
 	x = parse_str('@interface x -(int)a; @end', args=['-ObjC'])[0]
@@ -789,6 +809,7 @@ def test_ObjCInstanceMethodDecl27():
 	# a
 	match_cursor(a, libclang.CursorKind.OBJC_INSTANCE_METHOD_DECL)
 	match_type(a.type, libclang.TypeKind.INVALID, a)
+	equals(a.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_ObjCClassMethodDecl27():
 	x = parse_str('@interface x +(int)a; @end', args=['-ObjC'])[0]
@@ -796,6 +817,7 @@ def test_ObjCClassMethodDecl27():
 	# a
 	match_cursor(a, libclang.CursorKind.OBJC_CLASS_METHOD_DECL)
 	match_type(a.type, libclang.TypeKind.INVALID, a)
+	equals(a.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_ObjCImplementationDecl27():
 	i, x = parse_str("""
@@ -804,6 +826,7 @@ def test_ObjCImplementationDecl27():
 	# x
 	match_cursor(x, libclang.CursorKind.OBJC_IMPLEMENTATION_DECL)
 	match_type(x.type, libclang.TypeKind.INVALID, x)
+	equals(x.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_ObjCCategoryImplDecl27():
 	i, x = parse_str("""
@@ -812,11 +835,13 @@ def test_ObjCCategoryImplDecl27():
 	# x
 	match_cursor(x, libclang.CursorKind.OBJC_CATEGORY_IMPL_DECL)
 	match_type(x.type, libclang.TypeKind.INVALID, x)
+	equals(x.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_TypedefDecl27():
 	x = parse_str('typedef float x;')[0]
 	match_cursor(x, libclang.CursorKind.TYPEDEF_DECL)
 	match_type(x.type, libclang.TypeKind.TYPEDEF, x)
+	equals(x.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_TypedefDecl31():
 	x = parse_str('typedef float x;')[0]
@@ -852,6 +877,17 @@ def test_CxxMethodDecl28():
 	equals(isinstance(i, libclang.CxxMethodDecl), True)
 	equals(i.is_static, False)
 	match_type(i.type, libclang.TypeKind.FUNCTION_PROTO, i)
+	# access_specifier
+	if libclang.version <= 3.2:
+		equals(f.access_specifier, libclang.AccessSpecifier.INVALID)
+		equals(g.access_specifier, libclang.AccessSpecifier.INVALID)
+		equals(h.access_specifier, libclang.AccessSpecifier.INVALID)
+		equals(i.access_specifier, libclang.AccessSpecifier.INVALID)
+	else:
+		equals(f.access_specifier, libclang.AccessSpecifier.PUBLIC)
+		equals(g.access_specifier, libclang.AccessSpecifier.PUBLIC)
+		equals(h.access_specifier, libclang.AccessSpecifier.PUBLIC)
+		equals(i.access_specifier, libclang.AccessSpecifier.PUBLIC)
 
 def test_CxxMethodDecl30():
 	x = parse_str("""
@@ -903,6 +939,7 @@ def test_Namespace28():
 	# x
 	match_cursor(x, libclang.CursorKind.NAMESPACE)
 	match_type(x.type, libclang.TypeKind.INVALID, x)
+	equals(x.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_Constructor28():
 	x = parse_str('struct x { x(); };')[0]
@@ -910,6 +947,10 @@ def test_Constructor28():
 	# f
 	match_cursor(f, libclang.CursorKind.CONSTRUCTOR)
 	match_type(f.type, libclang.TypeKind.FUNCTION_PROTO, f)
+	if libclang.version <= 3.2:
+		equals(f.access_specifier, libclang.AccessSpecifier.INVALID)
+	else:
+		equals(f.access_specifier, libclang.AccessSpecifier.PUBLIC)
 
 def test_Destructor28():
 	x = parse_str('struct x { ~x(); };')[0]
@@ -917,6 +958,10 @@ def test_Destructor28():
 	# f
 	match_cursor(f, libclang.CursorKind.DESTRUCTOR)
 	match_type(f.type, libclang.TypeKind.FUNCTION_PROTO, f)
+	if libclang.version <= 3.2:
+		equals(f.access_specifier, libclang.AccessSpecifier.INVALID)
+	else:
+		equals(f.access_specifier, libclang.AccessSpecifier.PUBLIC)
 
 def test_ConversionFunction28():
 	x = parse_str('struct x { operator float(); };')[0]
@@ -924,18 +969,24 @@ def test_ConversionFunction28():
 	# f
 	match_cursor(f, libclang.CursorKind.CONVERSION_FUNCTION)
 	match_type(f.type, libclang.TypeKind.FUNCTION_PROTO, f)
+	if libclang.version <= 3.2:
+		equals(f.access_specifier, libclang.AccessSpecifier.INVALID)
+	else:
+		equals(f.access_specifier, libclang.AccessSpecifier.PUBLIC)
 
 def test_ClassTemplate28():
 	x = parse_str('template<typename T> struct x {};')[0]
 	# x
 	match_cursor(x, libclang.CursorKind.CLASS_TEMPLATE)
 	match_type(x.type, libclang.TypeKind.INVALID, x)
+	equals(x.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_ClassTemplatePartialSpecialization28():
 	xt, x = parse_str('template<typename T> struct x {}; template<typename T> struct x<T *> {};')
 	# x
 	match_cursor(x, libclang.CursorKind.CLASS_TEMPLATE_PARTIAL_SPECIALIZATION)
 	match_type(x.type, libclang.TypeKind.UNEXPOSED, x) # FIXME
+	equals(x.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_FunctionTemplate28():
 	f, x = parse_str('template<typename T> void f(); struct x { template <typename T> void g(); };')
@@ -943,9 +994,14 @@ def test_FunctionTemplate28():
 	# f
 	match_cursor(f, libclang.CursorKind.FUNCTION_TEMPLATE)
 	match_type(f.type, libclang.TypeKind.FUNCTION_PROTO, f)
+	equals(f.access_specifier, libclang.AccessSpecifier.INVALID)
 	# g -- libclang does not have a CursorKind.METHOD_TEMPLATE ...
 	match_cursor(g, libclang.CursorKind.FUNCTION_TEMPLATE)
 	match_type(g.type, libclang.TypeKind.FUNCTION_PROTO, g)
+	if libclang.version <= 3.2:
+		equals(g.access_specifier, libclang.AccessSpecifier.INVALID)
+	else:
+		equals(g.access_specifier, libclang.AccessSpecifier.PUBLIC)
 
 def test_TemplateTypeParameter28():
 	x = parse_str('template<typename T> struct x {};')[0]
@@ -953,6 +1009,10 @@ def test_TemplateTypeParameter28():
 	# t
 	match_cursor(t, libclang.CursorKind.TEMPLATE_TYPE_PARAMETER)
 	match_type(t.type, libclang.TypeKind.UNEXPOSED, t) # FIXME
+	if libclang.version <= 3.2:
+		equals(t.access_specifier, libclang.AccessSpecifier.INVALID)
+	else:
+		equals(t.access_specifier, libclang.AccessSpecifier.PUBLIC) # FIXME: ???
 
 def test_NonTypeTemplateParameter28():
 	x = parse_str('template<int T> struct x {};')[0]
@@ -960,6 +1020,10 @@ def test_NonTypeTemplateParameter28():
 	# t
 	match_cursor(t, libclang.CursorKind.NON_TYPE_TEMPLATE_PARAMETER)
 	match_type(t.type, libclang.TypeKind.INT, t)
+	if libclang.version <= 3.2:
+		equals(t.access_specifier, libclang.AccessSpecifier.INVALID)
+	else:
+		equals(t.access_specifier, libclang.AccessSpecifier.PUBLIC) # FIXME: ???
 
 def test_TemplateTemplateParameter28():
 	x = parse_str('template<template<typename T> class U> struct x {};')[0]
@@ -967,24 +1031,31 @@ def test_TemplateTemplateParameter28():
 	# u
 	match_cursor(u, libclang.CursorKind.TEMPLATE_TEMPLATE_PARAMETER)
 	match_type(u.type, libclang.TypeKind.INVALID, u)
+	if libclang.version <= 3.2:
+		equals(u.access_specifier, libclang.AccessSpecifier.INVALID)
+	else:
+		equals(u.access_specifier, libclang.AccessSpecifier.PUBLIC) # FIXME: ???
 
 def test_NamespaceAlias28():
 	x, y = parse_str('namespace x {} namespace y = x;')
 	# y
 	match_cursor(y, libclang.CursorKind.NAMESPACE_ALIAS)
 	match_type(y.type, libclang.TypeKind.INVALID, y)
+	equals(y.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_UsingDirective28():
 	x, y = parse_str('namespace x { int a; } using namespace x;')
 	# y
 	match_cursor(y, libclang.CursorKind.USING_DIRECTIVE)
 	match_type(y.type, libclang.TypeKind.INVALID, y)
+	equals(y.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_UsingDeclaration28():
 	x, y = parse_str('namespace x { int a; } using x::a;')
 	# y
 	match_cursor(y, libclang.CursorKind.USING_DECLARATION)
 	match_type(y.type, libclang.TypeKind.INVALID, y)
+	equals(y.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_CxxNullPtrLiteralExpr28():
 	x = parse_str('int *x = nullptr;', args=['-std=c++11'])[0]
@@ -992,6 +1063,7 @@ def test_CxxNullPtrLiteralExpr28():
 	# cursor
 	a = e.children[0]
 	match_cursor(a, libclang.CursorKind.CXX_NULLPTR_LITERAL_EXPR)
+	equals(a.access_specifier, libclang.AccessSpecifier.INVALID)
 	# type
 	t = a.type
 	match_type(t, libclang.TypeKind.NULLPTR, a)
@@ -1005,12 +1077,14 @@ def test_LinkageSpec30():
 	# s
 	match_cursor(s, libclang.CursorKind.LINKAGE_SPEC)
 	match_type(s.type, libclang.TypeKind.INVALID, s)
+	equals(s.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_TypeAliasDecl30():
 	x, y = parse_str('struct x {}; using y = x;', args=['-std=c++11'])
 	# y
 	match_cursor(y, libclang.CursorKind.TYPE_ALIAS_DECL)
 	match_type(y.type, libclang.TypeKind.TYPEDEF, y)
+	equals(y.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_ObjCSynthesizeDecl30():
 	i, x = parse_str("""
@@ -1020,6 +1094,7 @@ def test_ObjCSynthesizeDecl30():
 	# a
 	match_cursor(a, libclang.CursorKind.OBJC_SYNTHESIZE_DECL)
 	match_type(a.type, libclang.TypeKind.INVALID, a)
+	equals(a.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_ObjCDynamicDecl30():
 	i, x = parse_str("""
@@ -1029,6 +1104,7 @@ def test_ObjCDynamicDecl30():
 	# a
 	match_cursor(a, libclang.CursorKind.OBJC_DYNAMIC_DECL)
 	match_type(a.type, libclang.TypeKind.INVALID, a)
+	equals(a.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_CxxAccessSpecifier27():
 	x = parse_str("""
@@ -1070,6 +1146,7 @@ def test_ObjCSuperClassRef27():
 		match_type(a.type, libclang.TypeKind.INVALID, a)
 	else:
 		match_type(a.type, libclang.TypeKind.OBJC_INTERFACE, a)
+	equals(a.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_ObjCProtocolRef27():
 	x, y = parse_str("""
@@ -1080,6 +1157,7 @@ def test_ObjCProtocolRef27():
 	# a
 	match_cursor(a, libclang.CursorKind.OBJC_PROTOCOL_REF)
 	match_type(a.type, libclang.TypeKind.INVALID, a)
+	equals(a.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_ObjCClassRef27():
 	x, y = parse_str("""
@@ -1093,6 +1171,7 @@ def test_ObjCClassRef27():
 		match_type(r.type, libclang.TypeKind.INVALID, r)
 	else:
 		match_type(r.type, libclang.TypeKind.OBJC_INTERFACE, r)
+	equals(r.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_TypeRef27():
 	x, y = parse_str("""
@@ -1105,6 +1184,7 @@ def test_TypeRef27():
 		match_type(a.type, libclang.TypeKind.INVALID, a)
 	else:
 		match_type(a.type, libclang.TypeKind.RECORD, a)
+	equals(a.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_CxxBaseSpecifier28():
 	b1, b2, b3, b4, x, y = parse_str("""
@@ -1140,6 +1220,7 @@ def test_TemplateRef28():
 	# a
 	match_cursor(a, libclang.CursorKind.TEMPLATE_REF)
 	match_type(a.type, libclang.TypeKind.INVALID, a)
+	equals(a.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_NamespaceRef28():
 	x, y = parse_str("""
@@ -1149,6 +1230,7 @@ def test_NamespaceRef28():
 	# a
 	match_cursor(a, libclang.CursorKind.NAMESPACE_REF)
 	match_type(a.type, libclang.TypeKind.INVALID, a)
+	equals(a.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_MemberRef29():
 	x, y = parse_str("""
@@ -1165,6 +1247,7 @@ def test_MemberRef29():
 		match_type(a.type, libclang.TypeKind.INVALID, a)
 	else:
 		match_type(a.type, libclang.TypeKind.INT, a)
+	equals(a.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_LabelRef29():
 	f = parse_str('int main() { x:; goto x; }')[0]
@@ -1176,6 +1259,7 @@ def test_LabelRef29():
 	# a
 	match_cursor(a, libclang.CursorKind.LABEL_REF)
 	match_type(a.type, libclang.TypeKind.INVALID, a)
+	equals(a.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_OverloadedDeclRef29():
 	f, g = parse_str("""
@@ -1193,6 +1277,7 @@ def test_OverloadedDeclRef29():
 	# a
 	match_cursor(a, libclang.CursorKind.OVERLOADED_DECL_REF)
 	match_type(a.type, libclang.TypeKind.INVALID, a)
+	equals(a.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_VariableRef31():
 	f = parse_str('void f() { int x; [x](){}; }', args=['-std=c++11'])[0]
@@ -1204,6 +1289,7 @@ def test_VariableRef31():
 	# a
 	match_cursor(a, libclang.CursorKind.VARIABLE_REF)
 	match_type(a.type, libclang.TypeKind.INT, a)
+	equals(a.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_Token():
 	index = libclang.Index()
