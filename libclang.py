@@ -1645,10 +1645,13 @@ class Cursor:
 				c = _cursor(child, data['parent'], self._tu, data['access_specifier'])
 			if c != Cursor.null():
 				data['children'].append(c)
+				if version <= 3.2 and c.kind == CursorKind.CXX_ACCESS_SPECIFIER:
+					# fix access_specifier on libclang <= 3.2 declarations ...
+					data['access_specifier'] = c.access_specifier
 			return 1 # continue
 		data = {'children': [], 'parent': self, 'access_specifier': None}
 		if version <= 3.2:
-			# libclang <= 3.2 does not expose access_specifier for member declarations ...
+			# fix access_specifier on libclang <= 3.2 declarations ...
 			if self.kind == CursorKind.STRUCT_DECL or self.kind == CursorKind.UNION_DECL:
 				data['access_specifier'] = AccessSpecifier.PUBLIC
 			elif self.kind == CursorKind.CLASS_DECL:

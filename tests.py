@@ -1077,33 +1077,55 @@ def test_ObjCDynamicDecl30():
 	equals(a.access_specifier, libclang.AccessSpecifier.INVALID)
 
 def test_CxxAccessSpecifier27():
-	x = parse_str("""
-		struct x {
-			public:    int a;
-			protected: int b;
-			private:   int c;
-		};""")[0]
+	x, y = parse_str("""
+		class x {
+			int a;
+			protected: int c;
+			public:    int b;
+			private:   int d;
+		};
+		struct y {
+			int e;
+			protected: int f;
+			public:    int g;
+			private:   int h;
+		};""")
 	if libclang.version == 3.0:
 		# libclang 3.0 has a bug where the access specifier nodes are
 		# duplicated.
-		a, a2, a_, b, b2, b_, c, c2, c_ = x.children
-		match_cursor(a2, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
-		match_cursor(b2, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
-		match_cursor(c2, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
+		a, x1_, x1, b, x2_, x2, c, x3_, x3, d = x.children
+		match_cursor(x1_, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
+		match_cursor(x2_, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
+		match_cursor(x3_, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
+		e, y1_, y1, f, y2_, y2, g, y3_, y3, h = y.children
+		match_cursor(y1_, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
+		match_cursor(y2_, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
+		match_cursor(y3_, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
 	else:
-		a, a_, b, b_, c, c_ = x.children
-	# a
-	match_cursor(a, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
-	match_type(a.type, libclang.TypeKind.INVALID, a)
-	equals(a.access_specifier, libclang.AccessSpecifier.PUBLIC)
-	# b
-	match_cursor(b, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
-	match_type(b.type, libclang.TypeKind.INVALID, b)
+		a, x1, b, x2, c, x3, d = x.children
+		e, y1, f, y2, g, y3, h = y.children
+	# x1
+	match_cursor(x1, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
+	match_type(x1.type, libclang.TypeKind.INVALID, x1)
+	equals(x1.access_specifier, libclang.AccessSpecifier.PROTECTED)
+	# x2
+	match_cursor(x2, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
+	match_type(x2.type, libclang.TypeKind.INVALID, x2)
+	equals(x2.access_specifier, libclang.AccessSpecifier.PUBLIC)
+	# x3
+	match_cursor(x3, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
+	match_type(x3.type, libclang.TypeKind.INVALID, x3)
+	equals(x3.access_specifier, libclang.AccessSpecifier.PRIVATE)
+	# access_specifier -- class
+	equals(a.access_specifier, libclang.AccessSpecifier.PRIVATE)
 	equals(b.access_specifier, libclang.AccessSpecifier.PROTECTED)
-	# c
-	match_cursor(c, libclang.CursorKind.CXX_ACCESS_SPECIFIER)
-	match_type(c.type, libclang.TypeKind.INVALID, c)
-	equals(c.access_specifier, libclang.AccessSpecifier.PRIVATE)
+	equals(c.access_specifier, libclang.AccessSpecifier.PUBLIC)
+	equals(d.access_specifier, libclang.AccessSpecifier.PRIVATE)
+	# access_specifier -- struct
+	equals(e.access_specifier, libclang.AccessSpecifier.PUBLIC)
+	equals(f.access_specifier, libclang.AccessSpecifier.PROTECTED)
+	equals(g.access_specifier, libclang.AccessSpecifier.PUBLIC)
+	equals(h.access_specifier, libclang.AccessSpecifier.PRIVATE)
 
 def test_ObjCSuperClassRef27():
 	x, y = parse_str("""
