@@ -1132,7 +1132,10 @@ def test_MemberRef29():
 	a = j.children[0]
 	# a
 	match_cursor(a, libclang.CursorKind.MEMBER_REF)
-	match_type(a.type, libclang.TypeKind.INT, a)
+	if libclang.version <= 3.0:
+		match_type(a.type, libclang.TypeKind.INVALID, a)
+	else:
+		match_type(a.type, libclang.TypeKind.INT, a)
 
 def test_LabelRef29():
 	f = parse_str('int main() { x:; goto x; }')[0]
