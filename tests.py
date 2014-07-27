@@ -1107,16 +1107,30 @@ def test_TypeRef27():
 		match_type(a.type, libclang.TypeKind.RECORD, a)
 
 def test_CxxBaseSpecifier28():
-	x, y = parse_str("""
-		struct x {};
-		struct y : x {};""")
-	a = y.children[0]
+	b1, b2, b3, b4, x, y = parse_str("""
+		struct b1 {};
+		struct b2 {};
+		struct b3 {};
+		struct b4 {};
+		struct x : b1, protected b2, private b3, public b4 {};
+		class  y : b1, protected b2, private b3, public b4 {};""")
+	x1, x2, x3, x4 = x.children
+	y1, y2, y3, y4 = y.children
 	# a
-	match_cursor(a, libclang.CursorKind.CXX_BASE_SPECIFIER)
+	match_cursor(x1, libclang.CursorKind.CXX_BASE_SPECIFIER)
 	if libclang.version <= 2.8:
-		match_type(a.type, libclang.TypeKind.INVALID, a)
+		match_type(x1.type, libclang.TypeKind.INVALID, x1)
 	else:
-		match_type(a.type, libclang.TypeKind.RECORD, a)
+		match_type(x1.type, libclang.TypeKind.RECORD, x1)
+	# access_specifier
+	equals(x1.access_specifier, libclang.AccessSpecifier.PUBLIC)
+	equals(x2.access_specifier, libclang.AccessSpecifier.PROTECTED)
+	equals(x3.access_specifier, libclang.AccessSpecifier.PRIVATE)
+	equals(x4.access_specifier, libclang.AccessSpecifier.PUBLIC)
+	equals(y1.access_specifier, libclang.AccessSpecifier.PRIVATE)
+	equals(y2.access_specifier, libclang.AccessSpecifier.PROTECTED)
+	equals(y3.access_specifier, libclang.AccessSpecifier.PRIVATE)
+	equals(y4.access_specifier, libclang.AccessSpecifier.PUBLIC)
 
 def test_TemplateRef28():
 	x, y = parse_str("""
