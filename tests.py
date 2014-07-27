@@ -1147,7 +1147,10 @@ def test_OverloadedDeclRef29():
 	f, g = parse_str("""
 		template <typename T> void f(T x);
 		template <typename T> void g(T x) { f(x); }""")
-	_, _, c = g.children
+	if len(g.children) == 2: # libclang <= 3.2 : no TemplateTypeParameter
+		_, c = g.children
+	else:
+		_, _, c = g.children
 	e = c.children[0]
 	d = e.children[0]
 	a = d.children[0]
