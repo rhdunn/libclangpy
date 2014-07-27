@@ -1163,13 +1163,11 @@ def test_OverloadedDeclRef29():
 	match_type(a.type, libclang.TypeKind.INVALID, a)
 
 def test_VariableRef31():
-	f = parse_str('void f() { int x; auto y = [x](){}; }', args=['-std=c++11'])[0]
+	f = parse_str('void f() { int x; [x](){}; }', args=['-std=c++11'])[0]
 	c = f.children[0]
-	d, e = c.children
-	v = e.children[0]
-	c = v.children[0]
-	e = c.children[0]
-	l = e.children[0]
+	if len(c.children) == 1: # libclang <= 3.0
+		raise UnsupportedException('lambda expressions are not supported')
+	d, l = c.children
 	a = l.children[0]
 	# a
 	match_cursor(a, libclang.CursorKind.VARIABLE_REF)
