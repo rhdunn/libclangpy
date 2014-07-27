@@ -1637,14 +1637,24 @@ class Cursor:
 	@requires(2.7, 'clang_visitChildren', ['_CXCursor', 'cb_cursor_visitor', py_object], c_uint)
 	def children(self):
 		def visitor(child, parent_cursor, args):
-			(children, parent) = args
-			c = _cursor(child, parent, self._tu)
+			kind = CursorKind(child.kind)
+			if kind in [CursorKind.CXX_ACCESS_SPECIFIER, CursorKind.CXX_BASE_SPECIFIER]:
+				# libclang <= 3.2 correctly classifies these
+				c = _cursor(child, data['parent'], self._tu, None)
+			else:
+				c = _cursor(child, data['parent'], self._tu, data['access_specifier'])
 			if c != Cursor.null():
-				children.append(c)
+				data['children'].append(c)
 			return 1 # continue
-		ret = []
-		_libclang.clang_visitChildren(self._c, _map_type('cb_cursor_visitor')(visitor), (ret, self))
-		return ret
+		data = {'children': [], 'parent': self, 'access_specifier': None}
+		if version <= 3.2:
+			# libclang <= 3.2 does not expose access_specifier for member declarations ...
+			if self.kind == CursorKind.STRUCT_DECL or self.kind == CursorKind.UNION_DECL:
+				data['access_specifier'] = AccessSpecifier.PUBLIC
+			elif self.kind == CursorKind.CLASS_DECL:
+				data['access_specifier'] = AccessSpecifier.PRIVATE
+		_libclang.clang_visitChildren(self._c, _map_type('cb_cursor_visitor')(visitor), data)
+		return data['children']
 
 	@property
 	@requires(2.7, 'clang_getCursorUSR', ['_CXCursor'], _CXString)
@@ -1973,13 +1983,12 @@ _cursor_kinds = {
 
 _cursor_cache = {}
 
-def _cursor(c, parent, tu):
+def _cursor(c, parent, tu, access_specifier=None):
 	try:
 		return _cursor_cache[c]
 	except:
 		pass
 
-	access_specifier = None
 	kind = CursorKind(c.kind)
 	if kind == CursorKind.UNEXPOSED_DECL:
 		cursor = Cursor(c, kind, parent, tu)

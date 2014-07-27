@@ -702,10 +702,7 @@ def test_FieldDecl27():
 	# a
 	match_cursor(a, libclang.CursorKind.FIELD_DECL)
 	match_type(a.type, libclang.TypeKind.INT, a)
-	if libclang.version <= 3.2:
-		equals(a.access_specifier, libclang.AccessSpecifier.INVALID)
-	else:
-		equals(a.access_specifier, libclang.AccessSpecifier.PUBLIC)
+	equals(a.access_specifier, libclang.AccessSpecifier.PUBLIC)
 
 def test_EnumConstantDecl27():
 	x = parse_str('enum x { a = 7 };')[0]
@@ -878,16 +875,10 @@ def test_CxxMethodDecl28():
 	equals(i.is_static, False)
 	match_type(i.type, libclang.TypeKind.FUNCTION_PROTO, i)
 	# access_specifier
-	if libclang.version <= 3.2:
-		equals(f.access_specifier, libclang.AccessSpecifier.INVALID)
-		equals(g.access_specifier, libclang.AccessSpecifier.INVALID)
-		equals(h.access_specifier, libclang.AccessSpecifier.INVALID)
-		equals(i.access_specifier, libclang.AccessSpecifier.INVALID)
-	else:
-		equals(f.access_specifier, libclang.AccessSpecifier.PUBLIC)
-		equals(g.access_specifier, libclang.AccessSpecifier.PUBLIC)
-		equals(h.access_specifier, libclang.AccessSpecifier.PUBLIC)
-		equals(i.access_specifier, libclang.AccessSpecifier.PUBLIC)
+	equals(f.access_specifier, libclang.AccessSpecifier.PUBLIC)
+	equals(g.access_specifier, libclang.AccessSpecifier.PUBLIC)
+	equals(h.access_specifier, libclang.AccessSpecifier.PUBLIC)
+	equals(i.access_specifier, libclang.AccessSpecifier.PUBLIC)
 
 def test_CxxMethodDecl30():
 	x = parse_str("""
@@ -947,10 +938,7 @@ def test_Constructor28():
 	# f
 	match_cursor(f, libclang.CursorKind.CONSTRUCTOR)
 	match_type(f.type, libclang.TypeKind.FUNCTION_PROTO, f)
-	if libclang.version <= 3.2:
-		equals(f.access_specifier, libclang.AccessSpecifier.INVALID)
-	else:
-		equals(f.access_specifier, libclang.AccessSpecifier.PUBLIC)
+	equals(f.access_specifier, libclang.AccessSpecifier.PUBLIC)
 
 def test_Destructor28():
 	x = parse_str('struct x { ~x(); };')[0]
@@ -958,10 +946,7 @@ def test_Destructor28():
 	# f
 	match_cursor(f, libclang.CursorKind.DESTRUCTOR)
 	match_type(f.type, libclang.TypeKind.FUNCTION_PROTO, f)
-	if libclang.version <= 3.2:
-		equals(f.access_specifier, libclang.AccessSpecifier.INVALID)
-	else:
-		equals(f.access_specifier, libclang.AccessSpecifier.PUBLIC)
+	equals(f.access_specifier, libclang.AccessSpecifier.PUBLIC)
 
 def test_ConversionFunction28():
 	x = parse_str('struct x { operator float(); };')[0]
@@ -969,10 +954,7 @@ def test_ConversionFunction28():
 	# f
 	match_cursor(f, libclang.CursorKind.CONVERSION_FUNCTION)
 	match_type(f.type, libclang.TypeKind.FUNCTION_PROTO, f)
-	if libclang.version <= 3.2:
-		equals(f.access_specifier, libclang.AccessSpecifier.INVALID)
-	else:
-		equals(f.access_specifier, libclang.AccessSpecifier.PUBLIC)
+	equals(f.access_specifier, libclang.AccessSpecifier.PUBLIC)
 
 def test_ClassTemplate28():
 	x = parse_str('template<typename T> struct x {};')[0]
@@ -998,10 +980,7 @@ def test_FunctionTemplate28():
 	# g -- libclang does not have a CursorKind.METHOD_TEMPLATE ...
 	match_cursor(g, libclang.CursorKind.FUNCTION_TEMPLATE)
 	match_type(g.type, libclang.TypeKind.FUNCTION_PROTO, g)
-	if libclang.version <= 3.2:
-		equals(g.access_specifier, libclang.AccessSpecifier.INVALID)
-	else:
-		equals(g.access_specifier, libclang.AccessSpecifier.PUBLIC)
+	equals(g.access_specifier, libclang.AccessSpecifier.PUBLIC)
 
 def test_TemplateTypeParameter28():
 	x = parse_str('template<typename T> struct x {};')[0]
