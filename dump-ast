@@ -90,8 +90,12 @@ for arg in argv:
 		filenames.append(arg)
 
 if len(filenames) == 0:
-	filenames.append('stdin.cpp')
-	unsaved_files = [('stdin.cpp', sys.stdin.read())]
+	if '-std=c98' in clang_args or '-std=c99' in clang_args:
+		filenames.append('stdin.c')
+		unsaved_files = [('stdin.c', sys.stdin.read())]
+	else:
+		filenames.append('stdin.cpp')
+		unsaved_files = [('stdin.cpp', sys.stdin.read())]
 else:
 	unsaved_files = []
 
