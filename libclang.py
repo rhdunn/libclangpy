@@ -86,12 +86,18 @@ class _CXCursor27(Structure):
 		('data', c_void_p * 3)
 	]
 
+	def __hash__(self):
+		return hash((self.kind, self.data[0], self.data[1], self.data[2]))
+
 class _CXCursor30(Structure):
 	_fields_ = [
 		('kind', c_uint),
 		('xdata', c_int),
 		('data', c_void_p * 3)
 	]
+
+	def __hash__(self):
+		return hash((self.kind, self.xdata, self.data[0], self.data[1], self.data[2]))
 
 class _CXType(Structure):
 	_fields_ = [
@@ -1672,7 +1678,9 @@ class Cursor:
 	@cached_property
 	@requires(2.7)
 	def tokens(self):
-		return self._tu.tokenize(self.extent)
+		ret = self._tu.tokenize(self.extent)
+		ret.cursor = self
+		return ret
 
 	@cached_property
 	@requires(2.7)
@@ -1681,7 +1689,9 @@ class Cursor:
 		if len(children) == 0:
 			return self._tu.tokenize(self.extent)
 		end = children[0].extent.start
-		return self._tu.tokenize(SourceRange(self.extent.start, end))
+		ret = self._tu.tokenize(SourceRange(self.extent.start, end))
+		ret.cursor = self
+		return ret
 
 	@cached_property
 	@requires(2.8, 'clang_getCursorType', ['_CXCursor'], _CXType)
@@ -1961,7 +1971,14 @@ _cursor_kinds = {
 	CursorKind.CXX_METHOD_DECL: CxxMethodDecl,
 }
 
+_cursor_cache = {}
+
 def _cursor(c, parent, tu):
+	try:
+		return _cursor_cache[c]
+	except:
+		pass
+
 	access_specifier = None
 	kind = CursorKind(c.kind)
 	if kind == CursorKind.UNEXPOSED_DECL:
@@ -1998,6 +2015,7 @@ def _cursor(c, parent, tu):
 		ret = Cursor(c, kind, parent, tu)
 	if access_specifier:
 		ret._access_specifier = access_specifier
+	_cursor_cache[c] = ret
 	return ret
 
 class TranslationUnitFlags:
