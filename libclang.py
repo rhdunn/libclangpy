@@ -1714,13 +1714,16 @@ class Cursor:
 		return LanguageKind(kind)
 
 	@property
-	@requires(2.8, 'clang_getCXXAccessSpecifier', ['_CXCursor'], c_uint)
+	@requires(2.7)
+	@optional(2.8, 'clang_getCXXAccessSpecifier', ['_CXCursor'], c_uint)
 	def access_specifier(self):
 		if self._access_specifier:
 			# overridden for compatibility/bug fixes ...
 			return self._access_specifier
-		access = _libclang.clang_getCXXAccessSpecifier(self._c)
-		return AccessSpecifier(access)
+		if _libclang.clang_getCXXAccessSpecifier:
+			access = _libclang.clang_getCXXAccessSpecifier(self._c)
+			return AccessSpecifier(access)
+		return AccessSpecifier.INVALID
 
 	@property
 	@requires(2.8, 'clang_getTemplateCursorKind', ['_CXCursor'], c_uint)
