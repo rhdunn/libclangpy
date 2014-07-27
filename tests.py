@@ -91,8 +91,9 @@ def parse_str(contents, filename='parse_str.cpp', args=None, ignore_errors=False
 	tu = index.parse(filename, unsaved_files=[(filename, contents)], args=args)
 	if not ignore_errors:
 		diagnostics = list(tu.diagnostics)
-		if len(diagnostics) > 0:
-			raise ParseError(diagnostics[0].spelling)
+		for diagnostic in diagnostics:
+			if diagnostic.severity in [libclang.DiagnosticSeverity.ERROR, libclang.DiagnosticSeverity.FATAL]:
+				raise ParseError(diagnostic.spelling)
 	return [child for child in tu.cursor().children if child.location.file]
 
 def match_location(loc, filename, line, column, offset):
