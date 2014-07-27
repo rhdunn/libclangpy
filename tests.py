@@ -1066,7 +1066,10 @@ def test_ObjCSuperClassRef27():
 	a = y.children[0]
 	# a
 	match_cursor(a, libclang.CursorKind.OBJC_SUPER_CLASS_REF)
-	match_type(a.type, libclang.TypeKind.OBJC_INTERFACE, a)
+	if libclang.version <= 2.8:
+		match_type(a.type, libclang.TypeKind.INVALID, a)
+	else:
+		match_type(a.type, libclang.TypeKind.OBJC_INTERFACE, a)
 
 def test_ObjCProtocolRef27():
 	x, y = parse_str("""
@@ -1086,7 +1089,10 @@ def test_ObjCClassRef27():
 	r = a.children[0]
 	# r
 	match_cursor(r, libclang.CursorKind.OBJC_CLASS_REF)
-	match_type(r.type, libclang.TypeKind.OBJC_INTERFACE, r)
+	if libclang.version <= 2.8:
+		match_type(r.type, libclang.TypeKind.INVALID, r)
+	else:
+		match_type(r.type, libclang.TypeKind.OBJC_INTERFACE, r)
 
 def test_TypeRef27():
 	x, y = parse_str("""
@@ -1095,7 +1101,10 @@ def test_TypeRef27():
 	a = y.children[0]
 	# a
 	match_cursor(a, libclang.CursorKind.TYPE_REF)
-	match_type(a.type, libclang.TypeKind.RECORD, a)
+	if libclang.version <= 2.8:
+		match_type(a.type, libclang.TypeKind.INVALID, a)
+	else:
+		match_type(a.type, libclang.TypeKind.RECORD, a)
 
 def test_CxxBaseSpecifier28():
 	x, y = parse_str("""
@@ -1104,7 +1113,10 @@ def test_CxxBaseSpecifier28():
 	a = y.children[0]
 	# a
 	match_cursor(a, libclang.CursorKind.CXX_BASE_SPECIFIER)
-	match_type(a.type, libclang.TypeKind.RECORD, a)
+	if libclang.version <= 2.8:
+		match_type(a.type, libclang.TypeKind.INVALID, a)
+	else:
+		match_type(a.type, libclang.TypeKind.RECORD, a)
 
 def test_TemplateRef28():
 	x, y = parse_str("""
@@ -1130,6 +1142,8 @@ def test_MemberRef29():
 		struct x y = { .a = 2 };""", args=['-std=c99'], filename='memberref.c')
 	i = y.children[1]
 	j = i.children[0]
+	if len(j.children) == 0:
+		raise UnsupportedException('designated initializers not supported')
 	a = j.children[0]
 	# a
 	match_cursor(a, libclang.CursorKind.MEMBER_REF)
@@ -1142,6 +1156,8 @@ def test_LabelRef29():
 	f = parse_str('int main() { x:; goto x; }')[0]
 	c = f.children[0]
 	l, m = c.children
+	if len(m.children) == 0:
+		raise UnsupportedException('label references not supported')
 	a = m.children[0]
 	# a
 	match_cursor(a, libclang.CursorKind.LABEL_REF)
@@ -1157,6 +1173,8 @@ def test_OverloadedDeclRef29():
 		_, _, c = g.children
 	e = c.children[0]
 	d = e.children[0]
+	if len(d.children) == 0:
+		raise UnsupportedException('overloaded declarations not supported')
 	a = d.children[0]
 	# a
 	match_cursor(a, libclang.CursorKind.OVERLOADED_DECL_REF)
