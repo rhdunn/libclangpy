@@ -1058,6 +1058,116 @@ def test_CxxAccessSpecifier27():
 	match_type(c.type, libclang.TypeKind.INVALID, c)
 	equals(c.access_specifier, libclang.AccessSpecifier.PRIVATE)
 
+def test_ObjCSuperClassRef27():
+	x, y = parse_str("""
+		@interface x @end
+		@interface y : x @end""", args=['-ObjC', '-Wno-objc-root-class'])
+	a = y.children[0]
+	# a
+	match_cursor(a, libclang.CursorKind.OBJC_SUPER_CLASS_REF)
+	match_type(a.type, libclang.TypeKind.OBJC_INTERFACE, a)
+
+def test_ObjCProtocolRef27():
+	x, y = parse_str("""
+		@protocol x @end
+		@interface y @property (weak) id <x> a; @end""", args=['-ObjC', '-Wno-objc-root-class'])
+	p = y.children[0] # property
+	t, a = p.children
+	# a
+	match_cursor(a, libclang.CursorKind.OBJC_PROTOCOL_REF)
+	match_type(a.type, libclang.TypeKind.INVALID, a)
+
+def test_ObjCClassRef27():
+	x, y = parse_str("""
+		@interface x @end
+		@interface y -(x *)a; @end""", args=['-ObjC', '-Wno-objc-root-class'])
+	a = y.children[0] # method
+	r = a.children[0]
+	# r
+	match_cursor(r, libclang.CursorKind.OBJC_CLASS_REF)
+	match_type(r.type, libclang.TypeKind.OBJC_INTERFACE, r)
+
+def test_TypeRef27():
+	x, y = parse_str("""
+		struct x {};
+		typedef x y;""")
+	a = y.children[0]
+	# a
+	match_cursor(a, libclang.CursorKind.TYPE_REF)
+	match_type(a.type, libclang.TypeKind.RECORD, a)
+
+def test_CxxBaseSpecifier28():
+	x, y = parse_str("""
+		struct x {};
+		struct y : x {};""")
+	a = y.children[0]
+	# a
+	match_cursor(a, libclang.CursorKind.CXX_BASE_SPECIFIER)
+	match_type(a.type, libclang.TypeKind.RECORD, a)
+
+def test_TemplateRef28():
+	x, y = parse_str("""
+		template <typename T> struct x {};
+		typedef x<int> y;""")
+	a = y.children[0]
+	# a
+	match_cursor(a, libclang.CursorKind.TEMPLATE_REF)
+	match_type(a.type, libclang.TypeKind.INVALID, a)
+
+def test_NamespaceRef28():
+	x, y = parse_str("""
+		namespace x {}
+		namespace y = x;""")
+	a = y.children[0]
+	# a
+	match_cursor(a, libclang.CursorKind.NAMESPACE_REF)
+	match_type(a.type, libclang.TypeKind.INVALID, a)
+
+def test_MemberRef29():
+	x, y = parse_str("""
+		struct x { int a; };
+		struct x y = { .a = 2 };""", args=['-std=c99'], filename='memberref.c')
+	i = y.children[1]
+	j = i.children[0]
+	a = j.children[0]
+	# a
+	match_cursor(a, libclang.CursorKind.MEMBER_REF)
+	match_type(a.type, libclang.TypeKind.INT, a)
+
+def test_LabelRef29():
+	f = parse_str('int main() { x:; goto x; }')[0]
+	c = f.children[0]
+	l, m = c.children
+	a = m.children[0]
+	# a
+	match_cursor(a, libclang.CursorKind.LABEL_REF)
+	match_type(a.type, libclang.TypeKind.INVALID, a)
+
+def test_OverloadedDeclRef29():
+	f, g = parse_str("""
+		template <typename T> void f(T x);
+		template <typename T> void g(T x) { f(x); }""")
+	_, _, c = g.children
+	e = c.children[0]
+	d = e.children[0]
+	a = d.children[0]
+	# a
+	match_cursor(a, libclang.CursorKind.OVERLOADED_DECL_REF)
+	match_type(a.type, libclang.TypeKind.INVALID, a)
+
+def test_VariableRef31():
+	f = parse_str('void f() { int x; auto y = [x](){}; }', args=['-std=c++11'])[0]
+	c = f.children[0]
+	d, e = c.children
+	v = e.children[0]
+	c = v.children[0]
+	e = c.children[0]
+	l = e.children[0]
+	a = l.children[0]
+	# a
+	match_cursor(a, libclang.CursorKind.VARIABLE_REF)
+	match_type(a.type, libclang.TypeKind.INT, a)
+
 def test_Token():
 	index = libclang.Index()
 	tu = index.parse('tests/enumeration.hpp')
@@ -1351,6 +1461,17 @@ run(3.0, test_LinkageSpec30)
 run(3.0, test_TypeAliasDecl30)
 run(3.0, test_ObjCSynthesizeDecl30)
 run(2.7, test_CxxAccessSpecifier27)
+run(2.7, test_ObjCSuperClassRef27)
+run(2.7, test_ObjCProtocolRef27)
+run(2.7, test_ObjCClassRef27)
+run(2.7, test_TypeRef27)
+run(2.8, test_CxxBaseSpecifier28)
+run(2.8, test_TemplateRef28)
+run(2.8, test_NamespaceRef28)
+run(2.9, test_MemberRef29)
+run(2.9, test_LabelRef29)
+run(2.9, test_OverloadedDeclRef29)
+run(3.1, test_VariableRef31)
 run(2.7, test_Token)
 run(2.8, test_Type28)
 run(2.9, test_Type29)
