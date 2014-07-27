@@ -1071,7 +1071,7 @@ def test_ObjCSuperClassRef27():
 def test_ObjCProtocolRef27():
 	x, y = parse_str("""
 		@protocol x @end
-		@interface y @property (weak) id <x> a; @end""", args=['-ObjC', '-Wno-objc-root-class'])
+		@interface y @property id <x> a; @end""", args=['-ObjC', '-Wno-objc-root-class'])
 	p = y.children[0] # property
 	t, a = p.children
 	# a
